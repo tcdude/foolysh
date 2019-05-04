@@ -134,7 +134,7 @@ class GridLayout(object):
 
         self._root = parent.attach_new_node_path(f'GridLayout({row_count}, '
                                                  f'{col_count})')
-        self._root.center = nodepath.TOP_LEFT
+        self._root.center = nodepath.Origin.TOP_LEFT
         size = (box[2] - box[0], box[3] - box[1])
         self._root.set_dummy_size(size)
         self._root.position = box[:2]

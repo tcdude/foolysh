@@ -46,7 +46,7 @@ setup(
     install_requires=['plyer', 'Pillow', 'PySDL2>=0.9.6'],
     setup_requires=['Cython'],
     ext_modules=cythonize(
-        'foolysh/ext/*.pyx',
+        'foolysh/*/*.pyx',
         compiler_directives={'language_level': 3}
     ),
 )

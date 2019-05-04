@@ -46,11 +46,11 @@ def create_empty_np():
 def test_nodepath_relative_position():
     np = create_empty_np()
     assert np.relative_position == tools.Point()
-    np.center = tools.BOTTOM_RIGHT
+    np.center = nodepath.Origin.BOTTOM_RIGHT
     assert np.dirty is True
     assert np.traverse() is True
     assert np.relative_position == tools.Point(-1.0, -1.0)
-    np.center = tools.CENTER
+    np.center = nodepath.Origin.CENTER
     assert np.dirty is True
     assert np.traverse() is True
     assert np.relative_position == tools.Point(-0.5, -0.5)

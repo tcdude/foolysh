@@ -7,12 +7,9 @@ import math
 # noinspection PyPackageRequirements
 import pytest
 
-# from engine import tools
-# from engine.tools import aabb
-# from engine.tools import quadtree
-from foolysh.ext import vector
-from foolysh.ext import aabb
-from foolysh.ext import quadtree
+from foolysh.tools import vector
+from foolysh.tools import aabb
+from foolysh.tools import quadtree
 
 __author__ = 'Tiziano Bettio'
 __license__ = 'MIT'

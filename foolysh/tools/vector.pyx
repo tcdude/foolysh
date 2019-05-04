@@ -1,10 +1,12 @@
 """
-Provides 2D Vector and Point classes.
+Cython implementation of Vector and Point classes.
 """
-from typing import Optional
-from typing import Tuple
-from typing import Union
-import math
+
+from libc.math cimport sin
+from libc.math cimport cos
+from libc.math cimport sqrt
+from libc.math cimport pi
+
 
 __author__ = 'Tiziano Bettio'
 __license__ = 'MIT'
@@ -29,28 +31,13 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE."""
 
-NUMERIC = Union[int, float]
+
+cdef inline double radians(degrees):
+    return (degrees / 180.0) * pi
 
 
-class Vector(object):
-    """
-    2D Vector type.
-
-    :param x: Optional ``int/float`` or ``Tuple[int/float, int/float]`` ->
-        either x value or tuple of x and y.
-    :param y: Optional ``int/float`` -> y value, is ignored when a tuple is
-        passed in for ``x``.
-    :param d: Optional ``float`` -> delta used in the ``__eq__`` comparison of
-        two Vector objects. Defaults to ``1e-6`` to avoid errors due to
-        floating point precision.
-    """
-    def __init__(
-            self,
-            x=0,    # type: Optional[Union[NUMERIC, Tuple[NUMERIC, NUMERIC]]]
-            y=0,    # type: Optional[NUMERIC]
-            d=1e-6  # type: Optional[float]
-    ):
-        # type: (...) -> None
+cdef class Vector:
+    def __init__(self, x=0, y=0, precision=1e-6):
         if isinstance(x, tuple):
             if len(x) == 2:
                 x, y = x
@@ -60,92 +47,88 @@ class Vector(object):
             raise TypeError('numerical types expected for x and y')
         self._x = x
         self._y = y
-        self._d = d
-        self._changed = True
-        self._length = None
+        self._precision = precision
+        self._length = 0.0
+        self._dirty = 1
         self._rtype = Vector
 
     def __repr__(self):
-        return f'{type(self).__name__}({self._x:.4f}, {self._y:.4f})'
+        return f'{type(self).__name__}{str(self)}'
 
     def __str__(self):
-        return self.__repr__()
+        return str((self._x, self._y))
 
     @property
     def x(self):
-        # type: () -> NUMERIC
         """``x`` value"""
         return self._x
 
     @property
     def y(self):
-        # type: () -> NUMERIC
         """``y`` value"""
         return self._y
 
     @x.setter
     def x(self, v):
-        # type: (NUMERIC) -> None
         if isinstance(v, (int, float)):
             self._x = v
-            self._changed = True
+            self._dirty = 1
         else:
             raise TypeError('Must be of type int or float')
 
     @y.setter
     def y(self, v):
-        # type: (NUMERIC) -> None
         if isinstance(v, (int, float)):
             self._y = v
-            self._changed = True
+            self._dirty = 1
         else:
             raise TypeError('Must be of type int or float')
+
+    @property
+    def rtype(self):
+        return self._rtype
 
     @property
     def length(self):
         # type: () -> float
         """``length`` of the vector"""
-        if self._changed:
-            self._length = math.sqrt(self.x ** 2 + self.y ** 2)
-            self._changed = False
+        if self._dirty:
+            self._length = sqrt(self.x ** 2 + self.y ** 2)
+            self._dirty = 0
         return self._length
 
-    def normalized(self):
-        # type: () -> Vector
+    cpdef Vector normalized(self):
         """Returns a normalized Vector of this Vector instance."""
         vlen = self.length
         if vlen:
             return Vector(self.x / vlen, self.y / vlen)
         raise ValueError('Vector of zero length cannot be normalized')
 
-    def normalize(self):
-        # type: () -> bool
+    cpdef normalize(self):
         """
         Normalizes the Vector and returns True if successful. Raises a
         ValueError if the Vector is of zero length.
         """
         vlen = self.length
         if vlen:
-            self._changed = True
+            self._dirty = 1
             self._x /= vlen
             self._y /= vlen
             return True
         raise ValueError('Vector of zero length cannot be normalized')
 
-    def rotate(self, degrees):
-        # type: (NUMERIC) -> Vector
+    cpdef Vector rotate(self, degrees):
         """
         Returns a Vector rotated ``degrees`` around the origin.
 
         :param degrees: int/float -> angle of rotation in degrees.
         """
-        a = math.radians(-degrees)
-        sa = math.sin(a)
-        ca = math.cos(a)
+        a = radians(-degrees)
+        sa = sin(a)
+        ca = cos(a)
         return Vector(ca * self.x - sa * self.y, sa * self.x + ca * self.y)
 
-    def dot(self, other):
-        # type: (Vector) -> float
+    cpdef dot(self, Vector other):
         """
         Returns the dot product of ``this`` ⋅ ``other``
 
@@ -154,8 +137,7 @@ class Vector(object):
         if isinstance(other, Vector):
             return self.x * other.x + self.y * other.y
 
-    def asint(self, rounding=False):
-        # type: (Optional[bool]) -> Vector
+    cpdef Vector asint(self, int rounding=0):
         """
         Returns the Vector with its values cast to int. If rounding is True,
         rounds the value first, before casting (default=False).
@@ -166,13 +148,12 @@ class Vector(object):
             return self._rtype(int(round(self.x, 0)), int(round(self.y, 0)))
         return self._rtype(int(self.x), int(self.y))
 
-    def aspoint(self):
+    cpdef Point aspoint(self):
         # type: () -> Point
         """Returns the current Vector as Point."""
         return Point(*self)
 
-    def almost_equal(self, other, d=1e-6):
-        # type: (Union[Vector, Point], Optional[float]) -> bool
+    cpdef bint almost_equal(self, other, double d=1e-6):
         """Returns ``True`` if difference is less than or equal to ``d``."""
         if isinstance(other, Vector):
             d = abs(d)
@@ -180,7 +161,6 @@ class Vector(object):
         raise TypeError('expected type Vector or Point')
 
     def __getitem__(self, key):
-        # type: (Union[int, str]) -> NUMERIC
         if key in (0, 'x'):
             return self.x
         if key in (1, 'y'):
@@ -188,84 +168,76 @@ class Vector(object):
         raise IndexError('Invalid Index for Vector2 object')
 
     def __len__(self):
-        # type: () -> int
         return 2
 
     def __add__(self, other):
-        # type: (Union[Vector, int, float, Tuple[NUMERIC, NUMERIC]]) -> Vector
-        if isinstance(other, (int, float)):
-            return self._rtype(self.x + other, self.y + other)
-        elif isinstance(other, Vector):
-            return self._rtype(self.x + other.x, self.y + other.y)
+        if isinstance(self, Vector) and isinstance(other, (int, float)):
+            return self.rtype(self.x + other, self.y + other)
+        elif isinstance(self, Vector) and isinstance(other, Vector):
+            return self.rtype(self.x + other.x, self.y + other.y)
+        elif isinstance(other, Vector) and isinstance(self, (int, float)):
+            return other.rtype(other.x + self, other.y + self)
         elif isinstance(other, tuple) and len(other) == 2 and \
                 isinstance(other[0], (int, float)) and \
-                isinstance(other[1], (int, float)):
-            return self._rtype(self.x + other[0], self.y + other[1])
+                isinstance(other[1], (int, float)) and isinstance(self, Vector):
+            return self.rtype(self.x + other[0], self.y + other[1])
+        elif isinstance(self, tuple) and len(self) == 2 and \
+                isinstance(self[0], (int, float)) and \
+                isinstance(self[1], (int, float)) and isinstance(other, Vector):
+            return other.rtype(other.x + self[0], other.y + self[1])
         else:
-            raise TypeError('Must be of type Vector, int or float')
-
-    def __radd__(self, other):
-        # type: (Union[Vector, int, float, Tuple[NUMERIC, NUMERIC]]) -> Vector
-        return self.__add__(other)
+            raise TypeError('Must be of type Vector, tuple, int or float')
 
     def __sub__(self, other):
-        # type: (Union[Vector, int, float, Tuple[NUMERIC, NUMERIC]]) -> Vector
-        if isinstance(other, (int, float)):
-            return self._rtype(self.x - other, self.y - other)
-        elif isinstance(other, Vector):
-            return self._rtype(self.x - other.x, self.y - other.y)
+        if isinstance(self, Vector) and isinstance(other, Vector):
+            return self.rtype(self.x - other.x, self.y - other.y)
+        elif isinstance(self, Vector) and isinstance(other, (int, float)):
+            return self.rtype(self.x - other, self.y - other)
+        elif isinstance(other, Vector) and isinstance(self, (int, float)):
+            return other.rtype(self - other.x, self - other.y)
         elif isinstance(other, tuple) and len(other) == 2 and \
                 isinstance(other[0], (int, float)) and \
-                isinstance(other[1], (int, float)):
-            return self._rtype(self.x - other[0], self.y - other[1])
+                isinstance(other[1], (int, float)) and isinstance(self, Vector):
+            return self.rtype(self.x - other[0], self.y - other[1])
+        elif isinstance(self, tuple) and len(self) == 2 and \
+                isinstance(self[0], (int, float)) and \
+                isinstance(self[1], (int, float)) and isinstance(other, Vector):
+            return other.rtype(self[0] - other.x, self[1] - other.y)
         else:
-            raise TypeError('Must be of type Vector, int or float')
-
-    def __rsub__(self, other):
-        # type: (Union[Vector, int, float, Tuple[NUMERIC, NUMERIC]]) -> Vector
-        if isinstance(other, (int, float)):
-            return self._rtype(other - self.x, other - self.y)
-        elif isinstance(other, Vector):
-            return self._rtype(other.x - self.x, other.y - self.y)
-        elif isinstance(other, tuple) and len(other) == 2 and \
-                isinstance(other[0], (int, float)) and \
-                isinstance(other[1], (int, float)):
-            return self._rtype(other[0] - self.x, other[1] - self.y)
-        else:
-            raise TypeError('Must be of type Vector, int or float')
+            raise TypeError('Must be of type Vector, tuple, int or float')
 
     def __mul__(self, other):
-        # type: (NUMERIC) -> Vector
-        if isinstance(other, (int, float)):
-            return self._rtype(self.x * other, self.y * other)
+        if isinstance(self, Vector) and isinstance(other, (int, float)):
+            return self.rtype(self.x * other, self.y * other)
+        elif isinstance(self, (int, float)) and isinstance(other, Vector):
+            return other.rtype(self * other.x, self * other.y)
         else:
             raise TypeError('Must be of type int or float')
 
-    def __rmul__(self, other):
-        # type: (NUMERIC) -> Vector
-        return self.__mul__(other)
-
     def __truediv__(self, other):
-        # type: (NUMERIC) -> Vector
-        if isinstance(other, (int, float)):
-            return self._rtype(self.x / other, self.y / other)
+        if isinstance(self, Vector) and isinstance(other, (int, float)):
+            return self.rtype(self.x / other, self.y / other)
+        elif isinstance(self, (int, float)) and isinstance(other, Vector):
+            return other.rtype(self / other.x, self / other.y)
         else:
             raise TypeError('Must be of type int or float')
 
     def __floordiv__(self, other):
-        # type: (NUMERIC) -> Vector
-        if isinstance(other, (int, float)):
-            return self._rtype(self.x // other, self.y // other)
+        if isinstance(self, Vector) and isinstance(other, (int, float)):
+            return self.rtype(self.x // other, self.y // other)
+        elif isinstance(self, (int, float)) and isinstance(other, Vector):
+            return other.rtype(self // other.x, self // other.y)
         else:
             raise TypeError('Must be of type int or float')
 
+    def __neg__(self):
+        return self.rtype(-self.x, -self.y)
+
     def __eq__(self, other):
-        # type: (Vector) -> bool
-        return self.almost_equal(other, self._d)
+        return self.almost_equal(other, self._precision)
 
 
-class Point(Vector):
+cdef class Point(Vector):
     def __init__(self, x=0, y=0):
-        # type: (Union[NUMERIC, Tuple], NUMERIC) -> None
-        super(Point, self).__init__(x, y)
+        Vector.__init__(self, x, y)
         self._rtype = Point
