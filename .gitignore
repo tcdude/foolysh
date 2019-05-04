@@ -1,3 +1,11 @@
+#Custom
+.idea/
+*venv*/
+**cache/
+**.md#
+**.apk
+**/ext/*.c
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
