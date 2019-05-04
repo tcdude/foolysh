@@ -181,9 +181,9 @@ class TaskManager(object):
         if name in self._tasks:
             self._tasks.pop(name).disable()
 
-    def __call__(self):
+    def __call__(self, clk=None):
         """Calls all registered ``Task`` instances."""
-        clk = time.perf_counter()
+        clk = clk or time.perf_counter()
         for task in self._tasks.values():
             task(clk)
 

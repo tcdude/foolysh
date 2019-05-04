@@ -122,7 +122,7 @@ class App(object):
     def event_handler(self, *args, **kwargs):
         # type: (...) -> eventhandler.EventHandler
         """``EventHandler``"""
-        return self.__event_handler__
+        return self._event_handler
 
     @property
     def task_manager(self):
@@ -242,10 +242,10 @@ class App(object):
             ``sdl2.ext.FontManager.render()``
         :return: ``sdl2.ext.TextureSprite``
         """
-        if self.__font_manager__ is None:
+        if self._font_manager is None:
             raise ValueError('FontManager not initialized. Call '
                              'init_font_manager() method first')
-        surface = self.__font_manager__.render(
+        surface = self._font_manager.render(
             text,
             alias,
             size,
@@ -254,7 +254,7 @@ class App(object):
             bg_color,
             **kwargs
         )
-        sprite = self.__factory__.from_surface(surface)
+        sprite = self._factory.from_surface(surface)
         sdl2.SDL_FreeSurface(surface)
         return sprite
 
@@ -262,11 +262,11 @@ class App(object):
     def __update_mouse__(self, *args, **kwargs):
         # type: (...) -> None
         """Updates ``App.mouse_pos``."""
-        if not self.__running__:
+        if not self._running:
             return
         x, y = ctypes.c_int(0), ctypes.c_int(0)
         _ = sdl2.mouse.SDL_GetMouseState(ctypes.byref(x), ctypes.byref(y))
-        self.__mouse_pos__.x, self.__mouse_pos__.y = x.value, y.value
+        self._mouse_pos.x, self._mouse_pos.y = x.value, y.value
 
     # noinspection PyUnusedLocal
     def __animation__(self, dt, *args, **kwargs):
@@ -330,13 +330,13 @@ class App(object):
                 end_pos
             ))
         k = str(entity)
-        if k in self.__sequences__:
-            if k in self.__anim_callbacks__:
-                f, args, kwargs = self.__anim_callbacks__[k]
+        if k in self._sequences:
+            if k in self._anim_callbacks:
+                f, args, kwargs = self._anim_callbacks[k]
                 f(*args, **kwargs)
-        self.__sequences__[k] = seq
+        self._sequences[k] = seq
         if callback is not None:
-            self.__anim_callbacks__[k] = (callback, args, kwargs)
+            self._anim_callbacks[k] = (callback, args, kwargs)
 
     def stop_all_position_sequences(self):
         """Stops all position sequences and calls the respective callbacks."""
