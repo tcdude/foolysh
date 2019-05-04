@@ -34,12 +34,12 @@ with open(os.path.join(os.path.dirname(__file__), 'VERSION'), 'r') as f:
 
 
 setup(
-    name='foolysh-engine',
+    name='foolysh',
     version=version,
     description='A 2D Game Engine, nobody asked for or needed.',
     author='Tiziano Bettio',
     author_email='tizilogic@gmail.com',
-    packages=find_namespace_packages(include=['foolysh.']),
+    packages=find_namespace_packages(include=['foolysh.*', 'foolysh']),
     package_data={'foolysh': [
         'LICENSE.md',
     ]},
