@@ -12,6 +12,7 @@ from typing import Union
 import sdl2
 import sdl2.ext
 
+from .tools import config
 from . import eventhandler
 from . import interval
 from . import render
@@ -76,7 +77,8 @@ class App(object):
         Todo:
             * Replace PySDL2 Component System with SceneGraph
         """
-    def __init__(self, window_title='foolysh engine'):
+    def __init__(self, window_title='foolysh engine', config_file=None):
+        self._cfg = config.Config(config_file)
         self._taskmgr = taskmanager.TaskManager()
         self._event_handler = eventhandler.EventHandler()
         self._taskmgr.add_task('___EVENT_HANDLER___', self._event_handler)

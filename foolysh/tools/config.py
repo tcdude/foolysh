@@ -3,6 +3,12 @@ Provides the Config class to handle engine and user specific configuration.
 """
 
 import configparser
+import glob
+import os
+
+from plyer import storagepath
+
+from . import common
 
 __author__ = 'Tiziano Bettio'
 __license__ = 'MIT'
@@ -28,9 +34,60 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE."""
 
 
-class Config(object):
-    def __init__(self):
-        pass
+def _find_config_file():
+    chk_loc = glob.glob('**/foolysh.ini', recursive=True)
+    if chk_loc:
+        if len(chk_loc) == 1:
+            return os.path.abspath(chk_loc[0])
+        raise ValueError('found multiple "foolysh.ini" files in the '
+                         'current working directory.')
+    chk_loc = glob.glob(
+        os.path.join(storagepath.get_application_dir(), '**/foolish.ini'),
+        recursive=True
+    )
+    if chk_loc:
+        if len(chk_loc) == 1:
+            return os.path.abspath(chk_loc[0])
+        raise ValueError('found multiple "foolysh.ini" files in the '
+                         'application directory.')
+    chk_loc = glob.glob(
+        os.path.join(storagepath.get_home_dir(), '**/foolish.ini'),
+        recursive=True
+    )
+    if chk_loc:
+        if len(chk_loc) == 1:
+            return os.path.abspath(chk_loc[0])
+        raise ValueError('found multiple "foolysh.ini" files in the '
+                         'home directory.')
 
-    def find_config_file(self):
-        pass
+    if os.access(os.getcwd(), os.W_OK):
+        basedir = os.path.join(os.getcwd(), '.foolysh')
+    elif os.access(storagepath.get_application_dir(), os.W_OK):
+        basedir = os.path.join(storagepath.get_application_dir(), '.foolysh')
+    elif os.access(storagepath.get_home_dir(), os.W_OK):
+        basedir = os.path.join(storagepath.get_home_dir(), '.foolysh')
+    else:
+        raise PermissionError('unable to find writable location for config '
+                              'file.')
+    os.makedirs(basedir, exist_ok=True)
+    parser = configparser.ConfigParser()
+    parser.read_dict(common.DEFAULT_CONFIG)
+    fpath = os.path.join(basedir, 'foolysh.ini')
+    parser.write(open(fpath, 'w'))
+    return fpath
+
+
+class Config(configparser.ConfigParser):
+    def __init__(self, config_file=None, *args, **kwargs):
+        super(Config, self).__init__(*args, **kwargs)
+        self._cfg_path = config_file or _find_config_file()
+        self.read(open(self._cfg_path))
+
+    def save(self):
+        try:
+            self.write(open(self._cfg_path, 'w'))
+            return True
+        except PermissionError as e:
+            if e.errno == 13:
+                return False
+            raise e
