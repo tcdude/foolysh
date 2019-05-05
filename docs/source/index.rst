@@ -4,17 +4,18 @@
    contain the root `toctree` directive.
 
 Welcome to foolysh engine's documentation!
-=========================================
+==========================================
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
-   foolysh
-   foolysh.scene
-   foolysh.tools
-   foolysh.ui
-   foolysh.ext
+   installation
+   hello_world
+   api
+
+
+
 
 
 Indices and tables

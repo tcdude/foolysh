@@ -34,7 +34,6 @@ cpdef enum Origin:
 ctypedef Point
 
 cdef class NodePath:
-    cdef readonly str _np_id
     cdef readonly str _np_name
     cdef readonly Origin _center
     cdef readonly bint _visible
@@ -56,8 +55,7 @@ cdef class NodePath:
     cdef readonly list _children
     cdef readonly dict _tags
     cdef readonly int _max_level
-    cdef readonly object _parent
-    cdef readonly NodePath _root_nodepath
+    cdef readonly NodePath _parent
     cdef readonly object _sprite_loader
 
     cdef void propagate_dirty(self)

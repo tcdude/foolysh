@@ -22,7 +22,9 @@ copyright = '2019, Tiziano Bettio'
 author = 'Tiziano Bettio'
 
 # The full version, including alpha/beta/rc tags
-release = '0.1.0'
+with open('../../VERSION') as f:
+    version = f.read().strip()
+release = version
 
 
 # -- General configuration ---------------------------------------------------
@@ -48,7 +50,7 @@ templates_path = ['_templates']
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = []
+exclude_patterns = ['*setup*']
 
 
 # -- Options for HTML output -------------------------------------------------

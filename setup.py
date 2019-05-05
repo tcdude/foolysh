@@ -47,6 +47,7 @@ setup(
     setup_requires=['Cython'],
     ext_modules=cythonize(
         'foolysh/*/*.pyx',
-        compiler_directives={'language_level': 3}
+        compiler_directives={'language_level': 3},
+        annotate=True
     ),
 )

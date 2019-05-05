@@ -4,7 +4,9 @@ Cython implementation of Vector and Point classes.
 
 from libc.math cimport sin
 from libc.math cimport cos
+from libc.math cimport fabs
 from libc.math cimport sqrt
+from libc.math cimport round
 from libc.math cimport pi
 
 
@@ -32,7 +34,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE."""
 
 
-cdef inline double radians(degrees):
+cdef inline double radians(double degrees):
     return (degrees / 180.0) * pi
 
 
@@ -90,18 +92,17 @@ cdef class Vector:
 
     @property
     def length(self):
-        # type: () -> float
         """``length`` of the vector"""
         if self._dirty:
-            self._length = sqrt(self.x ** 2 + self.y ** 2)
+            self._length = sqrt(self._x ** 2 + self._y ** 2)
             self._dirty = 0
         return self._length
 
     cpdef Vector normalized(self):
         """Returns a normalized Vector of this Vector instance."""
-        vlen = self.length
+        cdef double vlen = self.length
         if vlen:
-            return Vector(self.x / vlen, self.y / vlen)
+            return Vector(self._x / vlen, self._y / vlen)
         raise ValueError('Vector of zero length cannot be normalized')
 
     cpdef normalize(self):
@@ -126,7 +127,7 @@ cdef class Vector:
         a = radians(-degrees)
         sa = sin(a)
         ca = cos(a)
-        return Vector(ca * self.x - sa * self.y, sa * self.x + ca * self.y)
+        return Vector(ca * self._x - sa * self._y, sa * self._x + ca * self._y)
 
     cpdef dot(self, Vector other):
         """
@@ -135,9 +136,9 @@ cdef class Vector:
         :param other: Vector -> the other Vector for the dot product.
         """
         if isinstance(other, Vector):
-            return self.x * other.x + self.y * other.y
+            return self._x * other._x + self._y * other._y
 
-    cpdef Vector asint(self, int rounding=0):
+    cpdef Vector asint(self, bint rounding=False):
         """
         Returns the Vector with its values cast to int. If rounding is True,
         rounds the value first, before casting (default=False).
@@ -145,26 +146,27 @@ cdef class Vector:
         :param rounding: Optional bool -> Whether to round the values first.
         """
         if rounding:
-            return self._rtype(int(round(self.x, 0)), int(round(self.y, 0)))
-        return self._rtype(int(self.x), int(self.y))
+            return self._rtype(<int> round(self._x), <int> round(self._y))
+        return self._rtype(<int> self._x, <int> self._y)
 
     cpdef Point aspoint(self):
-        # type: () -> Point
         """Returns the current Vector as Point."""
-        return Point(*self)
+        return Point(self._x, self._y)
 
-    cpdef bint almost_equal(self, other, double d=1e-6):
-        """Returns ``True`` if difference is less than or equal to ``d``."""
+    def almost_equal(self, other, d=1e-6):
         if isinstance(other, Vector):
-            d = abs(d)
-            return abs(self.x - other.x) <= d and abs(self.y - other.y) <= d
-        raise TypeError('expected type Vector or Point')
+            return self._almost_equal(other, d)
+        raise TypeError('expected Vector type')
+
+    cdef bint _almost_equal(self, Vector other, double d=1e-6):
+        """Returns ``True`` if difference is less than or equal to ``d``."""
+        return fabs(self._x - other._x) <= d and fabs(self._y - other._y) <= d
 
     def __getitem__(self, key):
         if key in (0, 'x'):
-            return self.x
+            return self._x
         if key in (1, 'y'):
-            return self.y
+            return self._y
         raise IndexError('Invalid Index for Vector2 object')
 
     def __len__(self):
@@ -172,69 +174,71 @@ cdef class Vector:
 
     def __add__(self, other):
         if isinstance(self, Vector) and isinstance(other, (int, float)):
-            return self.rtype(self.x + other, self.y + other)
+            return self._rtype(self._x + other, self._y + other)
         elif isinstance(self, Vector) and isinstance(other, Vector):
-            return self.rtype(self.x + other.x, self.y + other.y)
+            return self._rtype(self._x + other._x, self._y + other._y)
         elif isinstance(other, Vector) and isinstance(self, (int, float)):
-            return other.rtype(other.x + self, other.y + self)
+            return other._rtype(other._x + self, other._y + self)
         elif isinstance(other, tuple) and len(other) == 2 and \
                 isinstance(other[0], (int, float)) and \
                 isinstance(other[1], (int, float)) and isinstance(self, Vector):
-            return self.rtype(self.x + other[0], self.y + other[1])
+            return self._rtype(self._x + other[0], self._y + other[1])
         elif isinstance(self, tuple) and len(self) == 2 and \
                 isinstance(self[0], (int, float)) and \
                 isinstance(self[1], (int, float)) and isinstance(other, Vector):
-            return other.rtype(other.x + self[0], other.y + self[1])
+            return other._rtype(other._x + self[0], other._y + self[1])
         else:
             raise TypeError('Must be of type Vector, tuple, int or float')
 
     def __sub__(self, other):
         if isinstance(self, Vector) and isinstance(other, Vector):
-            return self.rtype(self.x - other.x, self.y - other.y)
+            return self._rtype(self._x - other._x, self._y - other._y)
         elif isinstance(self, Vector) and isinstance(other, (int, float)):
-            return self.rtype(self.x - other, self.y - other)
+            return self._rtype(self._x - other, self._y - other)
         elif isinstance(other, Vector) and isinstance(self, (int, float)):
-            return other.rtype(self - other.x, self - other.y)
+            return other._rtype(self - other._x, self - other._y)
         elif isinstance(other, tuple) and len(other) == 2 and \
                 isinstance(other[0], (int, float)) and \
                 isinstance(other[1], (int, float)) and isinstance(self, Vector):
-            return self.rtype(self.x - other[0], self.y - other[1])
+            return self._rtype(self._x - other[0], self._y - other[1])
         elif isinstance(self, tuple) and len(self) == 2 and \
                 isinstance(self[0], (int, float)) and \
                 isinstance(self[1], (int, float)) and isinstance(other, Vector):
-            return other.rtype(self[0] - other.x, self[1] - other.y)
+            return other._rtype(self[0] - other._x, self[1] - other._y)
         else:
             raise TypeError('Must be of type Vector, tuple, int or float')
 
     def __mul__(self, other):
         if isinstance(self, Vector) and isinstance(other, (int, float)):
-            return self.rtype(self.x * other, self.y * other)
+            return self._rtype(self._x * other, self._y * other)
         elif isinstance(self, (int, float)) and isinstance(other, Vector):
-            return other.rtype(self * other.x, self * other.y)
+            return other._rtype(self * other._x, self * other._y)
         else:
             raise TypeError('Must be of type int or float')
 
     def __truediv__(self, other):
         if isinstance(self, Vector) and isinstance(other, (int, float)):
-            return self.rtype(self.x / other, self.y / other)
+            return self._rtype(self._x / other, self._y / other)
         elif isinstance(self, (int, float)) and isinstance(other, Vector):
-            return other.rtype(self / other.x, self / other.y)
+            return other._rtype(self / other._x, self / other._y)
         else:
             raise TypeError('Must be of type int or float')
 
     def __floordiv__(self, other):
         if isinstance(self, Vector) and isinstance(other, (int, float)):
-            return self.rtype(self.x // other, self.y // other)
+            return self._rtype(self._x // other, self._y // other)
         elif isinstance(self, (int, float)) and isinstance(other, Vector):
-            return other.rtype(self // other.x, self // other.y)
+            return other._rtype(self // other._x, self // other._y)
         else:
             raise TypeError('Must be of type int or float')
 
     def __neg__(self):
-        return self.rtype(-self.x, -self.y)
+        return self._rtype(-self._x, -self._y)
 
     def __eq__(self, other):
-        return self.almost_equal(other, self._precision)
+        if not isinstance(other, Vector):
+            return False
+        return self._almost_equal(other, self._precision)
 
 
 cdef class Point(Vector):

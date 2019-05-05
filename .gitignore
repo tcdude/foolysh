@@ -5,6 +5,7 @@
 **.md#
 **.apk
 **/foolysh/**/*.c
+**/foolysh/**/*.html
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

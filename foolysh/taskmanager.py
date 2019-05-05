@@ -157,8 +157,8 @@ class TaskManager(object):
         Return a ``Task`` object.
 
         :param name: ``str`` -> unique name of the task.
-        :param callback: ``callable`` -> method to call, must either have **kwargs
-            or accept an argument called ``dt``.
+        :param callback: ``callable`` -> method to call, must either have
+            ``**kwargs`` or accept an argument called ``dt``.
         :param delay: Optional ``int``/``float`` -> number of seconds between
             execution (default=0). This argument must be explicitly passed to
             ``add_task()`` if optional ``args`` and/or ``kwargs`` for
@@ -169,6 +169,7 @@ class TaskManager(object):
             ``callback``.
         :param kwargs: Optional ``dict`` -> keyword arguments to be passed to
             ``callback``.
+
         :return: ``Task``
         """
         if name in self._tasks:

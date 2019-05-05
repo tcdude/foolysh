@@ -27,18 +27,18 @@ SOFTWARE."""
 
 
 cdef class Vector:
-    cdef _x, _y
+    cdef readonly _x, _y
     cdef double _precision, _length
     cdef int _dirty
-    cdef object _rtype
+    cdef readonly object _rtype
 
     cpdef Vector normalized(self)
     cpdef normalize(self)
     cpdef Vector rotate(self, degrees)
     cpdef dot(self, Vector other)
-    cpdef Vector asint(self, int rounding=*)
+    cpdef Vector asint(self, bint rounding=*)
     cpdef Point aspoint(self)
-    cpdef bint almost_equal(self, other, double d=*)
+    cdef bint _almost_equal(self, Vector other, double d=*)
 
 
 cdef class Point(Vector):
