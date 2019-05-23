@@ -4,10 +4,15 @@ Cython implementation of NodePath class.
 
 from ..tools import spriteloader
 from ..scene import node
+# noinspection PyUnresolvedReferences
 from ..tools.vector cimport Point
+# noinspection PyUnresolvedReferences
 from ..tools.vector cimport Vector
+# noinspection PyUnresolvedReferences
 from ..tools.quadtree cimport Quadtree
+# noinspection PyUnresolvedReferences
 from ..tools.quadtree cimport quadtree_from_pairs
+# noinspection PyUnresolvedReferences
 from ..tools.aabb cimport AABB
 
 __author__ = 'Tiziano Bettio'
@@ -69,7 +74,7 @@ cdef class NodePath:
             scale=1.0,
             depth=1,
             parent=None,
-            max_level=1
+            max_level=8
     ):
         self._np_name = name or 'Unnamed NodePath'
         self._node = node.Node(self)
@@ -85,7 +90,7 @@ cdef class NodePath:
             scale=1.0,
             depth=1,
             parent=None,
-            max_level=1
+            max_level=8
     ):
         cdef NodePath _parent
         self._center = center
@@ -114,6 +119,7 @@ cdef class NodePath:
             _parent = parent
             self._is_root = False
             self._parent = parent
+            # noinspection PyProtectedMember
             if not _parent._dirty:
                 _parent._dirty = True
 
@@ -356,7 +362,7 @@ cdef class NodePath:
         if value:
             self.propagate_dirty()
 
-    # noinspection PyProtectedMember
+    # noinspection PyProtectedMember,PyUnresolvedReferences
     cdef void propagate_dirty(self):
         """
         Propagates ``dirty=True`` to all ``NodePath`` instances that are below 
@@ -406,6 +412,7 @@ cdef class NodePath:
         """
         return self._update_relative()
 
+    # noinspection PyProtectedMember
     cdef tuple _update_relative(self):
         cdef Point offset, rel_pos
         cdef tuple box
@@ -459,7 +466,7 @@ cdef class NodePath:
             return False
         return self._traverse()
 
-    # noinspection PyProtectedMember
+    # noinspection PyProtectedMember,PyUnresolvedReferences
     cdef bint _traverse(self):
         cdef tuple box
         cdef long n
@@ -497,6 +504,7 @@ cdef class NodePath:
             if self.parent is not None:
                 self.parent.remove_node_path(self)
             self._parent = new_parent
+            # noinspection PyUnresolvedReferences
             self.parent.children.append(self)
             self._is_root = False
             self.dirty = True

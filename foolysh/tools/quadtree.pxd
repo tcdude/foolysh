@@ -27,6 +27,44 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE."""
 
+ctypedef struct QuadNode:
+    int first_child
+    short count
+
+ctypedef struct Item:
+    int id
+    Item* next
+
+ctypedef struct Position:
+    double cx, cy, hw, hh
+
+ctypedef fused Ptr:
+    QuadNode
+    Item
+    Position
+
+ctypedef unsigned long u_long
+
+
+cdef class CVec:
+    cdef Ptr* _vec
+    cdef u_long _size, _capacity
+
+    cdef void push_back(self, Ptr value)
+    cdef int reserve(self, u_long capacity)
+    cdef int shrink_to_fit(self)
+    cdef u_long size(self)
+    cdef u_long size(self)
+
+
+cdef class Quadtree:
+    cdef Item* items
+    cdef Position* positions
+    cdef QuadNode* nodes
+    cdef QuadNode* free_list
+    cdef Position aabb
+
+
 
 cdef class Quadtree:
     cdef public AABB aabb

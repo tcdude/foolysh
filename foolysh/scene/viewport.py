@@ -6,6 +6,7 @@ from typing import Tuple
 from typing import Union
 
 from . import nodepath
+from ..tools import aabb
 from ..tools import spriteloader
 from ..tools import vector
 
@@ -38,10 +39,12 @@ class ViewPort(object):
     2D ViewPort to render 0..1 and 0..>=1 in world space (translated to given
     ``screen_size``, where 1 unit equals the smaller part of ``screen_size``).
 
-    :param screen_size: available screen size for rendering
-    :param asset_pixel_ratio: pixels per world space unit for scaling
-    :param root_node: a Node object that gets rendered by the ViewPort
-    :param sprite_loader: spriteloader.SpriteLoader instance to use
+    :param screen_size: available screen size for rendering (if the logical
+        screen size differs from the physical one, the logical screen size is
+        required here).
+    :param asset_pixel_ratio: pixels per world space unit for scaling.
+    :param root_node: a Node object that gets rendered by the ViewPort.
+    :param sprite_loader: spriteloader.SpriteLoader instance to use.
     """
     def __init__(
             self,
@@ -52,12 +55,11 @@ class ViewPort(object):
     ):
         # type: (...) -> None
         if not isinstance(screen_size, tuple):
-            raise TypeError('expected Tuple for screen_size')
+            raise TypeError('expected Tuple for screen_size.')
         if len(screen_size) != 2 or not isinstance(screen_size[0], int) or \
                 not isinstance(screen_size[1], int) or screen_size[0] < 1 or \
                 screen_size[1] < 1:
-            raise ValueError('expected Tuple[int, int] with only positive '
-                             'values')
+            raise ValueError('expected Tuple[int, int] with only values > 0')
         if not isinstance(asset_pixel_ratio, int):
             raise TypeError('expected int for asset_pixel_ratio')
         if asset_pixel_ratio < 1:
@@ -69,13 +71,17 @@ class ViewPort(object):
                       'sprite_loader')
         self._scr_size = screen_size
         self._root_node = root_node
+        self._initial_asset_pixel_ratio = asset_pixel_ratio
         self._root_node.asset_pixel_ratio = asset_pixel_ratio
         self._root_node.scale = asset_pixel_ratio / min(screen_size)
         self._root_node.sprite_loader = sprite_loader
         self._position = vector.Point(0.0, 0.0)
+        self._zoom = 1.0
 
     @property
     def position(self):
+        # type: () -> vector.Point
+        """``vector.Point``"""
         return self._position
 
     @position.setter
@@ -89,6 +95,7 @@ class ViewPort(object):
     @property
     def screen_size(self):
         # type: () -> Tuple
+        """``Tuple[int, int]``"""
         return self._scr_size
 
     @screen_size.setter
@@ -101,7 +108,8 @@ class ViewPort(object):
 
     @property
     def asset_pixel_ratio(self):
-        # type: () -> float
+        # type: () -> int
+        """``int``"""
         return self.root_node.asset_pixel_ratio
 
     @asset_pixel_ratio.setter
@@ -112,6 +120,7 @@ class ViewPort(object):
     @property
     def root_node(self):
         # type: () -> nodepath.NodePath
+        """``nodepath.NodePath``"""
         return self._root_node  # type: nodepath.NodePath
 
     @root_node.setter
@@ -124,11 +133,30 @@ class ViewPort(object):
 
     @property
     def view_size(self):
+        # type: () -> Tuple[float, float]
+        """``int``"""
         x, y = self.screen_size
         if x < y:
             return 1.0, y / x
         else:
             return x / y, 1.0
+
+    @property
+    def zoom(self):
+        # type: () -> float
+        """``float``"""
+        return self._zoom
+
+    @zoom.setter
+    def zoom(self, value):
+        # type: (Union[int, float]) -> None
+        if isinstance(value, (int, float)) and value > 0:
+            self._zoom = value
+            self.asset_pixel_ratio = round(
+                self._initial_asset_pixel_ratio * value
+            )
+        else:
+            raise TypeError('expected numerical value > 0')
 
     def update(self):
         # type: () -> bool
@@ -140,12 +168,19 @@ class ViewPort(object):
 
         :return: True if the view has changed, otherwise False.
         """
-        result = self.root_node.traverse()
-        return False
+        if not self.root_node.visible:
+            return False
+        return self.root_node.traverse()
+
+    def get_sprite_list(self):
+        visible_aabb = aabb.AABB(
+            tuple(self.position) + tuple(self.position + self.view_size)
+        )
+
 
     def __repr__(self):
         return f'{type(self).__name__}({str(self.screen_size)}, ' \
-               f'{self.asset_pixel_ratio})'
+               f'{self._initial_asset_pixel_ratio})'
 
     def __str__(self):
         return self.__repr__()

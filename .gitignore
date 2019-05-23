@@ -6,6 +6,7 @@
 **.apk
 **/foolysh/**/*.c
 **/foolysh/**/*.html
+.vscode/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

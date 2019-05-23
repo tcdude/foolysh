@@ -29,7 +29,8 @@ SOFTWARE."""
 
 DEFAULT_CONFIG = {
     'foolysh-engine': {
-        'ASSET_PIXEL_RATIO': 1080
+        'asset_pixel_ratio': 1080,
+        'logical_screen_size_multiplier': 1
     }
 }
 

@@ -2,6 +2,8 @@
 Cython implementation of Quadtree class.
 """
 
+from libc.stdlib cimport malloc, free, realloc
+
 from math import inf
 
 from .vector cimport Point
@@ -30,6 +32,69 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE."""
 
+# noinspection PyAttributeOutsideInit
+cdef class CVec:
+    def __cinit__(self, int capacity=16):
+        self._vec = <Ptr*> malloc(sizeof(Ptr) * capacity)
+        self._size = 0
+        self._capacity = capacity
+
+    def __dealloc__(self):
+        if self._vec is not NULL:
+            free(self.vec)
+            self.vec = NULL
+
+    cdef void push_back(self, Ptr value):
+        if self._size == self._capacity:
+            self.reserve(self._capacity << 1)
+        self._vec[self._size] = value
+        self._size += 1
+
+    cdef int reserve(self, u_long capacity) except -1:
+        if capacity > self._capacity:
+            self._capacity = capacity
+            self._vec = <Ptr*> realloc(self._vec, sizeof(Ptr) * capacity)
+            if self._vec is NULL:
+                return -1
+        return 0
+
+
+    cdef int shrink_to_fit(self) except -1:
+        if self._capacity > self._size:
+            self._capacity = self._size
+            self._vec = <Ptr*> realloc(self._vec, sizeof(Ptr) * self._size)
+            if self._vec is NULL:
+                return -1
+        return 0
+
+    cdef u_long size(self):
+        return self._size
+
+    cdef u_long size(self):
+        return self._capacity
+
+    cdef void get_item(self, u_long idx, Ptr* item):
+        if idx < self._size:
+            item = <Ptr*> self._vec[idx]
+
+
+
+
+
+
+cdef class Quadtree:
+    def __cinit__(
+            self,
+            double x,
+            double y,
+            double hw,
+            double hh,
+            int items=16
+    ):
+        self.items = <Item*> malloc(sizeof(Item) * items)
+        self.
+
+
 
 cdef class Quadtree:
     """
@@ -44,8 +109,8 @@ cdef class Quadtree:
 
     Example Usage:
 
-    >>> from foolysh.ext import aabb
-    >>> from foolysh.ext import vector
+    >>> from foolysh.tools import aabb
+    >>> from foolysh.tools import vector
     >>> q = Quadtree()
     >>> some_obj = tuple(range(10))
     >>> some_other_obj = tuple(reversed(range(10)))
