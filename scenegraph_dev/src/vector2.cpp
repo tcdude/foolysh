@@ -1,14 +1,36 @@
 /**
+ * Copyright (c) 2019 Tiziano Bettio
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in 
+ * all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+/**
  * Basic 2D Vector implementation
  */
 
 #include "vector2.hpp"
 
+#include <iostream>
 #include <cmath>
 #include <stdexcept>
 
-constexpr double to_deg = 180.0 / 3.14159265358979323846;
-constexpr double to_rad = 3.14159265358979323846 / 180.0;
+#include "common.hpp"
 
 
 /**
@@ -45,12 +67,9 @@ Vector2(const double x, const double y) {
  * Copy c-tor
  */
 scenegraph::Vector2::
-Vector2(const Vector2& other) {
-    _x = other._x;
-    _y = other._y;
-    _magnitude = other._magnitude;
-    _length = other._length;
-    _state = other._state;
+Vector2(const Vector2& other) : _x(other._x), _y(other._y), 
+                                _magnitude(other._magnitude), 
+                                _length(other._length), _state(other._state) {
 }
 
 /**
@@ -58,7 +77,12 @@ Vector2(const Vector2& other) {
  */
 scenegraph::Vector2& scenegraph::Vector2::
 operator=(const Vector2& other) {
-    return *this = Vector2(other);
+    _x = other._x;
+    _y = other._y;
+    _magnitude = other._magnitude;
+    _length = other._length;
+    _state = other._state;
+    return *this;
 }
 
 /**
@@ -78,6 +102,8 @@ normalize() {
     if (l > 0.0) {
         _x /= l;
         _y /= l;
+        _length = _magnitude = 1.0;
+        _state = 2;
         return true;
     }
     return false;
@@ -90,6 +116,7 @@ scenegraph::Vector2 scenegraph::Vector2::
 normalized() {
     Vector2 v = Vector2(*this);
     if (v.normalize()) {
+        std::cout << "OK" << std::endl;
         return v;
     }
     throw std::underflow_error("Cannot normalize Vector2 of zero length.");
@@ -161,10 +188,11 @@ almost_equal(Vector2& other, const double d) {
  */
 double& scenegraph::Vector2::
 operator[](const int idx) {
-    if (-1 < idx < 2) {
+    if (idx == 0 || idx == 1) {
         _state = 0;
         return (idx == 0) ? _x : _y;
     }
+    throw std::range_error("Index out of range");
 }
 
 /**
@@ -206,6 +234,22 @@ operator+=(const double rhs) {
 }
 
 /**
+ * this += Vector2
+ */
+void scenegraph::Vector2::
+iadd(const Vector2& rhs) {
+    *this += rhs;
+}
+
+/**
+ * this += double
+ */
+void scenegraph::Vector2::
+iadd(const double rhs) {
+    *this += rhs;
+}
+
+/**
  * this - Vector2
  */
 scenegraph::Vector2 scenegraph::Vector2::
@@ -244,6 +288,22 @@ operator-=(const double rhs) {
 }
 
 /**
+ * this -= Vector2
+ */
+void scenegraph::Vector2::
+isub(const Vector2& rhs) {
+    *this -= rhs;
+}
+
+/**
+ * this -= double
+ */
+void scenegraph::Vector2::
+isub(const double rhs) {
+    *this -= rhs;
+}
+
+/**
  * this * double
  */
 scenegraph::Vector2 scenegraph::Vector2::
@@ -263,11 +323,30 @@ operator*=(const double rhs) {
 }
 
 /**
+ * this *= double
+ */
+void scenegraph::Vector2::
+imul(const double rhs) {
+    *this *= rhs;
+}
+
+/**
  * this / double
  */
 scenegraph::Vector2 scenegraph::Vector2::
 operator/(const double rhs) {
-    return Vector2(_x / rhs, _y / rhs);
+    if (rhs) {
+        return Vector2(_x / rhs, _y / rhs);
+    }
+    throw std::underflow_error("Division by zero.");
+}
+
+/**
+ * Ugly hack because cython cannot handle "operator/" atm.
+ */
+scenegraph::Vector2 scenegraph::Vector2::
+div(const double rhs) {
+    return *this / rhs;
 }
 
 /**
@@ -275,10 +354,21 @@ operator/(const double rhs) {
  */
 scenegraph::Vector2& scenegraph::Vector2::
 operator/=(const double rhs) {
-    _state = 0;
-    _x /= rhs;
-    _y /= rhs;
-    return *this;
+    if (rhs) {
+        _state = 0;
+        _x /= rhs;
+        _y /= rhs;
+        return *this;
+    }
+    throw std::underflow_error("Division by zero.");
+}
+
+/**
+ * this /= double
+ */
+void scenegraph::Vector2::
+idiv(const double rhs) {
+    *this /= rhs;
 }
 
 /**

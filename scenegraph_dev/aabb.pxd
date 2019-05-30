@@ -1,13 +1,16 @@
 # distutils: language = c++
 
-cdef extern from "src/aabb.cpp":
-    pass
+from _aabb cimport AABB as _AABB
+from _aabb cimport Quadrant
 
-cdef extern from "src/aabb.hpp" namespace "scenegraph":
-    cdef cppclass AABB:
-        AABB() except +
-        AABB(double, double, double, double) except +
-        bint inside(AABB)
-        bint inside(double, double)
-        bint overlap(AABB)
-        double x0, y0, x1, y1
+from libcpp.memory cimport unique_ptr
+
+
+cdef class AABB:
+    cdef unique_ptr[_AABB] thisptr
+
+    cdef bint _inside_aabb(self, AABB other)
+    cdef bint _overlap(self, AABB other)    
+    cdef _AABB _split(self, Quadrant q)
+    cdef _AABB _split_point(self, double x, double y, Quadrant q)
+    cdef public _AABB aabb(self)

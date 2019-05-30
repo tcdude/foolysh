@@ -1,4 +1,26 @@
 /**
+ * Copyright (c) 2019 Tiziano Bettio
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in 
+ * all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+/**
  * Provides an indexed free list with constant-time removals from anywhere 
  * in the list without invalidating indices. T must be trivially constructible 
  * and destructible.
@@ -88,9 +110,7 @@ const T& FreeList<T>::operator[](int n) const {
  * 
  */
 template <class T>
-SmallList<T>::SmallList() {
-    _size = 0;
-    _is_vec = false;
+SmallList<T>::SmallList() : _size(0), _is_vec(false) {
 }
 
 /**
@@ -107,14 +127,12 @@ template <class T>
 SmallList<T>::SmallList(const SmallList<T>& other) {
     if (other._is_vec) {
         _is_vec = true;
-        _arr_vec.v.insert(_arr_vec.v.begin(), other._arr_vec.v.begin(), 
-            other._arr_vec.v.end());
+        _v.insert(_v.begin(), other._v.begin(), other._v.end());
     }
     else {
         _size = other._size;
         _is_vec = false;
-        std::copy(std::begin(other._arr_vec.a), std::end(other._arr_vec.a), 
-            std::begin(_arr_vec.a));
+        std::copy(std::begin(other._a), std::end(other._a), std::begin(_a));
     }
 }
 
@@ -125,12 +143,12 @@ template <class T>
 SmallList<T>::SmallList(SmallList<T>&& other) noexcept {
     if (other._is_vec) {
         _is_vec = true;
-        _arr_vec.v = std::exchange(other._arr_vec.v, nullptr);
+        _v.swap(other._v);
     }
     else {
         _size = other._size;
         _is_vec = false;
-        _arr_vec.a = std::exchange(other._arr_vec.a, nullptr);
+        std::swap(_a, other._a);
     }
 }
 
@@ -148,13 +166,13 @@ SmallList<T>& SmallList<T>::operator=(const SmallList<T>& other) {
 template <class T>
 SmallList<T>& SmallList<T>::operator=(SmallList<T>&& other) noexcept {
     if (other._is_vec) {
-        std::swap(_arr_vec.v, other._arr_vec.v);
         _is_vec = true;
+        _v.swap(other._v);
     }
     else {
-        std::swap(_arr_vec.a, other._arr_vec.a);
-        _is_vec = false;
         _size = other._size;
+        _is_vec = false;
+        std::swap(_a, other._a);
     }
     return *this;
 }
@@ -165,21 +183,20 @@ SmallList<T>& SmallList<T>::operator=(SmallList<T>&& other) noexcept {
 template <class T>
 void SmallList<T>::push_back(const T& element) {
     if (_is_vec) {
-        _arr_vec.v.push_back(element);
+        _v.push_back(element);
     }
     else {
         if (_size < 128) {
-            _arr_vec.a[_size] = element;
+            _a[_size] = element;
             ++_size;
         }
         else {
             _is_vec = true;
-            _arr_vec.v.reset(new std::vector<T>);
-            _arr_vec.v->reserve(256);
-            for (auto it : _arr_vec.a) {
-                _arr_vec.v->push_back(it);
+            _v.reserve(256);
+            for (auto it : _a) {
+                _v.push_back(it);
             }
-            _arr_vec.v->push_back(element);
+            _v.push_back(element);
         }
     }
 }
@@ -188,12 +205,14 @@ void SmallList<T>::push_back(const T& element) {
  * 
  */
 template <class T>
-T& SmallList<T>::pop_back() {
+T SmallList<T>::pop_back() {
     if (_is_vec) {
-        return _arr_vec.v->pop_back();
+        T ret = _v.back();
+        _v.pop_back();
+        return ret;
     }
     --_size;
-    return _arr_vec.a[_size];
+    return _a[_size];
 }
 
 /**
@@ -202,7 +221,7 @@ T& SmallList<T>::pop_back() {
 template <class T>
 int SmallList<T>::size() {
     if (_is_vec) {
-        return static_cast<int>(_arr_vec.v->size());
+        return static_cast<int>(_v.size());
     }
     return _size;
 }
@@ -213,9 +232,9 @@ int SmallList<T>::size() {
 template <class T>
 T& SmallList<T>::operator[](int n) {
     if (_is_vec) {
-        return *_arr_vec.v[n];
+        return _v[n];
     }
-    return _arr_vec.a[n];
+    return _a[n];
 }
 
 /**
@@ -224,9 +243,9 @@ T& SmallList<T>::operator[](int n) {
 template <class T>
 const T& SmallList<T>::operator[](int n) const {
     if (_is_vec) {
-        return *_arr_vec.v[n];
+        return _v[n];
     }
-    return _arr_vec.a[n];
+    return _a[n];
 }
 
 
@@ -247,15 +266,16 @@ template <class T>
 int ExtFreeList<T>::insert(const T& element) {
     if (first_free != -1) {
         const int index = first_free;
-        first_free = data[first_free].next;
+        first_free = data[first_free].e.next;
         data[index].e.element = element;
         data[index].free = false;
         return index;
     }
     else {
-        FreeElement fe;
-        fe.e.element = element;
-        data.push_back(fe);
+        //FreeElement fe();
+        //fe.e.element = element;
+        data.push_back(FreeElement());
+        data.back().e.element = element;
         return static_cast<int>(data.size() - 1);
     }
 }
@@ -269,7 +289,7 @@ void ExtFreeList<T>::erase(int n) {
     data[n].free = true;
     first_free = n;
     ++free_count;
-    if (data.size() == free_count) {
+    if ((int) data.size() == free_count) {
         clear();
     }
 }
@@ -296,8 +316,8 @@ int ExtFreeList<T>::range() const {
  * 
  */
 template <class T>
-bool ExtFreeList<T>::active( int n) {
-    if (-1 < n < data.size()) {
+bool ExtFreeList<T>::active(int n) {
+    if (n < (int) data.size()) {
         return (data[n].free) ? false : true;
     }
     return false;
@@ -308,7 +328,7 @@ bool ExtFreeList<T>::active( int n) {
  */
 template <class T>
 T& ExtFreeList<T>::operator[](int n) {
-    return data[n].element;
+    return data[n].e.element;
 }
 
 /**
@@ -316,5 +336,5 @@ T& ExtFreeList<T>::operator[](int n) {
  */
 template <class T>
 const T& ExtFreeList<T>::operator[](int n) const {
-    return data[n].element;
+    return data[n].e.element;
 }

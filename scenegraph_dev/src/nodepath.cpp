@@ -1,15 +1,48 @@
 /**
+ * Copyright (c) 2019 Tiziano Bettio
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in 
+ * all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+/**
  * NodePath implementation
  */
 
 #include "nodepath.hpp"
+#include "common.hpp"
 
 #include <algorithm>
 #include <stdexcept>
 #include <limits>
+#include <iostream>
 
-constexpr double to_deg = 180.0 / 3.14159265358979323846;
-constexpr double to_rad = 3.14159265358979323846 / 180.0;
+
+/**
+ * Static method to get a NodePath reference by index.
+ */
+scenegraph::NodePath& scenegraph::NodePath::
+get_node_path(const int node_path_id) {
+    if (! NodePath::_node_paths.active(node_path_id)) {
+        throw std::range_error("No NodePath with this id.");
+    }
+    return *NodePath::_node_paths[node_path_id];
+}
 
 /**
  * Default Constructor.
@@ -20,8 +53,10 @@ NodePath() {
     _position.reset(new Vector2(0.0));
     _r_position.reset(new Vector2(0.0));
     _rot_center.reset(new Vector2(0.0));
-    _dirty = _isnew = true;
-    _distance_relative = _hidden = false;
+    _dirty = true;
+    _isnew = true;
+    _distance_relative = false;
+    _hidden = false;
     _parent = -1;
     _first_child = -1;
     _angle = _r_angle = 0.0;
@@ -34,11 +69,21 @@ NodePath() {
  */
 scenegraph::NodePath::
 ~NodePath() {
-    _node_paths.erase(_node_id);
-    if (_parent > -1) {
-        if (NodePath::_node_paths.active(_parent)) {
-            NodePath& np = *NodePath::_node_paths[_parent];
-            np._remove_child(_node_id);
+    if (_node_id > -1) {
+        if (!_isnew) {
+            try {
+                NodePath& root = _get_root();
+                root._quadtree->remove(_node_id, _aabb);
+            }
+            catch (const std::range_error& e) {
+            }
+        }
+        _node_paths.erase(_node_id);
+        if (_parent > -1) {
+            if (NodePath::_node_paths.active(_parent)) {
+                NodePath& np = *NodePath::_node_paths[_parent];
+                np._remove_child(_node_id);
+            }
         }
     }
 }
@@ -66,6 +111,8 @@ NodePath(const NodePath& other) {
     _first_child = -1;
     _angle = other._angle;
     _r_angle = other._r_angle;
+    _scale = other._scale;
+    _r_scale = other._r_scale;
     _depth = other._depth;
     _r_depth = other._r_depth;
     _origin = other._origin;
@@ -76,40 +123,37 @@ NodePath(const NodePath& other) {
  */
 scenegraph::NodePath::
 NodePath(NodePath&& other) noexcept {
-    _node_id = _node_paths.insert(this);
-    _position.reset(new Vector2(*other._position));
-    _r_position.reset(new Vector2(*other._r_position));
-    _rot_center.reset(new Vector2(*other._r_position));
-    _dirty = _isnew = true;
+    _node_id = other._node_id;
+    NodePath::_node_paths[_node_id] = this;
+    if (other._position) {
+        _position.reset(other._position.release());
+    }
+    if (other._r_position) {
+        _r_position.reset(other._r_position.release());
+    }
+    if (other._rot_center) {
+        _rot_center.reset(other._r_position.release());
+    }
+    if (other._tmp_quadtree_entry) {
+        _tmp_quadtree_entry.reset(other._tmp_quadtree_entry.release());
+    }
+    if (other._quadtree) {
+        _quadtree.reset(other._quadtree.release());
+    }
+    _dirty = other._dirty;
+    _isnew = other._isnew;
     _hidden = other._hidden;
     _distance_relative = other._distance_relative;
     _parent = other._parent;
-    if (_parent > -1) {
-        if (!NodePath::_node_paths.active(_parent)) {
-            throw std::runtime_error("Parent NodePath does not exist!");
-        }
-        NodePath& np = *NodePath::_node_paths[_parent];
-        np._insert_child(_node_id);
-    }
     _first_child = other._first_child;
-    if (_first_child > -1) {
-        SmallList<int> to_process;
-        to_process.push_back(_first_child);
-        while (to_process.size() > 0) {
-            const int cnp_id = to_process.pop_back();
-            ChildNodePath& cnp = NodePath::_child_node_paths[cnp_id];
-            NodePath& np = *NodePath::_node_paths[cnp.node_path_id];
-            np._parent = _node_id;
-            if (cnp.next != -1) {
-                to_process.push_back(cnp.next);
-            }
-        }
-    }
     _angle = other._angle;
     _r_angle = other._r_angle;
+    _scale = other._scale;
+    _r_scale = other._r_scale;
     _depth = other._depth;
     _r_depth = other._r_depth;
     _origin = other._origin;
+    other._node_id = -1;
 }
 
 /**
@@ -129,7 +173,37 @@ operator=(const NodePath& other) {
 scenegraph::NodePath& scenegraph::NodePath::
 operator=(NodePath&& other) noexcept {
     if (&other != this) {
-        *this = NodePath(other);
+        _node_id = other._node_id;
+        NodePath::_node_paths[_node_id] = this;
+        if (other._position) {
+            _position.reset(other._position.release());
+        }
+        if (other._r_position) {
+            _r_position.reset(other._r_position.release());
+        }
+        if (other._rot_center) {
+            _rot_center.reset(other._r_position.release());
+        }
+        if (other._tmp_quadtree_entry) {
+            _tmp_quadtree_entry.reset(other._tmp_quadtree_entry.release());
+        }
+        if (other._quadtree) {
+            _quadtree.reset(other._quadtree.release());
+        }
+        _dirty = other._dirty;
+        _isnew = other._isnew;
+        _hidden = other._hidden;
+        _distance_relative = other._distance_relative;
+        _parent = other._parent;
+        _first_child = other._first_child;
+        _angle = other._angle;
+        _r_angle = other._r_angle;
+        _scale = other._scale;
+        _r_scale = other._r_scale;
+        _depth = other._depth;
+        _r_depth = other._r_depth;
+        _origin = other._origin;
+        other._node_id = -1;
     }
     return *this;
 }
@@ -169,10 +243,7 @@ reparent_to(NodePath& parent) {
  */
 bool scenegraph::NodePath::
 traverse() {
-    NodePath& root = *this;
-    while (root._parent != -1) {
-        root = *NodePath::_node_paths[root._parent];
-    }
+    NodePath& root = _get_root();
     if (!root._dirty) {
         return false;
     }
@@ -192,16 +263,15 @@ traverse() {
         const int node_path_id = to_process.pop_back();
         NodePath& np = *NodePath::_node_paths[node_path_id];
         if (np._dirty) {
-            ChildNodePath& cnp = NodePath::_child_node_paths[np._first_child];
-            do {
+            int child_id = np._first_child;
+            while (child_id != -1) {
+                ChildNodePath& cnp = NodePath::_child_node_paths[child_id];
                 to_process.push_back(cnp.node_path_id);
-                if (cnp.next != -1) {
-                    cnp = NodePath::_child_node_paths[cnp.next];
-                }
-            } while (cnp.next != -1);
+                child_id = cnp.next;
+            }
             
             QuadtreeEntry qe;
-            qe.node_path_id = np._node_id;
+            qe.node_path_id = (np._isnew) ? -1 : np._node_id;
             qe.aabb = np._aabb;
             root._tmp_quadtree_entry->push_back(qe);
             np._update_relative();
@@ -220,29 +290,46 @@ traverse() {
         root._quadtree.reset(new Quadtree(qt, NodePath::_max_qt_leaf_elements, 
                              NodePath::_max_qt_depth));
     }
-    else if (root._quadtree->inside(x_min, y_min) 
-            && root._quadtree->inside(x_max, y_max)) {
-        if (root._tmp_quadtree_entry->size % 2) {
-            std::logic_error("Collected quadtree entries are not a multiple of "
-                             "2.");
-        }
-        while (root._tmp_quadtree_entry->size() > 0) {
-            QuadtreeEntry qe_to = root._tmp_quadtree_entry->back();
-            root._tmp_quadtree_entry->pop_back();
-            QuadtreeEntry qe_from = root._tmp_quadtree_entry->back();
-            root._tmp_quadtree_entry->pop_back();
-        }
-        
+    else if (!root._quadtree->inside(x_min, y_min) 
+            || !root._quadtree->inside(x_max, y_max)) {
+        root._quadtree->resize(qt);
     }
+
+    if (root._tmp_quadtree_entry->size() % 2) {
+        throw std::logic_error("Collected quadtree entries are not a multiple "
+                               "of 2.");
+    }
+    while (root._tmp_quadtree_entry->size() > 0) {
+        QuadtreeEntry& qe_to = *(root._tmp_quadtree_entry->end() - 1);
+        QuadtreeEntry& qe_from = *(root._tmp_quadtree_entry->end() - 2);
+        if (qe_from.node_path_id == -1) {
+            root._quadtree->insert(qe_to.node_path_id, qe_to.aabb);
+        }
+        else if (qe_from.aabb != qe_to.aabb) {
+            root._quadtree->move(qe_from.node_path_id, qe_from.aabb, qe_to.aabb);
+        }
+        root._tmp_quadtree_entry->pop_back();
+        root._tmp_quadtree_entry->pop_back();
+    }
+    root._quadtree->cleanup();
     return true;
 }
 
 /**
- * Return all NodePath i
+ * Return all NodePath indices that are visible and overlap with ``aabb`` since
+ * the last call to traverse().
  */
 SmallList<int> scenegraph::NodePath::
 query(AABB& aabb) {
-
+    SmallList<int> result, qt_result = _get_root()._quadtree->query(aabb);
+    while (qt_result.size() > 0) {
+        const int node_path_id = qt_result.pop_back();
+        NodePath& np = *NodePath::_node_paths[node_path_id];
+        if (!np._hidden) {
+            result.push_back(node_path_id);
+        }
+    }
+    return result;
 }
 
 /**
@@ -364,22 +451,7 @@ _update_relative() {
     _aabb.y = y_min + (y_max - y_min) / 2.0;
     _aabb.hw = _aabb.x - x_min;
     _aabb.hh = _aabb.y - y_min;
-    _dirty = false;
-}
-
-/**
- * Updates the AABB of the NodePath. This needs to be called after every call to
- * _update_relative().
- */
-void scenegraph::NodePath::
-_update_aabb() {
-    Vector2 relative_pos;
-    double base_angle = 0.0;
-    if (_parent > -1) {
-        NodePath& parent = *NodePath::_node_paths[_parent];
-        relative_pos = *parent._r_position;
-        base_angle = parent._r_angle;
-    }
+    _dirty = _isnew = false;
 }
 
 /**
@@ -437,14 +509,6 @@ _get_offset() {
 }
 
 /**
- * Gets the offset to the rotation center in relation to the origin.
- */
-scenegraph::Vector2 scenegraph::NodePath::
-_get_rotation_center_offset() {
-    return _get_offset() + Vector2(_size.w / 2.0, _size.h / 2.0) + *_rot_center;
-}
-
-/**
  * Insert NodePath with ``node_path_id`` as child.
  */
 void scenegraph::NodePath::
@@ -470,19 +534,32 @@ _insert_child(const int node_path_id) {
  */
 void scenegraph::NodePath::
 _remove_child(const int node_path_id) {
-    ChildNodePath& cnp = NodePath::_child_node_paths[_first_child];
+    if (_first_child == -1) {
+        throw std::range_error("No children");
+    }
+    ExtFreeList<ChildNodePath>& cnps = NodePath::_child_node_paths;
+    if (!cnps.active(_first_child)) {
+        throw std::range_error("Child is not present");
+    }
+    ChildNodePath& cnp = cnps[_first_child];
     int cnp_id = _first_child;
     if (cnp.node_path_id == node_path_id) {
         _first_child = cnp.next;
     }
     else {
-        while (NodePath::_child_node_paths[cnp.next].node_path_id != node_path_id) {
-            cnp = NodePath::_child_node_paths[cnp.next];
+        if (cnp.next == -1 || !cnps.active(cnp.next)) {
+            throw std::range_error("Child is not present");
+        }
+        while (cnps[cnp.next].node_path_id != node_path_id) {
+            if (cnp.next == -1 || !cnps.active(cnp.next)) {
+                throw std::range_error("Child not found");
+            }
+            cnp = cnps[cnp.next];
             cnp_id = cnp.next;
         }
-        cnp.next = NodePath::_child_node_paths[cnp.next].next;
+        cnp.next = cnps[cnp.next].next;
     }
-    NodePath::_child_node_paths.erase(cnp_id);
+    cnps.erase(cnp_id);
 }
 
 /**
@@ -491,15 +568,12 @@ _remove_child(const int node_path_id) {
  */
 void scenegraph::NodePath::
 _propagate_dirty() {
-    if (!_dirty) {
-        if (_parent > -1) {
-            NodePath& np = *NodePath::_node_paths[_parent];
-            do {
-                np._dirty = true;
-                if (np._parent > -1) {
-                    np = *NodePath::_node_paths[np._parent];
-                }
-            } while (np._parent > -1);
+    if (_parent > -1) {
+        int parent = _parent;
+        while (parent > -1) {
+            NodePath& np = *NodePath::_node_paths[parent];
+            np._dirty = true;
+            parent = np._parent;
         }
     }
     if (_first_child > -1) {
@@ -522,7 +596,24 @@ _propagate_dirty() {
 }
 
 /**
- * 
+ * Returns the root NodePath reference.
+ */
+scenegraph::NodePath& scenegraph::NodePath::
+_get_root() {
+    int parent = _parent;
+    NodePath& np = *this;
+    while (parent != -1) {
+        if (!NodePath::_node_paths.active(parent)) {
+            throw std::range_error("No path to root");
+        }
+        np = *NodePath::_node_paths[parent];
+        parent = np._parent;
+    }
+    return np;
+}
+
+/**
+ * Return the NodePath index, useful to later retrieve a reference by id.
  */
 int scenegraph::NodePath::
 get_id() {

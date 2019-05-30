@@ -1,4 +1,26 @@
 /**
+ * Copyright (c) 2019 Tiziano Bettio
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in 
+ * all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+/**
  * Simple Quadtree implementation, partially based on information found on:
  * https://bit.ly/309V7J2
  */
@@ -7,7 +29,7 @@
 
 #include <algorithm>
 #include <stdexcept>
-
+#include <iostream>
 
 /**
  * Default constructor, splits leafs at 8 elements and limits depth to 8.
@@ -29,7 +51,7 @@ Quadtree() {
  * 
  */
 scenegraph::Quadtree::
-Quadtree(AABB& aabb, int max_leaf_elements, int max_depth) {
+Quadtree(AABB& aabb, const int max_leaf_elements, const int max_depth) {
     _aabb = aabb;
     _max_leaf_elements = max_leaf_elements;
     _max_depth = max_depth;
@@ -88,15 +110,22 @@ query(AABB& aabb) {
  * Insert ``id`` into Quadtree using ``aabb``. Return ``true`` if successful.
  */
 bool scenegraph::Quadtree::
-insert(int id, AABB& aabb) {
+insert(const int id, AABB& aabb) {
     QuadElement qe;
     qe.id = id;
     qe.aabb = aabb;
-    QuadElementNode qen;
-    qen.element = _elements.insert(qe);
-    qen.next = -1;
-    int prev_qen_id = _insert_element_node(aabb);
-    _element_nodes[prev_qen_id].next = _element_nodes.insert(qen);
+    const int element_id = _elements.insert(qe);
+    const int prev_qen_id = _insert_element_node(aabb);
+    if (_element_nodes[prev_qen_id].element == -1) {
+        /* First Element */
+        _element_nodes[prev_qen_id].element = element_id;
+    }
+    else {
+        QuadElementNode qen;
+        qen.element = element_id;
+        const int element_node_id = _element_nodes.insert(qen);
+        _element_nodes[prev_qen_id].next = element_node_id;
+    }
     _max_w = std::max(_max_w, aabb.hw);
     _max_h = std::max(_max_h, aabb.hh);
     return true;
@@ -116,11 +145,18 @@ _insert_element_node(AABB& aabb) {
     while (to_process.size() > 0) {
         const int node_index = to_process.pop_back();
         if (node_index == 0 && _nodes[node_index].first_child == -1) {
+            /* Split Root Node */
             _leaf_to_branch(node_index, current_quadrant);
         }
         else if (_nodes[node_index].count > -1){
             /* Leaf */
             if (_nodes[node_index].count < _max_leaf_elements || depth == _max_depth) {
+                if (_nodes[node_index].first_child == -1) {
+                    ++_nodes[node_index].count;
+                    _nodes[node_index].first_child = _element_nodes.insert(QuadElementNode());
+                    return _nodes[node_index].first_child;
+                }
+
                 int element_node_id = _nodes[node_index].first_child;
                 while (_element_nodes[element_node_id].next != -1) {
                     element_node_id = _element_nodes[element_node_id].next;
@@ -145,7 +181,7 @@ _insert_element_node(AABB& aabb) {
  * Convert Leaf to Branch.
  */
 void scenegraph::Quadtree::
-_leaf_to_branch(int node_id, AABB& aabb) {
+_leaf_to_branch(const int node_id, AABB& aabb) {
     SmallList<int> elements;
     if (_nodes[node_id].first_child != -1) {
         int element_node_id = _nodes[node_id].first_child;
@@ -190,7 +226,7 @@ _leaf_to_branch(int node_id, AABB& aabb) {
  * if successful.
  */
 bool scenegraph::Quadtree::
-move(int id, AABB& aabb_from, AABB& aabb_to) {
+move(const int id, AABB& aabb_from, AABB& aabb_to) {
     if (remove(id, aabb_from)) {
         return insert(id, aabb_to);
     }
@@ -201,10 +237,10 @@ move(int id, AABB& aabb_from, AABB& aabb_to) {
  * Remove ``id`` in Quadtree at ``aabb``. Return ``true`` if successful.
  */
 bool scenegraph::Quadtree::
-remove(int id, AABB& aabb) {
-    if (_nodes[0].count != -1) {
+remove(const int id, AABB& aabb) {
+/*    if (_nodes[0].count != -1) {
         throw std::logic_error("Unable to remove, Quadtree is empty");
-    }
+    } */
     AABB current_quadrant = _aabb;
     SmallList<int> to_process;
     to_process.push_back(0);
@@ -220,30 +256,44 @@ remove(int id, AABB& aabb) {
             if (node.count == 0) {
                 throw std::logic_error("Unable to remove, leaf is empty");
             }
-            QuadElementNode& qen = _element_nodes[node.first_child];
-            if (qen.next == -1) {
-                if (_elements[qen.element].id != id) {
+
+            if (_element_nodes[node.first_child].next == -1) {
+                if (_elements[_element_nodes[node.first_child].element].id != id) {
                     throw std::logic_error("Unable to remove, element not found");
                 }
-                _elements.erase(qen.element);
+                _elements.erase(_element_nodes[node.first_child].element);
                 _element_nodes.erase(node.first_child);
                 node.first_child = -1;
+                --node.count;
                 return true;
             }
-            int last_element_node_id = node.first_child;
-            while (qen.next != -1) {
-                if (_elements[_element_nodes[qen.next].element].id == id) {
-                    _elements.erase(_element_nodes[qen.next].element);
-                    _element_nodes.erase(qen.next);
-                    qen.next = _element_nodes[qen.next].next;
-                    return true;
+            int search_id = node.first_child;
+            int prev_qen = -1, erase_qen = -1, next_qen = -1, erase_qe = -1;
+            while (erase_qen < 0) {
+                QuadElementNode& qen = _element_nodes[search_id];
+                next_qen = qen.next;
+                if (_elements[qen.element].id == id) {
+                    erase_qe = qen.element;
+                    erase_qen = search_id;
                 }
-                qen = _element_nodes[qen.next];
-                last_element_node_id = qen.next;
+                else {
+                    prev_qen = search_id;
+                    search_id = next_qen;
+                }
             }
-            throw std::logic_error("Unable to remove, element not found");
+            if (prev_qen == -1) {
+                node.first_child = next_qen;
+            }
+            else {
+                _element_nodes[prev_qen].next = next_qen;
+            }
+            _elements.erase(erase_qe);
+            _element_nodes.erase(erase_qen);
+            --node.count;
+            return true;
         }
     }
+    return true;
 }
 
 /**
@@ -298,4 +348,46 @@ inside(const double x, const double y) {
 bool scenegraph::Quadtree::
 inside(Vector2& v) {
     return _aabb.inside(v[0], v[1]);
+}
+
+/**
+ * Resize Quadtree to new ``aabb``. Temporarily stores all QuadElement indices
+ * for later reinsertion into the cleared and resized Quadtree.
+ */
+void scenegraph::Quadtree::
+resize(AABB& aabb) {
+    SmallList<int> elements, to_process;
+    if (_nodes[0].count == -1){
+        to_process.push_back(0);
+    }
+
+    while (to_process.size() > 0) {
+        const int node_index = to_process.pop_back();
+        if (_nodes[node_index].count == -1) {
+            for (int i = 0; i < 4; ++i) {
+                to_process.push_back(_nodes[node_index].first_child + i);
+            }
+        }
+        else {
+            int next = _nodes[node_index].first_child;
+            while (next != -1) {
+                elements.push_back(_element_nodes[next].element);
+                next = _element_nodes[next].next;
+            }
+        }
+    }
+    _aabb = aabb;
+    _element_nodes.clear();
+    _nodes.clear();
+    _max_w = 0.0;
+    _max_h = 0.0;
+    QuadNode root;
+    root.first_child = -1;
+    root.count = -1;
+    _nodes.push_back(root);
+    while (elements.size() > 0) {
+        const int element_id = elements.pop_back();
+        insert(_elements[element_id].id, _elements[element_id].aabb);
+        _elements.erase(element_id);
+    }
 }

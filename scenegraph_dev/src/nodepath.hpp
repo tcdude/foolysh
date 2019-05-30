@@ -1,5 +1,27 @@
 /**
- * NodePath implementation
+ * Copyright (c) 2019 Tiziano Bettio
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in 
+ * all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+/**
+ * NodePath implementation.
  */
 
 #ifndef NODEPATH_HPP
@@ -103,16 +125,15 @@ namespace scenegraph {
         void set_distance_relative(const bool v);
         bool get_distance_relative();
 
-        static void get_node_path(const int node_path_id, NodePath& np);
+        static NodePath& get_node_path(const int node_path_id);
 
     private:
         void _update_relative();
-        void _update_aabb();
         Vector2 _get_offset();
-        Vector2 _get_rotation_center_offset();
         void _insert_child(const int node_path_id);
         void _remove_child(const int node_path_id);
         void _propagate_dirty();
+        NodePath& _get_root();
 
         int _node_id;
         std::unique_ptr<Vector2> _position, _r_position, _rot_center;

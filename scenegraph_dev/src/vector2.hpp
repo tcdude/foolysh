@@ -1,5 +1,27 @@
 /**
- * Basic 2D Vector implementation
+ * Copyright (c) 2019 Tiziano Bettio
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in 
+ * all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+/**
+ * Basic 2D Vector implementation.
  */
 
 #ifndef VECTOR2_HPP
@@ -28,14 +50,21 @@ namespace scenegraph {
         Vector2 operator+(const double rhs);
         Vector2& operator+=(const Vector2& rhs);
         Vector2& operator+=(const double rhs);
+        void iadd(const Vector2& rhs);
+        void iadd(const double rhs);
         Vector2 operator-(const Vector2& rhs);
         Vector2 operator-(const double rhs);
         Vector2& operator-=(const Vector2& rhs);
         Vector2& operator-=(const double rhs);
+        void isub(const Vector2& rhs);
+        void isub(const double rhs);
         Vector2 operator*(const double rhs);
         Vector2& operator*=(const double rhs);
+        void imul(const double rhs);
         Vector2 operator/(const double rhs);
+        Vector2 div(const double rhs);
         Vector2& operator/=(const double rhs);
+        void idiv(const double rhs);
         bool operator==(const Vector2& rhs);
         bool operator!=(const Vector2& rhs);
         bool operator==(const double rhs);
