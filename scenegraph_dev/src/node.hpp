@@ -1,16 +1,16 @@
 /**
  * Copyright (c) 2019 Tiziano Bettio
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in 
+ *
+ * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -18,14 +18,13 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
+ *
+ *
+ * Node implementation.
  */
 
-/**
- * NodePath implementation.
- */
-
-#ifndef NODEPATH_HPP
-#define NODEPATH_HPP
+#ifndef NODE_HPP
+#define NODE_HPP
 
 #include "vector2.hpp"
 #include "quadtree.hpp"
@@ -49,10 +48,6 @@ namespace scenegraph {
         BOTTOM_CENTER,
     };
 
-    struct Size {
-        double w = 0.0, h = 0.0;
-    };
-
     struct Scale {
         double sx = 1.0, sy = 1.0;
         Scale operator*(const Scale& rhs) {
@@ -69,32 +64,78 @@ namespace scenegraph {
         }
     };
 
-    struct ChildNodePath {
-        int node_path_id;
+    struct Size {
+        double w = 0.0, h = 0.0;
+        Size operator*(const Scale& rhs) {
+            Size s;
+            s.w = w * rhs.sx;
+            s.h = h * rhs.sy;
+            return s;
+        }
+    };
+
+    struct ChildNode {
+        int node_id;
         int next = -1;
     };
 
     struct QuadtreeEntry {
-        int node_path_id;
+        int node_id;
         AABB aabb;
     };
 
-    class NodePath {
-    public:
-        NodePath();
-        ~NodePath();
-        NodePath(const NodePath& other);
-        NodePath(NodePath&& other) noexcept;
-        NodePath& operator=(const NodePath& other);
-        NodePath& operator=(NodePath&& other) noexcept;
+    struct NodeData {
+        NodeData();
+        ~NodeData();
+        NodeData& operator=(const NodeData& other);
 
-        NodePath attach_new_node_path();
-        void reparent_to(NodePath& parent);
+        bool _traverse();
+        SmallList<int> _query(AABB& aabb);
+        void _insert_child(const int node_id);
+        void _remove_child(const int node_id);
+        void _propagate_dirty();
+        void _update_relative();
+        Vector2 _get_offset();
+
+        Vector2 _position, _r_position, _tl_position, _rot_center;
+        std::vector<QuadtreeEntry> _tmp_quadtree_entry;
+        double _angle, _r_angle;
+        Scale _scale, _r_scale;
+        Size _size, _r_size;
+        int _depth, _r_depth;
+        bool _dirty, _distance_relative, _hidden, _isnew;
+        std::unique_ptr<Quadtree> _quadtree;
+        int _parent, _first_child, _node_data_id;
+        Origin _origin;
+        AABB _aabb;
+        unsigned int _ref_count;
+
+        static ExtFreeList<ChildNode> _child_nodes;
+        static ExtFreeList<NodeData*> _nd;
+        static int _max_qt_leaf_elements, _max_qt_depth;
+    };
+    ExtFreeList<NodeData*> NodeData::_nd;
+    ExtFreeList<ChildNode> NodeData::_child_nodes;
+    int NodeData::_max_qt_leaf_elements = 8;
+    int NodeData::_max_qt_depth = 8;
+
+    class Node {
+    public:
+        Node();
+        ~Node();
+        Node(const Node& other);
+        Node(Node&& other) noexcept;
+        Node& operator=(const Node& other);
+        Node& operator=(Node&& other) noexcept;
+
+        Node attach_node();
+        void reparent_to(Node& parent);
+        void reparent_to(const int parent);
         bool traverse();
         SmallList<int> query(AABB& aabb);
         void hide();
         void show();
-        
+
         int get_id();
         void set_pos(const double v);
         void set_pos(const double x, const double y);
@@ -118,6 +159,7 @@ namespace scenegraph {
         Scale get_relative_scale();
         double get_relative_angle();
         int get_relative_depth();
+        Size get_relative_size();
 
         void set_size(const Size& s);
         void set_size(const double w, const double h);
@@ -125,38 +167,15 @@ namespace scenegraph {
         void set_distance_relative(const bool v);
         bool get_distance_relative();
 
-        static NodePath& get_node_path(const int node_path_id);
+        AABB get_aabb();
 
     private:
-        void _update_relative();
-        Vector2 _get_offset();
-        void _insert_child(const int node_path_id);
-        void _remove_child(const int node_path_id);
-        void _propagate_dirty();
-        NodePath& _get_root();
+        inline NodeData& _get_root();
+        inline NodeData& _get_node_data(const int node_id);
 
         int _node_id;
-        std::unique_ptr<Vector2> _position, _r_position, _rot_center;
-        std::unique_ptr<std::vector<QuadtreeEntry>> _tmp_quadtree_entry;
-        double _angle, _r_angle;
-        Scale _scale, _r_scale;
-        Size _size;
-        int _depth, _r_depth;
-        bool _dirty, _distance_relative, _hidden, _isnew;
-        std::unique_ptr<Quadtree> _quadtree;
-        int _parent, _first_child;
-        Origin _origin;
-        AABB _aabb;
 
-        static ExtFreeList<NodePath*> _node_paths;
-        static ExtFreeList<ChildNodePath> _child_node_paths;
-        static int _max_qt_leaf_elements, _max_qt_depth;
     };
-
-    ExtFreeList<NodePath*> NodePath::_node_paths;
-    ExtFreeList<ChildNodePath> NodePath::_child_node_paths;
-    int NodePath::_max_qt_leaf_elements = 8;
-    int NodePath::_max_qt_depth = 8;
 }  // namespace scenegraph
 
-#endif 
+#endif

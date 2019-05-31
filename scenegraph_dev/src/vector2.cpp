@@ -1,16 +1,16 @@
 /**
  * Copyright (c) 2019 Tiziano Bettio
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in 
+ *
+ * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -67,8 +67,8 @@ Vector2(const double x, const double y) {
  * Copy c-tor
  */
 scenegraph::Vector2::
-Vector2(const Vector2& other) : _x(other._x), _y(other._y), 
-                                _magnitude(other._magnitude), 
+Vector2(const Vector2& other) : _x(other._x), _y(other._y),
+                                _magnitude(other._magnitude),
                                 _length(other._length), _state(other._state) {
 }
 
@@ -148,8 +148,8 @@ length() {
 }
 
 /**
- * Rotates this Vector2 by ``a`` degrees if ``radians`` is false, otherwise by
- * ``a`` radians.
+ * Rotates this Vector2 by ``a`` degrees/radians in a clockwise direction
+ * depending on argument ``radians``. Default is false (=degrees).
  */
 void scenegraph::Vector2::
 rotate(double a, bool radians) {
@@ -157,14 +157,17 @@ rotate(double a, bool radians) {
         a *= -to_rad;
     }
     const double sa = std::sin(a), ca = std::cos(a);
-    _x = ca * _x - sa * _y;
-    _y = sa * _x + ca * _y;
+    const double x = ca * _x - sa * _y;
+    const double y = sa * _x + ca * _y;
+    _x = x;
+    _y = y;
     _state = 0;
 }
 
 /**
- * Return a rotated Vector2 by ``a`` degrees if ``radians`` is false, otherwise 
- * by ``a`` radians.
+ * Return a Vector2 of this instance, rotated by ``a`` degrees/radians in a
+ * clockwise direction depending on argument ``radians``. Default is
+ * false (=degrees).
  */
 scenegraph::Vector2 scenegraph::Vector2::
 rotated(double a, bool radians) {
@@ -184,7 +187,7 @@ almost_equal(Vector2& other, const double d) {
 }
 
 /**
- * 
+ *
  */
 double& scenegraph::Vector2::
 operator[](const int idx) {
@@ -372,7 +375,7 @@ idiv(const double rhs) {
 }
 
 /**
- * 
+ *
  */
 bool scenegraph::Vector2::
 operator==(const Vector2& rhs) {
@@ -380,7 +383,7 @@ operator==(const Vector2& rhs) {
 }
 
 /**
- * 
+ *
  */
 bool scenegraph::Vector2::
 operator!=(const Vector2& rhs) {
@@ -388,7 +391,7 @@ operator!=(const Vector2& rhs) {
 }
 
 /**
- * 
+ *
  */
 bool scenegraph::Vector2::
 operator==(const double rhs) {
@@ -396,7 +399,7 @@ operator==(const double rhs) {
 }
 
 /**
- * 
+ *
  */
 bool scenegraph::Vector2::
 operator!=(const double rhs) {

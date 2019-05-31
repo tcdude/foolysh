@@ -36,6 +36,7 @@ cdef extern from "src/aabb.hpp" namespace "scenegraph":
         TR,
         BL,
         BR
+        
     cdef cppclass AABB:
         AABB() except +
         AABB(double, double, double, double) except +

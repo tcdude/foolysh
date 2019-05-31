@@ -45,7 +45,7 @@ cdef class Vector2:
                     raise TypeError
             elif len(args) == 2 and isinstance(args[0], (int, float)) \
                  and isinstance(args[1], (int, float)):
-                self.thisptr.reset(new _Vector2(args[0], args[1]))    
+                self.thisptr.reset(new _Vector2(args[0], args[1]))
 
     def dot(self, other):
         if not isinstance(other, Vector2):
@@ -67,13 +67,22 @@ cdef class Vector2:
         v.normalize()
         ret = Vector2.__new__(Vector2, deref(v)[0], deref(v)[1])
         del v
-        return ret 
+        return ret
 
+    @property
     def magnitude(self):
         return deref(self.thisptr).magnitude()
 
+    @property
     def length(self):
         return deref(self.thisptr).length()
+
+    cpdef void rotate(self, double a, bint radians=False):
+        deref(self.thisptr).rotate(a, radians)
+
+    cpdef Vector2 rotated(self, double a, bint radians=False):
+        cdef _Vector2 v = deref(self.thisptr).rotated(a, radians)
+        return Vector2(v[0], v[1])
 
     @property
     def x(self):

@@ -5,7 +5,7 @@ https://bit.ly/309V7J2
 """
 
 from _aabb cimport AABB
-from _nodepath cimport SmallList
+from _node cimport SmallList
 
 __author__ = 'Tiziano Bettio'
 __license__ = 'MIT'
@@ -38,7 +38,7 @@ cdef extern from "src/quadtree.hpp" namespace "scenegraph":
     cdef cppclass Quadtree:
         Quadtree() except +
         Quadtree(const AABB&, const int, const int) except +
-        
+
         SmallList[int] query(AABB&)
         bint insert(const int, AABB&)
         bint move(const int, AABB&, AABB&)

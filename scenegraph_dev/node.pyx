@@ -1,15 +1,15 @@
 # distutils: language = c++
 """
-NodePath implementation.
+Node implementation.
 """
 
 from enum import Enum
 
-from _nodepath cimport NodePath as _NodePath
-from _nodepath cimport SmallList
-from _nodepath cimport Scale
-from _nodepath cimport Size
-from _nodepath cimport Origin as _Origin
+from _node cimport Node as _Node
+from _node cimport SmallList
+from _node cimport Scale
+from _node cimport Size
+from _node cimport Origin as _Origin
 from _aabb cimport AABB as _AABB
 from aabb cimport AABB
 from _vector2 cimport Vector2 as _Vector2
@@ -57,38 +57,38 @@ class Origin(Enum):
     BOTTOM_CENTER=8
 
 
-cdef class NodePath:
-    cdef unique_ptr[_NodePath] thisptr
+cdef class Node:
+    cdef unique_ptr[_Node] thisptr
 
     def __cinit__(self):
-        self.thisptr.reset(new _NodePath())
-        # Reference the NodePath instance to keep it alive
-        _nodepaths[deref(self.thisptr).get_id()] = self  
+        self.thisptr.reset(new _Node())
+        # Reference the Node instance to keep it alive
+        _nodepaths[deref(self.thisptr).get_id()] = self
 
     @property
     def node_path_id(self):
         return deref(self.thisptr).get_id()
 
     cpdef void remove(self):
-        """Removes NodePath so it can get garbage collected."""
+        """Removes Node so it can get garbage collected."""
         _nodepaths.pop(deref(self.thisptr).get_id())
 
-    def attach_new_node_path(self):
-        np = NodePath.__new__(NodePath)
-        self._attach_new_node_path(np)
+    def attach_node(self):
+        np = Node.__new__(Node)
+        self._attach_node(np)
         return np
 
-    cdef void _attach_new_node_path(self, NodePath np):
-        cdef unique_ptr[_NodePath] _np
+    cdef void _attach_node(self, Node np):
+        cdef unique_ptr[_Node] _np
         _nodepaths.pop(deref(np.thisptr).get_id())
-        _np.reset(new _NodePath(deref(self.thisptr).attach_new_node_path()))
+        _np.reset(new _Node(deref(self.thisptr).attach_node()))
         _nodepaths[deref(_np).get_id()] = np
         np.thisptr.reset(_np.release())
 
     def reparent_to(self, parent):
         self._reparent_to(parent)
 
-    cdef void _reparent_to(self, NodePath parent):
+    cdef void _reparent_to(self, Node parent):
         deref(self.thisptr).reparent_to(deref(parent.thisptr))
 
     def traverse(self):
@@ -101,7 +101,7 @@ cdef class NodePath:
         cdef SmallList[int] r = deref(self.thisptr).query(deref(aabb.thisptr))
         cdef list rl = []
         for i in range(r.size()):
-            rl.append(r[i])
+            rl.append(_nodepaths[r[i]])
         return rl
 
     def hide(self):
@@ -132,7 +132,7 @@ cdef class NodePath:
 
     cdef void _set_pos_single(self, const double v):
         deref(self.thisptr).set_pos(v)
-    
+
     cdef void _set_pos(self, const double x, const double y):
         deref(self.thisptr).set_pos(x, y)
 
@@ -159,7 +159,7 @@ cdef class NodePath:
 
     cdef void _set_scale_single(self, const double v):
         deref(self.thisptr).set_scale(v)
-    
+
     cdef void _set_scale(self, const double x, const double y):
         deref(self.thisptr).set_scale(x, y)
 
@@ -296,3 +296,26 @@ cdef class NodePath:
             deref(self.thisptr).set_distance_relative(v)
         else:
             raise TypeError
+
+    @property
+    def relative_size(self):
+        s = self._get_relative_size()
+        return s
+
+    @property
+    def aabb(self):
+        return self._get_aabb()
+
+    cdef AABB _get_aabb(self):
+        cdef _AABB _aabb = deref(self.thisptr).get_aabb()
+        return AABB(_aabb.x, _aabb.y, _aabb.hw, _aabb.hh)
+
+    cdef tuple _get_relative_size(self):
+        cdef Size s = deref(self.thisptr).get_relative_size()
+        return s.w, s.h
+
+    def __repr__(self):
+        return f'{type(self).__name__}{str(self)}'
+
+    def __str__(self):
+        return f'(id:{self.node_path_id})'

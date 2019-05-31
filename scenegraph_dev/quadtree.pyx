@@ -5,7 +5,7 @@ https://bit.ly/309V7J2
 """
 
 from _quadtree cimport Quadtree as _Quadtree
-from _nodepath cimport SmallList
+from _node cimport SmallList
 from _aabb cimport AABB
 from aabb cimport AABB as AABB_
 
@@ -66,6 +66,7 @@ def get_quadtree(aabb, max_leaf_elements=8, max_depth=8):
     return _get_quadtree(aabb, max_leaf_elements, max_depth)
 
 cdef Quadtree _get_quadtree(AABB_ aabb, const int max_leaf_elements, const int max_depth):
+    cdef AABB caabb = aabb.aabb()
     qt = Quadtree()
-    qt.thisptr.reset(new _Quadtree(aabb.aabb(), max_leaf_elements, max_depth))
+    qt.thisptr.reset(new _Quadtree(caabb, max_leaf_elements, max_depth))
     return qt

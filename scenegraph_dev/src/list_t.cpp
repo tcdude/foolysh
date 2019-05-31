@@ -1,16 +1,16 @@
 /**
  * Copyright (c) 2019 Tiziano Bettio
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in 
+ *
+ * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -21,8 +21,8 @@
  */
 
 /**
- * Provides an indexed free list with constant-time removals from anywhere 
- * in the list without invalidating indices. T must be trivially constructible 
+ * Provides an indexed free list with constant-time removals from anywhere
+ * in the list without invalidating indices. T must be trivially constructible
  * and destructible.
  */
 
@@ -35,13 +35,13 @@
  */
 
 /**
- * 
+ *
  */
 template <class T>
 FreeList<T>::FreeList(): first_free(-1) {}
 
 /**
- * 
+ *
  */
 template <class T>
 int FreeList<T>::insert(const T& element) {
@@ -60,7 +60,7 @@ int FreeList<T>::insert(const T& element) {
 }
 
 /**
- * 
+ *
  */
 template <class T>
 void FreeList<T>::erase(int n) {
@@ -69,7 +69,7 @@ void FreeList<T>::erase(int n) {
 }
 
 /**
- * 
+ *
  */
 template <class T>
 void FreeList<T>::clear() {
@@ -78,7 +78,7 @@ void FreeList<T>::clear() {
 }
 
 /**
- * 
+ *
  */
 template <class T>
 int FreeList<T>::range() const {
@@ -86,7 +86,7 @@ int FreeList<T>::range() const {
 }
 
 /**
- * 
+ *
  */
 template <class T>
 T& FreeList<T>::operator[](int n) {
@@ -94,7 +94,7 @@ T& FreeList<T>::operator[](int n) {
 }
 
 /**
- * 
+ *
  */
 template <class T>
 const T& FreeList<T>::operator[](int n) const {
@@ -107,21 +107,21 @@ const T& FreeList<T>::operator[](int n) const {
  */
 
 /**
- * 
+ *
  */
 template <class T>
 SmallList<T>::SmallList() : _size(0), _is_vec(false) {
 }
 
 /**
- * 
+ *
  */
 template <class T>
 SmallList<T>::~SmallList() {
 }
 
 /**
- * 
+ *
  */
 template <class T>
 SmallList<T>::SmallList(const SmallList<T>& other) {
@@ -137,7 +137,7 @@ SmallList<T>::SmallList(const SmallList<T>& other) {
 }
 
 /**
- * 
+ *
  */
 template <class T>
 SmallList<T>::SmallList(SmallList<T>&& other) noexcept {
@@ -153,7 +153,7 @@ SmallList<T>::SmallList(SmallList<T>&& other) noexcept {
 }
 
 /**
- * 
+ *
  */
 template <class T>
 SmallList<T>& SmallList<T>::operator=(const SmallList<T>& other) {
@@ -161,7 +161,7 @@ SmallList<T>& SmallList<T>::operator=(const SmallList<T>& other) {
 }
 
 /**
- * 
+ *
  */
 template <class T>
 SmallList<T>& SmallList<T>::operator=(SmallList<T>&& other) noexcept {
@@ -178,7 +178,7 @@ SmallList<T>& SmallList<T>::operator=(SmallList<T>&& other) noexcept {
 }
 
 /**
- * 
+ *
  */
 template <class T>
 void SmallList<T>::push_back(const T& element) {
@@ -202,7 +202,7 @@ void SmallList<T>::push_back(const T& element) {
 }
 
 /**
- * 
+ *
  */
 template <class T>
 T SmallList<T>::pop_back() {
@@ -216,7 +216,7 @@ T SmallList<T>::pop_back() {
 }
 
 /**
- * 
+ *
  */
 template <class T>
 int SmallList<T>::size() {
@@ -227,7 +227,7 @@ int SmallList<T>::size() {
 }
 
 /**
- * 
+ *
  */
 template <class T>
 T& SmallList<T>::operator[](int n) {
@@ -238,7 +238,7 @@ T& SmallList<T>::operator[](int n) {
 }
 
 /**
- * 
+ *
  */
 template <class T>
 const T& SmallList<T>::operator[](int n) const {
@@ -254,20 +254,20 @@ const T& SmallList<T>::operator[](int n) const {
  */
 
 /**
- * 
+ *
  */
 template <class T>
 ExtFreeList<T>::ExtFreeList(): first_free(-1), free_count(0) {}
 
 /**
- * 
+ *
  */
 template <class T>
 int ExtFreeList<T>::insert(const T& element) {
     if (first_free != -1) {
         const int index = first_free;
-        first_free = data[first_free].e.next;
-        data[index].e.element = element;
+        first_free = data[first_free].next;
+        data[index].element = element;
         data[index].free = false;
         return index;
     }
@@ -275,17 +275,17 @@ int ExtFreeList<T>::insert(const T& element) {
         //FreeElement fe();
         //fe.e.element = element;
         data.push_back(FreeElement());
-        data.back().e.element = element;
+        data.back().element = element;
         return static_cast<int>(data.size() - 1);
     }
 }
 
 /**
- * 
+ *
  */
 template <class T>
 void ExtFreeList<T>::erase(int n) {
-    data[n].e.next = first_free;
+    data[n].next = first_free;
     data[n].free = true;
     first_free = n;
     ++free_count;
@@ -295,7 +295,7 @@ void ExtFreeList<T>::erase(int n) {
 }
 
 /**
- * 
+ *
  */
 template <class T>
 void ExtFreeList<T>::clear() {
@@ -305,7 +305,7 @@ void ExtFreeList<T>::clear() {
 }
 
 /**
- * 
+ *
  */
 template <class T>
 int ExtFreeList<T>::range() const {
@@ -313,28 +313,28 @@ int ExtFreeList<T>::range() const {
 }
 
 /**
- * 
+ *
  */
 template <class T>
 bool ExtFreeList<T>::active(int n) {
-    if (n < (int) data.size()) {
+    if (n < (int) data.size() && n > -1) {
         return (data[n].free) ? false : true;
     }
     return false;
 }
 
 /**
- * 
+ *
  */
 template <class T>
 T& ExtFreeList<T>::operator[](int n) {
-    return data[n].e.element;
+    return data[n].element;
 }
 
 /**
- * 
+ *
  */
 template <class T>
 const T& ExtFreeList<T>::operator[](int n) const {
-    return data[n].e.element;
+    return data[n].element;
 }

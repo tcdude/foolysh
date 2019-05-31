@@ -63,10 +63,10 @@ cdef extern from "src/list_t.hpp" namespace "":
         bint active(int)
         T& operator[](int)
 
-cdef extern from "src/nodepath.cpp":
+cdef extern from "src/node.cpp":
     pass
 
-cdef extern from "src/nodepath.hpp" namespace "scenegraph":
+cdef extern from "src/node.hpp" namespace "scenegraph":
     cdef enum Origin "scenegraph::Origin":
         TOP_LEFT,
         TOP_RIGHT,
@@ -77,7 +77,7 @@ cdef extern from "src/nodepath.hpp" namespace "scenegraph":
         BOTTOM_LEFT,
         BOTTOM_RIGHT,
         BOTTOM_CENTER
-    
+
     cdef cppclass Size "scenegraph::Size":
         double w
         double h
@@ -97,17 +97,18 @@ cdef extern from "src/nodepath.hpp" namespace "scenegraph":
         int node_path_id
         AABB aabb
 
-    cdef cppclass NodePath:
-        NodePath() except +
-        NodePath(const NodePath&) except +
+    cdef cppclass Node:
+        Node() except +
+        Node(const Node&) except +
 
-        NodePath attach_new_node_path()
-        void reparent_to(NodePath&)
+        Node attach_node()
+        void reparent_to(Node&)
+        void reparent_to(const int)
         bint traverse() except +
-        SmallList[int] query(AABB&)
+        SmallList[int] query(AABB&) except +
         void hide()
         void show()
-        
+
         int get_id()
         void set_pos(const double)
         void set_pos(const double, const double)
@@ -131,12 +132,12 @@ cdef extern from "src/nodepath.hpp" namespace "scenegraph":
         Scale get_relative_scale()
         double get_relative_angle()
         int get_relative_depth()
+        Size get_relative_size()
 
         void set_size(const Size&)
         void set_size(const double, const double)
         Size get_size()
         void set_distance_relative(const bint)
         bint get_distance_relative()
-        
-        @staticmethod
-        NodePath& get_node_path(const int)
+
+        AABB get_aabb()

@@ -18,9 +18,8 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- */
-
-/**
+ * 
+ * 
  * Simple Quadtree implementation, partially based on information found on:
  * https://bit.ly/309V7J2
  */
