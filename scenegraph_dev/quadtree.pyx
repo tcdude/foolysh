@@ -6,8 +6,8 @@ https://bit.ly/309V7J2
 
 from _quadtree cimport Quadtree as _Quadtree
 from _node cimport SmallList
-from _aabb cimport AABB
-from aabb cimport AABB as AABB_
+from _aabb cimport AABB as _AABB
+from aabb cimport AABB
 
 from cython.operator cimport dereference as deref
 
@@ -43,30 +43,42 @@ cdef class Quadtree:
     def __cinit__(self, *args, **kwargs):
         pass
 
-    cdef bint insert(self, const int id, AABB& aabb):
-        return deref(self.thisptr).insert(id, aabb)
+    def __init__(self, aabb=None, max_leaf_elements=8, max_depth=8):
+        if aabb is None:
+            aabb = AABB()
+        self._init_ptr(aabb, max_leaf_elements, max_depth)
 
-    cdef bint move(self, const int id, AABB& aabb_from, AABB& aabb_to):
-        return deref(self.thisptr).move(id, aabb_from, aabb_to)
+    cdef _init_ptr(self, AABB aabb, const int mle, const int md):
+        cdef _AABB caabb = aabb.aabb()
+        self.thisptr.reset(new _Quadtree(caabb, mle, md))
 
-    cdef bint remove(self, const int id, AABB& aabb):
-        return deref(self.thisptr).remove(id, aabb)
+    cpdef bint insert(self, const int id, AABB aabb):
+        cdef _AABB caabb = aabb.aabb()
+        return deref(self.thisptr).insert(id, caabb)
 
-    cdef bint cleanup(self):
+    cpdef bint move(self, const int id, AABB aabb_from, AABB aabb_to):
+        cdef _AABB caabb_f = aabb_from.aabb()
+        cdef _AABB caabb_t = aabb_to.aabb()
+        return deref(self.thisptr).move(id, caabb_f, caabb_t)
+
+    cpdef bint remove(self, const int id, AABB aabb):
+        cdef _AABB caabb = aabb.aabb()
+        return deref(self.thisptr).remove(id, caabb)
+
+    cpdef bint cleanup(self):
         return deref(self.thisptr).cleanup()
 
-    cdef bint inside(self, const double x, const double y):
+    cpdef bint inside(self, const double x, const double y):
         return deref(self.thisptr).inside(x, y)
 
-    cdef void resize(self, AABB& aabb):
-        deref(self.thisptr).resize(aabb)
+    cpdef void resize(self, AABB aabb):
+        cdef _AABB caabb = aabb.aabb()
+        deref(self.thisptr).resize(caabb)
 
-
-def get_quadtree(aabb, max_leaf_elements=8, max_depth=8):
-    return _get_quadtree(aabb, max_leaf_elements, max_depth)
-
-cdef Quadtree _get_quadtree(AABB_ aabb, const int max_leaf_elements, const int max_depth):
-    cdef AABB caabb = aabb.aabb()
-    qt = Quadtree()
-    qt.thisptr.reset(new _Quadtree(caabb, max_leaf_elements, max_depth))
-    return qt
+    cpdef list query(self, AABB aabb):
+        cdef _AABB caabb = aabb.aabb()
+        cdef SmallList[int] r = deref(self.thisptr).query(caabb)
+        cdef list rl = []
+        for i in range(r.size()):
+            rl.append(r[i])
+        return rl

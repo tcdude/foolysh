@@ -27,6 +27,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE."""
 
 
+cdef extern from "src/common.hpp":
+    pass
+
 cdef extern from "src/vector2.cpp":
     pass
 

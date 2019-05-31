@@ -46,4 +46,3 @@ cdef extern from "src/quadtree.hpp" namespace "scenegraph":
         bint cleanup()
         bint inside(const double, const double)
         void resize(AABB&)
-

@@ -29,6 +29,9 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE."""
 
+cdef extern from "src/common.hpp":
+    pass
+
 cdef extern from "src/quadtree.cpp":
     pass
 
