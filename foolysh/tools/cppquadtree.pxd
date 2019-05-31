@@ -1,7 +1,11 @@
 # distutils: language = c++
 """
-Simple 2D Axis Aligned Bounding Box implementation.
+Simple Quadtree implementation, partially based on information found on:
+https://bit.ly/309V7J2
 """
+
+from .cppaabb cimport AABB
+from ..scene.cppnode cimport SmallList
 
 __author__ = 'Tiziano Bettio'
 __license__ = 'MIT'
@@ -27,22 +31,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE."""
 
 
-cdef extern from "src/aabb.cpp":
+cdef extern from "src/quadtree.cpp":
     pass
 
-cdef extern from "src/aabb.hpp" namespace "scenegraph":
-    cdef enum Quadrant "scenegraph::Quadrant":
-        TL,
-        TR,
-        BL,
-        BR
-        
-    cdef cppclass AABB:
-        AABB() except +
-        AABB(double, double, double, double) except +
-        bint inside(AABB)
-        bint inside(double, double)
-        bint overlap(AABB)
-        AABB split(Quadrant)
-        AABB split(double, double, Quadrant)
-        double x, y, hw, hh
+cdef extern from "src/quadtree.hpp" namespace "tools":
+    cdef cppclass Quadtree:
+        Quadtree() except +
+        Quadtree(const AABB&, const int, const int) except +
+
+        SmallList[int] query(AABB&)
+        bint insert(const int, AABB&)
+        bint move(const int, AABB&, AABB&)
+        bint remove(const int, AABB&)
+        bint cleanup()
+        bint inside(const double, const double)
+        void resize(AABB&)

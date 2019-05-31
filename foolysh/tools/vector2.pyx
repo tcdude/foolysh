@@ -3,7 +3,7 @@
 Basic 2D Vector implementation.
 """
 
-from _vector2 cimport Vector2 as _Vector2
+from .cppvector2 cimport Vector2 as _Vector2
 
 cimport cython
 from cython.operator cimport dereference as deref

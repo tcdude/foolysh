@@ -1,11 +1,7 @@
 # distutils: language = c++
 """
-Basic 2D Vector implementation.
+Simple 2D Axis Aligned Bounding Box implementation.
 """
-
-from _vector2 cimport Vector2 as _Vector2
-
-from libcpp.memory cimport unique_ptr
 
 __author__ = 'Tiziano Bettio'
 __license__ = 'MIT'
@@ -31,25 +27,22 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE."""
 
 
-cdef class Vector2:
-    cdef unique_ptr[_Vector2] thisptr
+cdef extern from "src/aabb.cpp":
+    pass
 
-    cdef double _dot(self, Vector2 other)
-    cdef Vector2 _normalized(self)
-    cpdef void rotate(self, double a, bint radians=*)
-    cpdef Vector2 rotated(self, double a, bint radians=*)
-    cpdef Vector2 add(self, Vector2 other)
-    cdef void _iadd_vec(Vector2 self, Vector2 other)
-    cpdef Vector2 add_scalar(self, const double other)
-    cpdef Vector2 sub(self, Vector2 other)
-    cdef void _isub_vec(Vector2 self, Vector2 other)
-    cpdef Vector2 sub_scalar(self, const double other)
-    cpdef Vector2 sub_scalar_r(self, const double other)
-    cpdef Vector2 neg(self)
-    cpdef Vector2 mul(self, const double other)
-    cpdef Vector2 tdiv(self, double value)
-    cpdef bint eq(self, Vector2 other)
-    cpdef bint eq_scalar(self, double other)
-    cpdef bint ne(self, Vector2 other)
-    cpdef bint ne_scalar(self, double other)
-    cdef public _Vector2 vector2(self)
+cdef extern from "src/aabb.hpp" namespace "tools":
+    cdef enum Quadrant "tools::Quadrant":
+        TL,
+        TR,
+        BL,
+        BR
+
+    cdef cppclass AABB:
+        AABB() except +
+        AABB(double, double, double, double) except +
+        bint inside(AABB)
+        bint inside(double, double)
+        bint overlap(AABB)
+        AABB split(Quadrant)
+        AABB split(double, double, Quadrant)
+        double x, y, hw, hh

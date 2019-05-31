@@ -1,8 +1,11 @@
+# distutils: language = c++
 """
-Cython implementation of Quadtree class.
+Basic 2D Vector implementation.
 """
 
-from .aabb cimport AABB
+from .cppvector2 cimport Vector2 as _Vector2
+
+from libcpp.memory cimport unique_ptr
 
 __author__ = 'Tiziano Bettio'
 __license__ = 'MIT'
@@ -27,58 +30,26 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE."""
 
-ctypedef struct QuadNode:
-    int first_child
-    short count
 
-ctypedef struct Item:
-    int id
-    Item* next
+cdef class Vector2:
+    cdef unique_ptr[_Vector2] thisptr
 
-ctypedef struct Position:
-    double cx, cy, hw, hh
-
-ctypedef fused Ptr:
-    QuadNode
-    Item
-    Position
-
-ctypedef unsigned long u_long
-
-
-cdef class CVec:
-    cdef Ptr* _vec
-    cdef u_long _size, _capacity
-
-    cdef void push_back(self, Ptr value)
-    cdef int reserve(self, u_long capacity)
-    cdef int shrink_to_fit(self)
-    cdef u_long size(self)
-    cdef u_long size(self)
-
-
-cdef class Quadtree:
-    cdef Item* items
-    cdef Position* positions
-    cdef QuadNode* nodes
-    cdef QuadNode* free_list
-    cdef Position aabb
-
-
-
-cdef class Quadtree:
-    cdef public AABB aabb
-    cdef Children children
-    cdef public list child_nodes, items, positions
-    cdef readonly int max_level
-    cdef item_count
-
-    cpdef list get_items(self, pos, bint overlap=*)
-    cpdef bint add(self, obj, pos)
-    cpdef void populate_children(self)
-
-
-cdef class Children:
-    cdef AABB ul, ur, dl, dr
-
-cpdef Quadtree quadtree_from_pairs(list quadtree_pairs, int max_level=*)
+    cdef double _dot(self, Vector2 other)
+    cdef Vector2 _normalized(self)
+    cpdef void rotate(self, double a, bint radians=*)
+    cpdef Vector2 rotated(self, double a, bint radians=*)
+    cpdef Vector2 add(self, Vector2 other)
+    cdef void _iadd_vec(Vector2 self, Vector2 other)
+    cpdef Vector2 add_scalar(self, const double other)
+    cpdef Vector2 sub(self, Vector2 other)
+    cdef void _isub_vec(Vector2 self, Vector2 other)
+    cpdef Vector2 sub_scalar(self, const double other)
+    cpdef Vector2 sub_scalar_r(self, const double other)
+    cpdef Vector2 neg(self)
+    cpdef Vector2 mul(self, const double other)
+    cpdef Vector2 tdiv(self, double value)
+    cpdef bint eq(self, Vector2 other)
+    cpdef bint eq_scalar(self, double other)
+    cpdef bint ne(self, Vector2 other)
+    cpdef bint ne_scalar(self, double other)
+    cdef public _Vector2 vector2(self)
