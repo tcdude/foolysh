@@ -3,8 +3,8 @@
 NodePath implementation.
 """
 
-from _vector2 cimport Vector2
-from _aabb cimport AABB
+from ..tools.cppvector2 cimport Vector2
+from ..tools.cppaabb cimport AABB
 
 __author__ = 'Tiziano Bettio'
 __license__ = 'MIT'
@@ -41,7 +41,7 @@ cdef extern from "src/quadtree.hpp":
 cdef extern from "src/list_t.cpp":
     pass
 
-cdef extern from "src/list_t.hpp" namespace "":
+cdef extern from "src/list_t.hpp" namespace "tools":
     cdef cppclass FreeList[T]:
         FreeList()
         int insert(T&)
@@ -91,14 +91,6 @@ cdef extern from "src/node.hpp" namespace "scenegraph":
         Scale operator*(const Scale&)
         bint operator==(const double)
         bint operator!=(const double)
-
-    cdef cppclass ChildNodePath "scenegraph::ChildNodePath":
-        int node_path_id
-        int next
-
-    cdef cppclass QuadtreeEntry "scenegraph::QuadtreeEntry":
-        int node_path_id
-        AABB aabb
 
     cdef cppclass Node:
         Node() except +

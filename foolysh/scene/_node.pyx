@@ -5,15 +5,15 @@ Node implementation.
 
 from enum import Enum
 
-from _node cimport Node as _Node
-from _node cimport SmallList
-from _node cimport Scale
-from _node cimport Size
-from _node cimport Origin as _Origin
-from _aabb cimport AABB as _AABB
-from aabb cimport AABB
-from _vector2 cimport Vector2 as _Vector2
-from vector2 cimport Vector2
+from .cppnode cimport Node as _Node
+from .cppnode cimport SmallList
+from .cppnode cimport Scale
+from .cppnode cimport Size
+from .cppnode cimport Origin as _Origin
+from ..tools.cppaabb cimport AABB as _AABB
+from ..tools.aabb cimport AABB
+from ..tools.cppvector2 cimport Vector2 as _Vector2
+from ..tools.vector2 cimport Vector2
 
 from cython.operator cimport dereference as deref
 

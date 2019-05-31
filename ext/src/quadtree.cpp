@@ -1,16 +1,16 @@
 /**
  * Copyright (c) 2019 Tiziano Bettio
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in 
+ *
+ * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -34,7 +34,7 @@
 /**
  * Default constructor, splits leafs at 8 elements and limits depth to 8.
  */
-scenegraph::Quadtree::
+tools::Quadtree::
 Quadtree() {
     _aabb = AABB(0.0, 0.0, 1.0, 1.0);
     _max_leaf_elements = 8;
@@ -48,9 +48,9 @@ Quadtree() {
 }
 
 /**
- * 
+ *
  */
-scenegraph::Quadtree::
+tools::Quadtree::
 Quadtree(AABB& aabb, const int max_leaf_elements, const int max_depth) {
     _aabb = aabb;
     _max_leaf_elements = max_leaf_elements;
@@ -66,7 +66,7 @@ Quadtree(AABB& aabb, const int max_leaf_elements, const int max_depth) {
 /**
  * Return ``SmallList<int>`` with ids intersecting with ``aabb``.
  */
-SmallList<int> scenegraph::Quadtree::
+SmallList<int> tools::Quadtree::
 query(AABB& aabb) {
     SmallList<int> result;
     if (_nodes[0].first_child == -1) {
@@ -76,7 +76,7 @@ query(AABB& aabb) {
     SmallList<AABB> quadrants;
     /* Extend search AABB to allow for cheap point inside AABB check */
     AABB search_aabb = AABB(aabb.x, aabb.y, aabb.hw + _max_w, aabb.hh + _max_h);
-    
+
     to_process.push_back(0);
     quadrants.push_back(_aabb);
     while (to_process.size() > 0) {
@@ -109,7 +109,7 @@ query(AABB& aabb) {
 /**
  * Insert ``id`` into Quadtree using ``aabb``. Return ``true`` if successful.
  */
-bool scenegraph::Quadtree::
+bool tools::Quadtree::
 insert(const int id, AABB& aabb) {
     QuadElement qe;
     qe.id = id;
@@ -135,7 +135,7 @@ insert(const int id, AABB& aabb) {
  * Return last element_node index for insertion of an element and increments
  * the node count by 1.
  */
-int scenegraph::Quadtree::
+int tools::Quadtree::
 _insert_element_node(AABB& aabb) {
     AABB current_quadrant = _aabb;
     SmallList<int> to_process;
@@ -169,7 +169,7 @@ _insert_element_node(AABB& aabb) {
             }
         }
         /* Is Branch */
-        scenegraph::Quadrant quadrant = current_quadrant.find_quadrant(aabb.x, aabb.y);
+        tools::Quadrant quadrant = current_quadrant.find_quadrant(aabb.x, aabb.y);
         to_process.push_back(_nodes[node_index].first_child + (int) quadrant);
         current_quadrant = current_quadrant.split(quadrant);
         ++depth;
@@ -180,7 +180,7 @@ _insert_element_node(AABB& aabb) {
 /**
  * Convert Leaf to Branch.
  */
-void scenegraph::Quadtree::
+void tools::Quadtree::
 _leaf_to_branch(const int node_id, AABB& aabb) {
     SmallList<int> elements;
     if (_nodes[node_id].first_child != -1) {
@@ -225,7 +225,7 @@ _leaf_to_branch(const int node_id, AABB& aabb) {
  * Move ``id`` in Quadtree from ``aabb_from`` to ``aabb_to``. Return ``true``
  * if successful.
  */
-bool scenegraph::Quadtree::
+bool tools::Quadtree::
 move(const int id, AABB& aabb_from, AABB& aabb_to) {
     if (remove(id, aabb_from)) {
         return insert(id, aabb_to);
@@ -236,7 +236,7 @@ move(const int id, AABB& aabb_from, AABB& aabb_to) {
 /**
  * Remove ``id`` in Quadtree at ``aabb``. Return ``true`` if successful.
  */
-bool scenegraph::Quadtree::
+bool tools::Quadtree::
 remove(const int id, AABB& aabb) {
 /*    if (_nodes[0].count != -1) {
         throw std::logic_error("Unable to remove, Quadtree is empty");
@@ -299,7 +299,7 @@ remove(const int id, AABB& aabb) {
 /**
  * Deferred cleanup of the Quadtree.
  */
-bool scenegraph::Quadtree::
+bool tools::Quadtree::
 cleanup() {
     SmallList<int> to_process;
     if (_nodes[0].count == -1){
@@ -337,7 +337,7 @@ cleanup() {
 /**
  * Return true when point (``x``, ``y``) lie inside the quadtree.
  */
-bool scenegraph::Quadtree::
+bool tools::Quadtree::
 inside(const double x, const double y) {
     return _aabb.inside(x, y);
 }
@@ -345,7 +345,7 @@ inside(const double x, const double y) {
 /**
  * Return true when ``v`` lies inside the quadtree.
  */
-bool scenegraph::Quadtree::
+bool tools::Quadtree::
 inside(Vector2& v) {
     return _aabb.inside(v[0], v[1]);
 }
@@ -354,7 +354,7 @@ inside(Vector2& v) {
  * Resize Quadtree to new ``aabb``. Temporarily stores all QuadElement indices
  * for later reinsertion into the cleared and resized Quadtree.
  */
-void scenegraph::Quadtree::
+void tools::Quadtree::
 resize(AABB& aabb) {
     SmallList<int> elements, to_process;
     if (_nodes[0].count == -1){

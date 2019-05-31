@@ -5,8 +5,8 @@ Provides general tools.
 import sdl2.ext
 import plyer
 
-from .vector import Point
-from .vector import Vector
+# from .vector import Point
+# from .vector import Vector
 
 __author__ = 'Tiziano Bettio'
 __license__ = 'MIT'

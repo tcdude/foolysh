@@ -368,7 +368,7 @@ _update_relative() {
 /**
  * Return Vector2 with origin offset relative to original size.
  */
-scenegraph::Vector2 scenegraph::NodeData::
+Vector2 scenegraph::NodeData::
 _get_offset() {
     Vector2 offset;
     switch (_origin) {
@@ -672,7 +672,7 @@ set_pos(Vector2& p) {
 /**
  *
  */
-scenegraph::Vector2 scenegraph::Node::
+Vector2 scenegraph::Node::
 get_pos() {
     return _get_node_data(_node_id)._position;
 }
@@ -791,7 +791,7 @@ set_rotation_center(Vector2& c) {
 /**
  *
  */
-scenegraph::Vector2 scenegraph::Node::
+Vector2 scenegraph::Node::
 get_rotation_center() {
     return _get_node_data(_node_id)._rot_center;
 }
@@ -839,7 +839,7 @@ get_origin() {
 /**
  *
  */
-scenegraph::Vector2 scenegraph::Node::
+Vector2 scenegraph::Node::
 get_relative_pos() {
     return _get_node_data(_node_id)._r_position;
 }
@@ -937,7 +937,7 @@ get_distance_relative() {
 /**
  *
  */
-scenegraph::AABB scenegraph::Node::
+AABB scenegraph::Node::
 get_aabb() {
     return _get_node_data(_node_id)._aabb;
 }

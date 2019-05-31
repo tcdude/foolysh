@@ -33,7 +33,7 @@ cdef extern from "src/common.hpp":
 cdef extern from "src/vector2.cpp":
     pass
 
-cdef extern from "src/vector2.hpp" namespace "scenegraph":
+cdef extern from "src/vector2.hpp" namespace "tools":
     cdef cppclass Vector2:
         Vector2() except +
         Vector2(const double) except +

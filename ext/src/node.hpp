@@ -34,6 +34,12 @@
 #include <memory>
 #include <vector>
 
+using tools::AABB;
+using tools::Vector2;
+using tools::Quadtree;
+using tools::FreeList;
+using tools::ExtFreeList;
+using tools::SmallList;
 
 namespace scenegraph {
     enum Origin {

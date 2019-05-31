@@ -1,9 +1,13 @@
+# distutils: language = c++
 """
-Cython implementation of AABB class.
+Basic 2D Vector implementation.
 """
 
-from .vector cimport Vector
-from .vector cimport Point
+from .cppaabb cimport AABB as _AABB
+from .cppaabb cimport Quadrant
+
+from cython.operator cimport dereference as deref
+
 
 __author__ = 'Tiziano Bettio'
 __license__ = 'MIT'
@@ -30,148 +34,56 @@ SOFTWARE."""
 
 
 cdef class AABB:
-    """
-    Represents an Axis Aligned Bounding Box. Can be tested against
-    with the overloaded operators (``<``, ``<=``, ``>=``, ``>``) as follows:
+    def __cinit__(
+        self,
+        double x=0.0,
+        double y=0.0,
+        double hw=1.0,
+        double hh=1.0
+        ):
+        self.thisptr.reset(new _AABB(x, y, hw, hh))
 
-    >>> from engine.tools import vector
-    >>>
-    >>> a = AABB(box=(0.5, 0.5, 1.0, 1.0))
-    >>> b = AABB(box=(0.5, 0.5, 0.7, 0.7))
-    >>> a < b       # Is b completely inside a? (not touching)
-    False
-    >>> a <= b      # Is b inside a? (including exact overlap)
-    True
-    >>> a > b       # Is b overlapping a?
-    True
-    >>> a >= b      # Is b overlapping or touching a?
-    True
-    >>> a < vector.Point(0.75, 0.75)  # Is vector.Point at 0.75, 0.75 completely inside a?
-    True
+    def inside_aabb(self, other):
+        return self._inside_aabb(other)
 
-    :param box: ``4-Tuple[int/float]`` -> x1, y1, x2, y2 = top left and bottom
-        right points of the bounding box.
+    cdef bint _inside_aabb(self, AABB other):
+        return deref(self.thisptr).inside(other.aabb())
 
-    """
-    def __init__(self, box, double precision=1e-6):
-        if isinstance(box, tuple) and len(box) == 4 and \
-                sum([isinstance(i, (int, float)) for i in box]) == 4:
-            if box[0] < box[2] and box[1] < box[3]:
-                self.x0, self.y0, self.x1, self.y1 = box
-            else:
-                raise ValueError(f'invalid bounding box specified: {str(box)}')
-        else:
-            raise TypeError(f'expected 4-Tuple[int/float], got type {type(box).__name__} with content {str(box)}')
-        self._precision = precision
+    def inside_tup(self, x, y):
+        return deref(self.thisptr).inside(<double>x, <double>y)
 
-    @property
-    def box(self):
-        return self.x0, self.y0, self.x1, self.y1
+    def overlap(self, other):
+        return self._overlap(other)
 
-    cdef bint _test_aabb(self, AABB other, int test_type):
-        if test_type == 0:      # <=
-            if self.x0 <= other.x0 and self.y0 <= other.y0 and self.x1 >= other.x1 \
-                    and self.y1 >= other.y1:
-                return True
-        elif test_type == 1:    # <
-            if self.x0 < other.x0 and self.y0 < other.y0 and self.x1 > other.x1 and self.y1 > other.y1:
-                return True
-        elif test_type == 2:    # >
-            if self.x0 < other.x0 < self.x1 and self.y0 < other.y0 < self.y1:
-                return True
-            if self.x0 < other.x1 < self.x1 and self.y0 < other.y1 < self.y1:
-                return True
-            if other < self:
-                return True
-        elif test_type == 3:    # >=
-            if self.x0 <= other.x0 <= self.x1 and self.y0 <= other.y0 <= self.y1:
-                return True
-            if self.x0 <= other.x1 <= self.x1 and self.y0 <= other.y1 <= self.y1:
-                return True
-            if other <= self:
-                return True
-        return False
+    cdef bint _overlap(self, AABB other):
+        return deref(self.thisptr).overlap(other.aabb())
 
-    cdef bint _test_point(self, Point other, int test_type):
-        lx = self.x0 - other.x
-        hx = other.x - self.x1
-        ly = self.y0 - other.y
-        hy = other.y - self.y1
-        if test_type == 0 or test_type == 3:
-            if lx <= self._precision >= hx and ly <= self._precision >= hy:
-                return True
-        else:
-            if lx < 0 > hx and ly < 0 > hy:
-                return True
-        return False
+    def split(self, q):
+        cdef Quadrant _q = q
+        cdef _AABB _aabb = self._split(_q)
+        return AABB(_aabb.x, _aabb.y, _aabb.hw, _aabb.hh)
 
-    cdef bint _test(self, other, int test_type):
-        if isinstance(other, AABB):
-            return self._test_aabb(other, test_type)
-        elif isinstance(other, Point):
-            return self._test_point(other, test_type)
-        elif isinstance(other, Vector):
-            return self._test_point(other.aspoint(), test_type)
-        elif isinstance(other, (list, tuple)) and len(other) == 2:
-            p = Point(tuple(other))
-            return self._test_point(p, test_type)
-        else:
-            raise ValueError('Expected other to be of type AABB, vector.Point or '
-                             'List/Tuple of length 2')
+    cdef _AABB _split(self, Quadrant q):
+        return deref(self.thisptr).split(q)
 
-    cpdef bint inside(self, other, bint completely=False):
-        """
-        Test whether a box or point is inside this ``AABB``. This method yields
-        the same results as using the ``<`` and ``<=`` operators would.
+    def split_point(self, x, y, q):
+        cdef Quadrant _q = q
+        cdef _AABB _aabb = self._split_point(x, y, _q)
+        return AABB(_aabb.x, _aabb.y, _aabb.hw, _aabb.hh)
 
-        :param other: ``AABB``, ``Vector/Point``, ``Iterable``
-        :param completely: Optional ``bool`` -> whether ``other`` must lie
-            entirely inside this ``AABB``.
-        :return: ``bool``
-        """
-        if completely:
-            return self._test(other, 0)
-        return self._test(other, 1)
+    cdef _AABB _split_point(self, double x, double y, Quadrant q):
+        return deref(self.thisptr).split(x, y, q)
 
-    cpdef bint overlap(self, other, bint touching=True):
-        """
-        Test whether a box or point overlaps with this ``AABB``. This method
-        yields the same results as using the ``>=`` and ``>`` operators would.
-
-        :param other: ``AABB``, ``Vector/Point``, ``Iterable``
-        :param touching: Optional ``bool`` -> whether to include the border of
-            this ``AABB``.
-        :return: ``bool``
-        """
-        if touching:
-            return self._test(other, 3)
-        return self._test(other, 2)
-
-    def __le__(self, other):
-        return self._test(other, 0)
-
-    def __lt__(self, other):
-        return self._test(other, 1)
-
-    def __gt__(self, other):
-        return self._test(other, 2)
-
-    def __ge__(self, other):
-        return self._test(other, 3)
-
-    def __len__(self):
-        return 4
-
-    def __contains__(self, item):
-        return True if item in range(4) else False
-
-    def __getitem__(self, item):
-        if item in range(4):
-            return self.box[item]
-        raise IndexError
+    cdef _AABB aabb(self):
+        return deref(self.thisptr)
 
     def __repr__(self):
-        return f'{type(self).__name__}{self.__str__()}'
+        return f'{type(self).__name__}{str(self)}'
 
     def __str__(self):
-        return str(self.box)
+        cdef double x, y, hw, hh
+        x = deref(self.thisptr).x
+        y = deref(self.thisptr).y
+        hw = deref(self.thisptr).hw
+        hh = deref(self.thisptr).hh
+        return f'(pos: {x:.4}, {y:.4} / sz: {hw:.4}, {hh:.4})'

@@ -1,6 +1,7 @@
 import os
 from setuptools import setup
 from setuptools import find_namespace_packages
+from distutils.extension import Extension
 from Cython.Build import cythonize
 
 __author__ = 'Tiziano Bettio'
@@ -33,6 +34,12 @@ with open(os.path.join(os.path.dirname(__file__), 'VERSION'), 'r') as f:
     version = f.read().strip()
 
 
+extensions = [
+    Extension('*', ['foolysh/*/*.pyx'],
+              include_dirs=['ext'])
+]
+
+
 setup(
     name='foolysh',
     version=version,
@@ -45,9 +52,7 @@ setup(
     ]},
     install_requires=['plyer', 'Pillow', 'PySDL2>=0.9.6'],
     setup_requires=['Cython'],
-    ext_modules=cythonize(
-        'foolysh/*/*.pyx',
-        compiler_directives={'language_level': 3},
-        annotate=True
-    ),
+    ext_modules=cythonize(extensions,
+                          compiler_directives={'language_level': 3},
+                          annotate=False),
 )

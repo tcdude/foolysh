@@ -36,7 +36,7 @@
 /**
  * Default c-tor, initialize vector to x = y = 0.0
  */
-scenegraph::Vector2::
+tools::Vector2::
 Vector2() {
     _x = _y = _magnitude = _length = 0.0;
     _state = 0;
@@ -45,7 +45,7 @@ Vector2() {
 /**
  * Initialize vector to x = y = v
  */
-scenegraph::Vector2::
+tools::Vector2::
 Vector2(const double v) {
     _x = _y = v;
     _magnitude = _length = 0.0;
@@ -55,7 +55,7 @@ Vector2(const double v) {
 /**
  * Initialize with x and y
  */
-scenegraph::Vector2::
+tools::Vector2::
 Vector2(const double x, const double y) {
     _x = x;
     _y = y;
@@ -66,7 +66,7 @@ Vector2(const double x, const double y) {
 /**
  * Copy c-tor
  */
-scenegraph::Vector2::
+tools::Vector2::
 Vector2(const Vector2& other) : _x(other._x), _y(other._y),
                                 _magnitude(other._magnitude),
                                 _length(other._length), _state(other._state) {
@@ -75,7 +75,7 @@ Vector2(const Vector2& other) : _x(other._x), _y(other._y),
 /**
  * Assignment c-tor
  */
-scenegraph::Vector2& scenegraph::Vector2::
+tools::Vector2& tools::Vector2::
 operator=(const Vector2& other) {
     _x = other._x;
     _y = other._y;
@@ -88,7 +88,7 @@ operator=(const Vector2& other) {
 /**
  * Dot product
  */
-double scenegraph::Vector2::
+double tools::Vector2::
 dot(const Vector2& other) {
     return _x * other._x + _y * other._y;
 }
@@ -96,7 +96,7 @@ dot(const Vector2& other) {
 /**
  * Return true if length > 0 otherwise false
  */
-bool scenegraph::Vector2::
+bool tools::Vector2::
 normalize() {
     double l = length();
     if (l > 0.0) {
@@ -112,7 +112,7 @@ normalize() {
 /**
  * Return normalized Vector2 of this
  */
-scenegraph::Vector2 scenegraph::Vector2::
+tools::Vector2 tools::Vector2::
 normalized() {
     Vector2 v = Vector2(*this);
     if (v.normalize()) {
@@ -125,7 +125,7 @@ normalized() {
 /**
  * Return the magnitude of Vector2
  */
-double scenegraph::Vector2::
+double tools::Vector2::
 magnitude() {
     if (_state < 1) {
         _magnitude = dot(*this);
@@ -137,7 +137,7 @@ magnitude() {
 /**
  * Return the length of Vector2
  */
-double scenegraph::Vector2::
+double tools::Vector2::
 length() {
     if (_state < 2) {
         const double mag = magnitude();
@@ -151,7 +151,7 @@ length() {
  * Rotates this Vector2 by ``a`` degrees/radians in a clockwise direction
  * depending on argument ``radians``. Default is false (=degrees).
  */
-void scenegraph::Vector2::
+void tools::Vector2::
 rotate(double a, bool radians) {
     if (!radians) {
         a *= -to_rad;
@@ -169,7 +169,7 @@ rotate(double a, bool radians) {
  * clockwise direction depending on argument ``radians``. Default is
  * false (=degrees).
  */
-scenegraph::Vector2 scenegraph::Vector2::
+tools::Vector2 tools::Vector2::
 rotated(double a, bool radians) {
     if (!radians) {
         a *= -to_rad;
@@ -181,7 +181,7 @@ rotated(double a, bool radians) {
 /**
  * Return true if almost equal. Use ``d`` for allowed delta.
  */
-bool scenegraph::Vector2::
+bool tools::Vector2::
 almost_equal(Vector2& other, const double d) {
     return (std::fabs(_x - other._x) + std::fabs(_y - other._y) <= d) ? true : false;
 }
@@ -189,7 +189,7 @@ almost_equal(Vector2& other, const double d) {
 /**
  *
  */
-double& scenegraph::Vector2::
+double& tools::Vector2::
 operator[](const int idx) {
     if (idx == 0 || idx == 1) {
         _state = 0;
@@ -201,7 +201,7 @@ operator[](const int idx) {
 /**
  * this + Vector2
  */
-scenegraph::Vector2 scenegraph::Vector2::
+tools::Vector2 tools::Vector2::
 operator+(const Vector2& rhs) {
     return Vector2(_x + rhs._x, _y + rhs._y);
 }
@@ -209,7 +209,7 @@ operator+(const Vector2& rhs) {
 /**
  * this + double
  */
-scenegraph::Vector2 scenegraph::Vector2::
+tools::Vector2 tools::Vector2::
 operator+(const double rhs) {
     return Vector2(_x + rhs, _y + rhs);
 }
@@ -217,7 +217,7 @@ operator+(const double rhs) {
 /**
  * this += Vector2
  */
-scenegraph::Vector2& scenegraph::Vector2::
+tools::Vector2& tools::Vector2::
 operator+=(const Vector2& rhs) {
     _state = 0;
     _x += rhs._x;
@@ -228,7 +228,7 @@ operator+=(const Vector2& rhs) {
 /**
  * this += double
  */
-scenegraph::Vector2& scenegraph::Vector2::
+tools::Vector2& tools::Vector2::
 operator+=(const double rhs) {
     _state = 0;
     _x += rhs;
@@ -239,7 +239,7 @@ operator+=(const double rhs) {
 /**
  * this += Vector2
  */
-void scenegraph::Vector2::
+void tools::Vector2::
 iadd(const Vector2& rhs) {
     *this += rhs;
 }
@@ -247,7 +247,7 @@ iadd(const Vector2& rhs) {
 /**
  * this += double
  */
-void scenegraph::Vector2::
+void tools::Vector2::
 iadd(const double rhs) {
     *this += rhs;
 }
@@ -255,7 +255,7 @@ iadd(const double rhs) {
 /**
  * this - Vector2
  */
-scenegraph::Vector2 scenegraph::Vector2::
+tools::Vector2 tools::Vector2::
 operator-(const Vector2& rhs) {
     return Vector2(_x - rhs._x, _y - rhs._y);
 }
@@ -263,7 +263,7 @@ operator-(const Vector2& rhs) {
 /**
  * this - double
  */
-scenegraph::Vector2 scenegraph::Vector2::
+tools::Vector2 tools::Vector2::
 operator-(const double rhs) {
     return Vector2(_x - rhs, _y - rhs);
 }
@@ -271,7 +271,7 @@ operator-(const double rhs) {
 /**
  * this -= Vector2
  */
-scenegraph::Vector2& scenegraph::Vector2::
+tools::Vector2& tools::Vector2::
 operator-=(const Vector2& rhs) {
     _state = 0;
     _x -= rhs._x;
@@ -282,7 +282,7 @@ operator-=(const Vector2& rhs) {
 /**
  * this -= double
  */
-scenegraph::Vector2& scenegraph::Vector2::
+tools::Vector2& tools::Vector2::
 operator-=(const double rhs) {
     _state = 0;
     _x -= rhs;
@@ -293,7 +293,7 @@ operator-=(const double rhs) {
 /**
  * this -= Vector2
  */
-void scenegraph::Vector2::
+void tools::Vector2::
 isub(const Vector2& rhs) {
     *this -= rhs;
 }
@@ -301,7 +301,7 @@ isub(const Vector2& rhs) {
 /**
  * this -= double
  */
-void scenegraph::Vector2::
+void tools::Vector2::
 isub(const double rhs) {
     *this -= rhs;
 }
@@ -309,7 +309,7 @@ isub(const double rhs) {
 /**
  * this * double
  */
-scenegraph::Vector2 scenegraph::Vector2::
+tools::Vector2 tools::Vector2::
 operator*(const double rhs) {
     return Vector2(_x * rhs, _y * rhs);
 }
@@ -317,7 +317,7 @@ operator*(const double rhs) {
 /**
  * this *= double
  */
-scenegraph::Vector2& scenegraph::Vector2::
+tools::Vector2& tools::Vector2::
 operator*=(const double rhs) {
     _state = 0;
     _x *= rhs;
@@ -328,7 +328,7 @@ operator*=(const double rhs) {
 /**
  * this *= double
  */
-void scenegraph::Vector2::
+void tools::Vector2::
 imul(const double rhs) {
     *this *= rhs;
 }
@@ -336,7 +336,7 @@ imul(const double rhs) {
 /**
  * this / double
  */
-scenegraph::Vector2 scenegraph::Vector2::
+tools::Vector2 tools::Vector2::
 operator/(const double rhs) {
     if (rhs) {
         return Vector2(_x / rhs, _y / rhs);
@@ -347,7 +347,7 @@ operator/(const double rhs) {
 /**
  * Ugly hack because cython cannot handle "operator/" atm.
  */
-scenegraph::Vector2 scenegraph::Vector2::
+tools::Vector2 tools::Vector2::
 div(const double rhs) {
     return *this / rhs;
 }
@@ -355,7 +355,7 @@ div(const double rhs) {
 /**
  * this /= double
  */
-scenegraph::Vector2& scenegraph::Vector2::
+tools::Vector2& tools::Vector2::
 operator/=(const double rhs) {
     if (rhs) {
         _state = 0;
@@ -369,7 +369,7 @@ operator/=(const double rhs) {
 /**
  * this /= double
  */
-void scenegraph::Vector2::
+void tools::Vector2::
 idiv(const double rhs) {
     *this /= rhs;
 }
@@ -377,7 +377,7 @@ idiv(const double rhs) {
 /**
  *
  */
-bool scenegraph::Vector2::
+bool tools::Vector2::
 operator==(const Vector2& rhs) {
     return (_x == rhs._x && _y == rhs._y);
 }
@@ -385,7 +385,7 @@ operator==(const Vector2& rhs) {
 /**
  *
  */
-bool scenegraph::Vector2::
+bool tools::Vector2::
 operator!=(const Vector2& rhs) {
     return !(*this == rhs);
 }
@@ -393,7 +393,7 @@ operator!=(const Vector2& rhs) {
 /**
  *
  */
-bool scenegraph::Vector2::
+bool tools::Vector2::
 operator==(const double rhs) {
     return (_x == rhs && _y == rhs);
 }
@@ -401,7 +401,7 @@ operator==(const double rhs) {
 /**
  *
  */
-bool scenegraph::Vector2::
+bool tools::Vector2::
 operator!=(const double rhs) {
     return !(*this == rhs);
 }
