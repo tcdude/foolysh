@@ -6,7 +6,7 @@ from typing import Optional
 from typing import Tuple
 from typing import Union
 
-from . import nodepath
+from . import node
 
 __author__ = 'Tiziano Bettio'
 __license__ = 'MIT'
@@ -65,13 +65,13 @@ def compute_spacing(spacing_arg):
 
 class GridLayout(object):
     """
-    Provides a grid layout as collection of NodePaths distributed inside the
+    Provides a grid layout as collection of Nodes distributed inside the
     specified ``box`` to indicate the top left and bottom right extent of the
-    grid, relative to the ``parent`` NodePath.
+    grid, relative to the ``parent`` Node.
 
-    :param parent: ``NodePath``
-    :param box: ``Tuple[float, float, float, float]`` -> indicating top left and
-        bottom right points of the grid in world space units.
+    :param parent: ``Node``
+    :param box: ``Tuple[float, float, float, float]`` -> indicating top left
+        and bottom right points of the grid in world space units.
     :param rows: Optional ``iterable`` -> row sizes or number of rows if length
         is 1.
     :param cols: Optional ``iterable`` -> column sizes or number of columns if
@@ -81,26 +81,32 @@ class GridLayout(object):
 
     Example usage:
 
-    >>> parent_np = nodepath.NodePath()
+    >>> parent_np = node.Node()
     >>> grid = GridLayout(parent_np, (0.0, 0.0, 1.7, 1.0), rows=(10, None, 20))
-    >>> content_node_path = nodepath.NodePath('Cell [0, 0]', parent=grid[1])
+    >>> content_node_path = node.Node('Cell [0, 0]', parent=grid[1])
     >>> grid[1]
-    NodePath(GridCell(1, 0))
+    Node(GridCell(1, 0))
 
     .. note::
         The following rules apply to the parameters ``rows`` and ``cols``:
 
-        * If ``None`` is passed (as is by default), exactly 1 row/column is created.
-        * If an ``iterable`` of length 1 is passed, it indicates the number of equally sized rows/columns as positive ``int``.
-        * ``None`` inside an ``iterable`` will be interpreted as equal part of the remaining space.
-        * The remaining space for the example above is calculated ``100 - 10 - 20 = 70``
-        * Total space is the next higher power of 10 from the sum of all numerical values in an ``iterable``
-        * For an ``iterable`` containing only numerical values the sum of all values reflects ``100%``
+        * If ``None`` is passed (as is by default), exactly 1 row/column is
+          created.
+        * If an ``iterable`` of length 1 is passed, it indicates the number of
+          equally sized rows/columns as positive ``int``.
+        * ``None`` inside an ``iterable`` will be interpreted as equal part of
+          the remaining space.
+        * The remaining space for the example above is calculated
+          ``100 - 10 - 20 = 70``
+        * Total space is the next higher power of 10 from the sum of all
+          numerical values in an ``iterable``
+        * For an ``iterable`` containing only numerical values the sum of all
+          values reflects ``100%``
 
     """
     def __init__(
             self,
-            parent,             # type: nodepath.NodePath
+            parent,             # type: node.Node
             box,                # type: Tuple[NUM, NUM, NUM, NUM]
             rows=None,          # type: Optional[Union[Iterable, None]]
             cols=None,          # type: Optional[Union[Iterable, None]]
@@ -132,9 +138,8 @@ class GridLayout(object):
                              'combination of positive int/float and optionally '
                              'None.')
 
-        self._root = parent.attach_new_node_path(f'GridLayout({row_count}, '
-                                                 f'{col_count})')
-        self._root.center = nodepath.Origin.TOP_LEFT
+        self._root = parent.attach_node(f'GridLayout({row_count}, {col_count})')
+        self._root.center = node.Origin.TOP_LEFT
         size = (box[2] - box[0], box[3] - box[1])
         self._root.set_dummy_size(size)
         self._root.position = box[:2]
@@ -181,5 +186,5 @@ class GridLayout(object):
                              'single row or column')
 
     def reparent_to(self, new_parent):
-        # type: (nodepath.NodePath) -> bool
+        # type: (node.Node) -> bool
         return self._root.reparent_to(new_parent)

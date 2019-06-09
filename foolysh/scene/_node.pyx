@@ -66,7 +66,7 @@ cdef class Node:
         _nodepaths[deref(self.thisptr).get_id()] = self
 
     @property
-    def node_path_id(self):
+    def node_id(self):
         return deref(self.thisptr).get_id()
 
     cpdef void remove(self):
@@ -318,4 +318,4 @@ cdef class Node:
         return f'{type(self).__name__}{str(self)}'
 
     def __str__(self):
-        return f'(id:{self.node_path_id})'
+        return f'(id:{self.node_id})'

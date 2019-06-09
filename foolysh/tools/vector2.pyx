@@ -46,6 +46,8 @@ cdef class Vector2:
             elif len(args) == 2 and isinstance(args[0], (int, float)) \
                  and isinstance(args[1], (int, float)):
                 self.thisptr.reset(new _Vector2(args[0], args[1]))
+        else:
+            self.thisptr.reset(new _Vector2())
 
     def dot(self, other):
         if not isinstance(other, Vector2):

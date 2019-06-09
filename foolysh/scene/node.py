@@ -6,12 +6,11 @@ import os
 from typing import List
 from typing import Optional
 from typing import Tuple
-from typing import Union
 
 from PIL import Image
 import sdl2.ext
 
-from . import nodepath
+from . import _node
 
 __author__ = 'Tiziano Bettio'
 __license__ = 'MIT'
@@ -36,34 +35,27 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE."""
 
+Origin = _node.Origin
 
-class Node(object):
+
+class Node(_node.Node):
     """
     Base class from which all Node Type classes should be subclassed.
     A Node object must at least provide size and name properties.
     """
-    def __init__(self, node_path, name=None):
-        # type: (nodepath.NodePath, Optional[str]) -> None
-        if not isinstance(node_path, nodepath.NodePath):
-            raise ValueError('invalid argument for node_path')
-        self._node_path = node_path
+    def __init__(self, name=None):
+        # type: (Optional[str]) -> None
         self._node_name = name or 'Unnamed Node'
-
-    @property
-    def size(self):
-        # type: () -> Union[Tuple[int, int], None]
-        """``Tuple[int, int]`` or ``None``"""
-        return None
-
-    @property
-    def node_path(self):
-        """``NodePath``"""
-        return self._node_path
 
     @property
     def name(self):
         """``str``"""
         return self._node_name
+
+    def attach_node(self):
+        n = Node()
+        n.reparent_to(self)
+        return n
 
     def __repr__(self):
         return f'{type(self).__name__}({self.name}, {self.size})'
@@ -77,8 +69,8 @@ class ImageNode(Node):
     A Node subclass, that holds one or more images, of which one can be
     rendered at a time. The ImageNode class
     """
-    def __init__(self, node_path, name=None, image=None):
-        super(ImageNode, self).__init__(node_path, name)
+    def __init__(self, name=None, image=None):
+        super(ImageNode, self).__init__(name)
         self._images = []            # type: List[str]
         self._current_index = -1
         self._asset_size = 0, 0
@@ -136,12 +128,12 @@ class ImageNode(Node):
             raise ValueError('cannot update, no images added')
         self.sprite = self.node_path.sprite_loader.load_image(
             self._images[self._current_index],
-            self.node_path.relative_scale
+            self.relative_scale
         )
-        if self.node_path.relative_angle:
-            self.sprite.angle = self.node_path.relative_angle
+        if self.relative_angle:
+            self.sprite.angle = self.relative_angle
         pos = (
-                self.node_path.relative_position
+                self.relative_pos
                 * self.node_path.asset_pixel_ratio
         )
         self.sprite.position = tuple(pos)

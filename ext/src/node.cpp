@@ -172,11 +172,13 @@ _insert_child(const int node_id) {
         _first_child = cnp_id;
     }
     else {
-        ChildNode& search_cnp = NodeData::_child_nodes[_first_child];
-        while (search_cnp.next != -1) {
-            ChildNode& search_cnp = NodeData::_child_nodes[search_cnp.next];
+        int current = _first_child;
+        int next = NodeData::_child_nodes[current].next;
+        while (next != -1) {
+            current = next;
+            next = NodeData::_child_nodes[next].next;
         }
-        search_cnp.next = cnp_id;
+        NodeData::_child_nodes[current].next = cnp_id;
     }
     _propagate_dirty();
 }
@@ -524,17 +526,7 @@ attach_node() {
  */
 void scenegraph::Node::
 reparent_to(Node& parent) {
-    NodeData& nd = _get_node_data(_node_id);
-    if (nd._parent > -1) {
-        NodeData& pnd = *NodeData::_nd[nd._parent];
-        pnd._remove_child(_node_id);
-    }
-    nd._tmp_quadtree_entry.clear();
-
-    nd._parent = parent._node_id;
-    NodeData& pnd = *NodeData::_nd[nd._parent];
-    pnd._insert_child(_node_id);
-    nd._propagate_dirty();
+    reparent_to(parent._node_id);
 }
 
 /**
@@ -542,6 +534,16 @@ reparent_to(Node& parent) {
  */
 void scenegraph::Node::
 reparent_to(const int parent) {
+    int _p_id = NodeData::_nd[parent]->_parent;
+    while (_p_id > -1) {
+        if (_p_id == _node_id) {
+            throw std::logic_error("Unable to reparent: new parent is a child "
+                                   "of this Node.");
+        }
+        NodeData& lnd = _get_node_data(_p_id);
+        _p_id = lnd._parent;
+    }
+
     NodeData& nd = _get_node_data(_node_id);
     if (nd._parent > -1) {
         NodeData& pnd = *NodeData::_nd[nd._parent];
@@ -552,6 +554,7 @@ reparent_to(const int parent) {
     nd._parent = parent;
     NodeData& pnd = *NodeData::_nd[nd._parent];
     pnd._insert_child(_node_id);
+    std::cout << "here++" << std::endl;
     nd._propagate_dirty();
 }
 
