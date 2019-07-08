@@ -64,7 +64,7 @@ cdef class Vector2:
     def normalized(self):
         return self._normalized()
 
-    cdef Vector2 _normalized(self):
+    cdef Vector2 _normalized(self) except +:
         cdef _Vector2* v = new _Vector2(deref(self.thisptr)[0], deref(self.thisptr)[1])
         v.normalize()
         ret = Vector2.__new__(Vector2, deref(v)[0], deref(v)[1])

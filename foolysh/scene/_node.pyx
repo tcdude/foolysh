@@ -88,7 +88,7 @@ cdef class Node:
     def reparent_to(self, parent):
         self._reparent_to(parent)
 
-    cdef void _reparent_to(self, Node parent):
+    cdef void _reparent_to(self, Node parent) except +:
         deref(self.thisptr).reparent_to(deref(parent.thisptr))
 
     def traverse(self):
@@ -97,7 +97,7 @@ cdef class Node:
     def query(self, aabb):
         return self._query(aabb)
 
-    cdef list _query(self, AABB aabb):
+    cdef list _query(self, AABB aabb) except +:
         cdef SmallList[int] r = deref(self.thisptr).query(deref(aabb.thisptr))
         cdef list rl = []
         for i in range(r.size()):

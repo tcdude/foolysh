@@ -35,7 +35,7 @@ cdef class Vector2:
     cdef unique_ptr[_Vector2] thisptr
 
     cdef double _dot(self, Vector2 other)
-    cdef Vector2 _normalized(self)
+    cdef Vector2 _normalized(self) except +
     cpdef void rotate(self, double a, bint radians=*)
     cpdef Vector2 rotated(self, double a, bint radians=*)
     cpdef Vector2 add(self, Vector2 other)
