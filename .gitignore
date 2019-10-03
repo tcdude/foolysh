@@ -5,6 +5,7 @@
 **.md#
 **.apk
 **/foolysh/**/*.c
+**/foolysh/**/*.cpp
 **/foolysh/**/*.html
 .vscode/
 
