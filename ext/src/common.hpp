@@ -30,13 +30,13 @@ constexpr double to_deg = 180.0 / 3.14159265358979323846;
 constexpr double to_rad = 3.14159265358979323846 / 180.0;
 
 /**
- * Return a clamped angle in the range -180..180.
+ * Return a clamped angle in the range [-180, 180].
  */
 inline double clamp_angle(double a) {
     while (a > 180) {
         a -= 360.0;
     }
-    while (a < 180) {
+    while (a < -180) {
         a += 360.0;
     }
     return a;
