@@ -88,7 +88,9 @@ cdef class Vector2:
         return self._normalized()
 
     cdef Vector2 _normalized(self) except +:
-        cdef _Vector2* v = new _Vector2(deref(self.thisptr)[0], deref(self.thisptr)[1])
+        cdef _Vector2* v = new _Vector2(
+            deref(self.thisptr)[0], deref(self.thisptr)[1]
+        )
         v.normalize()
         ret = Vector2.__new__(Vector2, deref(v)[0], deref(v)[1])
         del v
@@ -172,18 +174,20 @@ cdef class Vector2:
         return NotImplemented
 
     def __iadd__(self, other):
-        if self.iadd(other):
+        if self._iadd(other):
             return self
         return NotImplemented
 
-    cpdef Vector2 add(self, Vector2 other):
-        cdef _Vector2* v = new _Vector2(deref(self.thisptr) + deref(other.thisptr))
+    cdef Vector2 add(self, Vector2 other):
+        cdef _Vector2* v = new _Vector2(
+            deref(self.thisptr) + deref(other.thisptr)
+        )
         try:
             return Vector2.__new__(Vector2, deref(v)[0], deref(v)[1])
         finally:
             del v
 
-    def iadd(self, other):
+    def _iadd(self, other):
         if isinstance(other, Vector2):
             self._iadd_vec(other)
             return True
@@ -195,7 +199,7 @@ cdef class Vector2:
     cdef void _iadd_vec(Vector2 self, Vector2 other):
         deref(self.thisptr).iadd(<_Vector2> deref(other.thisptr))
 
-    cpdef Vector2 add_scalar(self, const double other):
+    cdef Vector2 add_scalar(self, const double other):
         cdef _Vector2* v = new _Vector2(deref(self.thisptr) + other)
         try:
             return Vector2.__new__(Vector2, deref(v)[0], deref(v)[1])
@@ -212,18 +216,20 @@ cdef class Vector2:
         return NotImplemented
 
     def __isub__(self, other):
-        if self.isub(other):
+        if self._isub(other):
             return self
         return NotImplemented
 
-    cpdef Vector2 sub(self, Vector2 other):
-        cdef _Vector2* v = new _Vector2(deref(self.thisptr) - deref(other.thisptr))
+    cdef Vector2 sub(self, Vector2 other):
+        cdef _Vector2* v = new _Vector2(
+            deref(self.thisptr) - deref(other.thisptr)
+        )
         try:
             return Vector2.__new__(Vector2, deref(v)[0], deref(v)[1])
         finally:
             del v
 
-    def isub(self, other):
+    def _isub(self, other):
         if isinstance(other, Vector2):
             self._iadd_vec(other)
             return True
@@ -234,15 +240,17 @@ cdef class Vector2:
     cdef void _isub_vec(Vector2 self, Vector2 other):
         deref(self.thisptr).isub(<_Vector2> deref(other.thisptr))
 
-    cpdef Vector2 sub_scalar(self, const double other):
+    cdef Vector2 sub_scalar(self, const double other):
         cdef _Vector2* v = new _Vector2(deref(self.thisptr) - other)
         try:
             return Vector2.__new__(Vector2, deref(v)[0], deref(v)[1])
         finally:
             del v
 
-    cpdef Vector2 sub_scalar_r(self, const double other):
-        cdef _Vector2* v = new _Vector2(other - deref(self.thisptr)[0], other - deref(self.thisptr)[1])
+    cdef Vector2 sub_scalar_r(self, const double other):
+        cdef _Vector2* v = new _Vector2(
+            other - deref(self.thisptr)[0], other - deref(self.thisptr)[1]
+        )
         try:
             return Vector2.__new__(Vector2, deref(v)[0], deref(v)[1])
         finally:
@@ -251,7 +259,7 @@ cdef class Vector2:
     def __neg__(self):
         return self.neg()
 
-    cpdef Vector2 neg(self):
+    cdef Vector2 neg(self):
         return Vector2.__new__(Vector2, -deref(self.thisptr)[0], -deref(self.thisptr)[1])
 
     def __mul__(self, other):
@@ -262,18 +270,18 @@ cdef class Vector2:
         return NotImplemented
 
     def __imul__(self, other):
-        if self.imul(other):
+        if self._imul(other):
             return self
         return NotImplemented
 
-    cpdef Vector2 mul(self, const double other):
+    cdef Vector2 mul(self, const double other):
         cdef _Vector2* v = new _Vector2(deref(self.thisptr) * other)
         try:
             return Vector2.__new__(Vector2, deref(v)[0], deref(v)[1])
         finally:
             del v
 
-    def imul(self, other):
+    def _imul(self, other):
         if isinstance(other, (int, float)):
             deref(self.thisptr).imul(<double> other)
             return True
@@ -287,17 +295,17 @@ cdef class Vector2:
         return NotImplemented
 
     def __itruediv__(self, other):
-        if self.idiv(other):
+        if self._idiv(other):
             return self.tdiv(other)
         return NotImplemented
 
-    def idiv(self, other):
+    def _idiv(self, other):
         if isinstance(other, (int, float)):
             deref(self.thisptr).idiv(other)
             return True
         return False
 
-    cpdef Vector2 tdiv(self, double value):
+    cdef Vector2 tdiv(self, double value):
         cdef _Vector2* v = new _Vector2(deref(self.thisptr).div(<double> value))
         try:
             return Vector2.__new__(Vector2, deref(v)[0], deref(v)[1])
@@ -313,10 +321,10 @@ cdef class Vector2:
             return other.eq_scalar(self)
         return NotImplemented
 
-    cpdef bint eq(self, Vector2 other):
+    cdef bint eq(self, Vector2 other):
         return deref(self.thisptr) == deref(other.thisptr)
 
-    cpdef bint eq_scalar(self, double other):
+    cdef bint eq_scalar(self, double other):
         return deref(self.thisptr) == other
 
     def __ne__(self, other):
@@ -328,10 +336,10 @@ cdef class Vector2:
             return other.ne_scalar(self)
         return NotImplemented
 
-    cpdef bint ne(self, Vector2 other):
+    cdef bint ne(self, Vector2 other):
         return deref(self.thisptr) != deref(other.thisptr)
 
-    cpdef bint ne_scalar(self, double other):
+    cdef bint ne_scalar(self, double other):
         return deref(self.thisptr) != other
 
     cdef _Vector2 vector2(self):
