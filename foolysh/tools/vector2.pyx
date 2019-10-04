@@ -345,3 +345,12 @@ cdef class Vector2:
         x = deref(self.thisptr)[0]
         y = deref(self.thisptr)[1]
         return f'({x:.4}, {y:.4})'
+
+
+cdef class Point2(Vector2):
+    """
+    Stub class to represent a Point2. Underlying there is no difference between
+    this and ``Vector2``, other than the fact that ``repr`` will represent this
+    as ``Point2``.
+    """
+    pass
