@@ -144,20 +144,32 @@ namespace scenegraph {
 
         int get_id();
         void set_pos(const double v);
+        void set_pos(Node& other, const double v);
         void set_pos(const double x, const double y);
+        void set_pos(Node& other, const double x, const double y);
         void set_pos(Vector2& p);
+        void set_pos(Node& other, Vector2& p);
         Vector2 get_pos();
+        Vector2 get_pos(Node& other);
         void set_scale(const double s);
+        void set_scale(Node& other, const double s);
         void set_scale(const double sx, const double sy);
+        void set_scale(Node& other, const double sx, const double sy);
         void set_scale(const Scale& s);
+        void set_scale(Node& other, const Scale& s);
         Scale get_scale();
+        Scale get_scale(Node& other);
         void set_angle(double a, bool radians = false);
+        void set_angle(Node& other, double a, bool radians = false);
         double get_angle(bool radians = false);
+        double get_angle(Node& other, bool radians = false);
         void set_rotation_center(const double x, const double y);
         void set_rotation_center(Vector2& c);
         Vector2 get_rotation_center();
         void set_depth(const int d);
+        void set_depth(Node& other, const int d);
         int get_depth();
+        int get_depth(Node& other);
         void set_origin(Origin o);
         Origin get_origin();
 
@@ -170,7 +182,7 @@ namespace scenegraph {
         void set_size(const Size& s);
         void set_size(const double w, const double h);
         Size get_size();
-        void set_distance_relative(const bool v);
+        void set_distance_relative(const bool v);  // Whether to scale distance
         bool get_distance_relative();
 
         AABB get_aabb();
@@ -178,6 +190,7 @@ namespace scenegraph {
     private:
         inline NodeData& _get_root();
         inline NodeData& _get_node_data(const int node_id);
+        inline void _check_dirty(Node& node_a, Node& node_b);
 
         int _node_id;
 

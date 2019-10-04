@@ -627,6 +627,18 @@ _get_node_data(const int node_id) {
 }
 
 /**
+ * Traverses the scene_graph if either ``node_a`` or ``node_b`` is marked dirty.
+ */
+inline void scenegraph::Node::
+_check_dirty(Node& node_a, Node& node_b) {
+    NodeData& a = _get_node_data(node_a._node_id);
+    NodeData& b = _get_node_data(node_b._node_id);
+    if (a._dirty || b._dirty) {
+        traverse();
+    }
+}
+
+/**
  * Return the Node index, useful to later retrieve a reference by id.
  */
 int scenegraph::Node::
@@ -648,6 +660,18 @@ set_pos(const double v) {
 }
 
 /**
+ * Set both parts of position to ``v``, relative to ``other``. If either this
+ * or ``other`` is marked dirty, triggers scenegraph traversal to update the
+ * relative positions.
+ */
+void scenegraph::Node::
+set_pos(Node& other, const double v) {
+    _check_dirty(*this, other);
+    Vector2 offset = other.get_relative_pos() - get_relative_pos() + v;
+    set_pos(offset);
+}
+
+/**
  * Set position to ``x``, ``y``.
  */
 void scenegraph::Node::
@@ -658,6 +682,19 @@ set_pos(const double x, const double y) {
         nd._position[1] = y;
         nd._propagate_dirty();
     }
+}
+
+/**
+ * Set position to ``x``, ``y``, relative to ``other``. If either this
+ * or ``other`` is marked dirty, triggers scenegraph traversal to update the
+ * relative positions.
+ */
+void scenegraph::Node::
+set_pos(Node& other, const double x, const double y) {
+    _check_dirty(*this, other);
+    Vector2 offset = other.get_relative_pos() - get_relative_pos();
+    offset += Vector2(x, y);
+    set_pos(offset);
 }
 
 /**
@@ -673,11 +710,32 @@ set_pos(Vector2& p) {
 }
 
 /**
- *
+ * Set position to ``x``, ``y``, relative to ``other``. If either this or
+ * ``other`` is marked dirty, triggers scenegraph traversal to update the
+ * relative positions.
+ */
+void scenegraph::Node::
+set_pos(Node& other, Vector2& p) {
+    _check_dirty(*this, other);
+    Vector2 offset = other.get_relative_pos() - get_relative_pos() + p;
+    set_pos(offset);
+}
+
+/**
+ * Return a ``Vector2`` of the current position.
  */
 Vector2 scenegraph::Node::
 get_pos() {
     return _get_node_data(_node_id)._position;
+}
+
+/**
+ * Return a ``Vector2`` of the current position, relative to ``other``.
+ */
+Vector2 scenegraph::Node::
+get_pos(Node& other) {
+    _check_dirty(*this, other);
+    return get_relative_pos() - other.get_relative_pos();
 }
 
 /**
@@ -693,6 +751,24 @@ set_scale(const double s) {
         nd._scale.sx = nd._scale.sy = s;
         nd._propagate_dirty();
     }
+}
+
+/**
+ * Set scale to ``s``, relative to ``other``.
+ */
+void scenegraph::Node::
+set_scale(Node& other, const double s) {
+    if (s <= 0.0) {
+        throw std::domain_error("Scale must be positive.");
+    }
+    _check_dirty(*this, other);
+    Scale t_rel = get_relative_scale();
+    Scale t_s = get_scale();
+    Scale o_rel = other.get_relative_scale();
+    set_scale(
+        t_s.sx / o_rel.sx * s / t_rel.sx,
+        t_s.sy / o_rel.sy * s / t_rel.sy
+    );
 }
 
 /**
@@ -712,6 +788,24 @@ set_scale(const double sx, const double sy) {
 }
 
 /**
+ * Set scale to ``sx``, ``sy``, relative to ``other``.
+ */
+void scenegraph::Node::
+set_scale(Node& other, const double sx, const double sy) {
+    if (sx <= 0.0 || sy <= 0.0) {
+        throw std::domain_error("Scale must be positive.");
+    }
+    _check_dirty(*this, other);
+    Scale t_rel = get_relative_scale();
+    Scale t_s = get_scale();
+    Scale o_rel = other.get_relative_scale();
+    set_scale(
+        t_s.sx / o_rel.sx * sx / t_rel.sx,
+        t_s.sy / o_rel.sy * sy / t_rel.sy
+    );
+}
+
+/**
  * Set scale to ``s``.
  */
 void scenegraph::Node::
@@ -728,11 +822,43 @@ set_scale(const Scale& s) {
 }
 
 /**
+ * Set scale to ``s``, relative to ``other``.
+ */
+void scenegraph::Node::
+set_scale(Node& other, const Scale& s) {
+    if (s.sx <= 0.0 || s.sy <= 0.0) {
+        throw std::domain_error("Scale must be positive.");
+    }
+    _check_dirty(*this, other);
+    Scale t_rel = get_relative_scale();
+    Scale t_s = get_scale();
+    Scale o_rel = other.get_relative_scale();
+    set_scale(
+        t_s.sx / o_rel.sx * s.sx / t_rel.sx,
+        t_s.sy / o_rel.sy * s.sy / t_rel.sy
+    );
+}
+
+/**
  *
  */
 scenegraph::Scale scenegraph::Node::
 get_scale() {
     return _get_node_data(_node_id)._scale;
+}
+
+/**
+ *
+ */
+scenegraph::Scale scenegraph::Node::
+get_scale(Node& other) {
+    _check_dirty(*this, other);
+    Scale t_rel = get_relative_scale();
+    Scale o_rel = other.get_relative_scale();
+    Scale res;
+    res.sx = t_rel.sx / o_rel.sx;
+    res.sy = t_rel.sy / o_rel.sy;
+    return res;
 }
 
 /**
@@ -746,9 +872,25 @@ set_angle(double a, bool radians) {
     }
     NodeData& nd = _get_node_data(_node_id);
     if (a != nd._angle) {
-        nd._angle = a;
+        nd._angle = clamp_angle(a);
         nd._propagate_dirty();
     }
+}
+
+/**
+ * Set angle to ``a`` degrees if ``radians`` is false (default) otherwise
+ * to ``a`` radians, relative to ``other``.
+ */
+void scenegraph::Node::
+set_angle(Node& other, double a, bool radians) {
+    if (radians) {
+        a = a * to_deg;
+    }
+    a = clamp_angle(a);
+    _check_dirty(*this, other);
+    double rel_a = other.get_relative_angle() + a - get_angle()
+                   + get_relative_angle();
+    set_angle(clamp_angle(rel_a), false);
 }
 
 /**
@@ -762,6 +904,24 @@ get_angle(bool radians) {
     }
     else {
         return nd._angle;
+    }
+}
+
+/**
+ * Get angle in degrees if ``radians`` is false, otherwise in radians, relative
+ * to ``other``.
+ */
+double scenegraph::Node::
+get_angle(Node& other, bool radians) {
+    _check_dirty(*this, other);
+    double a_rel = other.get_relative_angle() - get_relative_angle();
+    a_rel = clamp_angle(a_rel);
+
+    if (radians) {
+        return a_rel * to_rad;
+    }
+    else {
+        return a_rel;
     }
 }
 
@@ -812,11 +972,30 @@ set_depth(const int d) {
 }
 
 /**
+ * Set depth to ``d``, relative to ``other``.
+ */
+void scenegraph::Node::
+set_depth(Node& other, const int d) {
+    _check_dirty(*this, other);
+    set_depth(
+        get_relative_depth() -  get_depth() - other.get_relative_depth() + d);
+}
+
+/**
  *
  */
 int scenegraph::Node::
 get_depth() {
     return _get_node_data(_node_id)._depth;
+}
+
+/**
+ *
+ */
+int scenegraph::Node::
+get_depth(Node& other) {
+    _check_dirty(*this, other);
+    return get_relative_depth() - other.get_relative_depth();
 }
 
 /**
