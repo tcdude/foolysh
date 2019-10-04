@@ -205,8 +205,29 @@ cdef class Node:
         elif isinstance(v, tuple) and isinstance(v[0], (int, float)) \
              and isinstance(v[1], (int, float)):
             self._set_pos(v[0], v[1])
+        elif isinstance(v, tuple) and isinstance(v[0], Node):
+            if len(v) == 2 and isinstance(v[1], (int, float)):
+                self._set_pos_relative(v[0], v[1], v[1])
+            elif len(v) == 2 and isinstance(v[1], Vector2):
+                self._set_pos_relative(v[0], v[1].x, v[1].y)
+            elif len(v) == 3 and isinstance(v[1], (int, float)) \
+                 and isinstance(v[2], (int, float)):
+                self._set_pos_relative(v[0], v[1], v[2])
+            else:
+                raise TypeError
         else:
             raise TypeError
+
+    def get_pos_node(self, other):
+        """
+        Retrieve the position, relative to `other`.
+
+        Args:
+            other: The Node used as reference.
+        Returns:
+            ``foolysh.tools.vector2.Vector2`` Position relative to another Node.
+        """
+        return self._get_pos_node(other)
 
     cdef Vector2 _get_pos(self):
         cdef _Vector2 v = deref(self.thisptr).get_pos()
@@ -217,6 +238,18 @@ cdef class Node:
 
     cdef void _set_pos(self, const double x, const double y):
         deref(self.thisptr).set_pos(x, y)
+
+    cdef void _set_pos_relative(
+        self,
+        Node other,
+        const double x,
+        const double y
+    ):
+        deref(self.thisptr).set_pos(deref(other.thisptr), x, y)
+
+    cdef Vector2 _get_pos_node(self, Node other):
+        cdef _Vector2 v = deref(self.thisptr).get_pos(deref(other.thisptr))
+        return Vector2(v[0], v[1])
 
     @property
     def scale(self):
@@ -234,8 +267,6 @@ cdef class Node:
                 the respective scale, relative to the specified Node.
         """
         s = self._get_scale()
-        if s[0] == s[1]:
-            return s[0]
         return s
 
     @scale.setter
@@ -245,11 +276,63 @@ cdef class Node:
         elif isinstance(v, tuple) and isinstance(v[0], (int, float)) \
              and isinstance(v[1], (int, float)):
             self._set_scale(v[0], v[1])
+        elif isinstance(v, tuple) and isinstance(v[0], Node):
+            if len(v) == 3 and isinstance(v[1], (int, float)) \
+                 and isinstance(v[2], (int, float)):
+                self._set_scale_node(v[0], v[1], v[2])
+            elif len(v) == 2 and isinstance(v[1], (int, float)):
+                self._set_scale_node(v[0], v[1], v[1])
+            else:
+                raise TypeError
         else:
             raise TypeError
 
+    @property
+    def scale_single(self):
+        """
+        ``int``/``float`` scale of this Node, relative to its parent. Raises a
+        ``TypeError`` if the scale is asimmetrical.
+        """
+        s = self._get_scale()
+        if s[0] == s[1]:
+            return s[0]
+        raise TypeError('Requested Node scale as single element, but '
+                        'the Node has an asymmetrical scale.')
+
+    def get_scale_single_node(self, other):
+        """
+        Retrieve the single part scale, relative to `other`. Raises a
+        ``TypeError`` if the scale is asimmetrical.
+
+        Args:
+            other: The Node used as reference.
+        Returns:
+            ``float``/``int`` Scale relative to another Node.
+        """
+        s = self._get_scale_node(other)
+        if s[0] == s[1]:
+            return s[0]
+        raise TypeError('Requested Node scale as single element, but '
+                        'the Node has an asymmetrical scale.')
+
+    def get_scale_node(self, other):
+        """
+        Retrieve the two part scale, relative to `other`.
+
+        Args:
+            other: The Node used as reference.
+        Returns:
+            ``tuple`` of two ``float``/``int`` Scale relative to another Node.
+        """
+        s = self._get_scale_node(other)
+        return s
+
     cdef tuple _get_scale(self):
         cdef Scale s = deref(self.thisptr).get_scale()
+        return s.sx, s.sy
+
+    cdef tuple _get_scale_node(self, Node other):
+        cdef Scale s = deref(self.thisptr).get_scale(deref(other.thisptr))
         return s.sx, s.sy
 
     cdef void _set_scale_single(self, const double v):
@@ -257,6 +340,9 @@ cdef class Node:
 
     cdef void _set_scale(self, const double x, const double y):
         deref(self.thisptr).set_scale(x, y)
+
+    cdef void _set_scale_node(self, Node other, const double x, const double y):
+        deref(self.thisptr).set_scale(deref(other.thisptr), x, y)
 
     @property
     def angle(self):
@@ -279,11 +365,31 @@ cdef class Node:
     def angle(self, v):
         if isinstance(v, (int, float)):
             self._set_angle(v)
+        elif isinstance(v, tuple) and isinstance(v[0], Node) \
+             and isinstance(v[1], (int, float)):
+             self._set_angle_node(v[0], v[1])
         else:
             raise TypeError
 
+    def get_angle_node(self, other):
+        """
+        Retrieve the rotational angle in degrees, relative to `other`.
+
+        Args:
+            other: The Node used as reference.
+        Returns:
+            ``float`` rotational angle relative to another Node.
+        """
+        return self._get_angle_node(other)
+
+    cdef double _get_angle_node(self, Node other):
+        return deref(self.thisptr).get_angle(deref(other.thisptr), False)
+
     cdef void _set_angle(self, const double d):
         deref(self.thisptr).set_angle(d, False)
+
+    cdef void _set_angle_node(self, Node other, const double r):
+        deref(self.thisptr).set_angle(deref(other.thisptr), r, False)
 
     @property
     def angle_rad(self):
@@ -306,11 +412,31 @@ cdef class Node:
     def angle_rad(self, v):
         if isinstance(v, (int, float)):
             self._set_angle_rad(v)
+        elif isinstance(v, tuple) and isinstance(v[0], Node) \
+             and isinstance(v[1], (int, float)):
+             self._set_angle_rad_node(v[0], v[1])
         else:
             raise TypeError
 
+    def get_angle_rad_node(self, other):
+        """
+        Retrieve the rotational angle in radians, relative to `other`.
+
+        Args:
+            other: The Node used as reference.
+        Returns:
+            ``float`` rotational angle relative to another Node.
+        """
+        return self._get_angle_rad_node(other)
+
+    cdef double _get_angle_rad_node(self, Node other):
+        return deref(self.thisptr).get_angle(deref(other.thisptr), True)
+
     cdef void _set_angle_rad(self, const double r):
         deref(self.thisptr).set_angle(r, True)
+
+    cdef void _set_angle_rad_node(self, Node other, const double r):
+        deref(self.thisptr).set_angle(deref(other.thisptr), r, True)
 
     @property
     def rotation_center(self):
