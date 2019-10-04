@@ -36,6 +36,12 @@ SOFTWARE."""
 
 @cython.freelist(10)
 cdef class Vector2:
+    """
+    Basic 2D Vector implementation with the following overloaded operators:
+
+      * Arithmetic operators ``(+, +=, -, -=, *, *=, /, /=)``
+      * Comparison against other ``Vector2`` objects and scalars ``(==, !=)``
+    """
     def __cinit__(self, *args, **kwargs):
         if args:
             if len(args) == 1:
@@ -50,6 +56,13 @@ cdef class Vector2:
             self.thisptr.reset(new _Vector2())
 
     def dot(self, other):
+        """
+        Args:
+            other: ``Vector2``
+
+        Returns:
+            Dot product of this and `other`.
+        """
         if not isinstance(other, Vector2):
             raise TypeError(f'Expected type Vector2, got '
                             f'{type(other).__name__} instead.')
@@ -59,9 +72,19 @@ cdef class Vector2:
         return deref(self.thisptr).dot(deref(other.thisptr))
 
     def normalize(self):
+        """
+        Normalize the vector to unit length.
+
+        Returns:
+            ``True`` if successful, otherwise ``False``.
+        """
         return deref(self.thisptr).normalize()
 
     def normalized(self):
+        """
+        Returns:
+            ``Vector2`` of this vector normalized to unit length.
+        """
         return self._normalized()
 
     cdef Vector2 _normalized(self) except +:
@@ -73,21 +96,49 @@ cdef class Vector2:
 
     @property
     def magnitude(self):
+        """
+        Returns:
+            ``float`` the squared length of this vector.
+        """
         return deref(self.thisptr).magnitude()
 
     @property
     def length(self):
+        """
+        Returns:
+            ``float`` the length of this vector.
+        """
         return deref(self.thisptr).length()
 
     cpdef void rotate(self, double a, bint radians=False):
+        """
+        Rotates this vector around the origin.
+
+        Args:
+            a: ``float`` angle in degrees or radians
+            radians: ``bool`` whether to use radians or degrees
+                (default=``False``)
+        """
         deref(self.thisptr).rotate(a, radians)
 
     cpdef Vector2 rotated(self, double a, bint radians=False):
+        """
+
+        Args:
+            a: ``float`` angle in degrees or radians
+            radians: ``bool`` whether to use radians or degrees
+
+        Returns:
+            ``Vector2`` of the rotated vector around the origin.
+        """
         cdef _Vector2 v = deref(self.thisptr).rotated(a, radians)
         return Vector2(v[0], v[1])
 
     @property
     def x(self):
+        """
+        ``int`` / ``float`` x component of the vector
+        """
         return deref(self.thisptr)[0]
 
     @x.setter
@@ -99,6 +150,9 @@ cdef class Vector2:
 
     @property
     def y(self):
+        """
+        ``int`` / ``float`` y component of the vector
+        """
         return deref(self.thisptr)[1]
 
     @y.setter
