@@ -267,7 +267,7 @@ _update_relative() {
         base_dist_rel = parent._distance_relative || _distance_relative;
     }
     else {
-        base_scale = _scale;
+        base_scale = Scale();
         base_angle = 0.0;
         _r_depth = _depth;
         base_dist_rel = _distance_relative;
