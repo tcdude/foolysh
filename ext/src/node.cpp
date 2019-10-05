@@ -267,6 +267,7 @@ _update_relative() {
         base_dist_rel = parent._distance_relative || _distance_relative;
     }
     else {
+        local_origin = _get_offset();
         base_scale = Scale();
         base_angle = 0.0;
         _r_depth = _depth;
