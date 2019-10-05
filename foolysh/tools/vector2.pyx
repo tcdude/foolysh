@@ -119,7 +119,7 @@ cdef class Vector2:
         Args:
             a: ``float`` angle in degrees or radians
             radians: ``bool`` whether to use radians or degrees
-                (default=``False``)
+                (default = ``False``)
         """
         deref(self.thisptr).rotate(a, radians)
 
@@ -358,7 +358,7 @@ cdef class Vector2:
 cdef class Point2(Vector2):
     """
     Stub class to represent a Point2. Underlying there is no difference between
-    this and ``Vector2``, other than the fact that ``repr`` will represent this
-    as ``Point2``.
+    this and :class:`Vector2`, other than the fact that ``repr`` will represent
+    this as ``Point2``.
     """
     pass
