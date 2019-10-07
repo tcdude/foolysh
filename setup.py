@@ -35,8 +35,14 @@ with open(os.path.join(os.path.dirname(__file__), 'VERSION'), 'r') as f:
 
 
 extensions = [
-    Extension('*', ['foolysh/*/*.pyx'],
-              include_dirs=['ext'])
+    Extension(
+        '*',
+        ['foolysh/**/*.pyx'],
+        include_dirs=['ext'],
+        libraries=['stdc++'],
+        extra_compile_args=["-std=c++11"],
+        extra_link_args=["-std=c++11"]
+    )
 ]
 
 
