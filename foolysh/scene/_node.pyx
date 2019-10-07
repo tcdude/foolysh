@@ -1,6 +1,6 @@
 # distutils: language = c++
 """
-Node implementation.
+Cython wrapper of the C++ Node implementation.
 """
 
 from enum import Enum
@@ -137,10 +137,12 @@ cdef class Node:
     def traverse(self):
         """
         Traverses the Scenegraph, starting at the root Node, relative to this.
-        ..warning::
+
+        .. warning::
             This method is used for internal processing of the Scenegraph when
             rendering and shouldn't be called by the user. There may be some
-            exotic use cases, where updating a detached Scenegraph is necessary.
+            exotic use cases, where updating a detached Scenegraph could be
+            useful.
 
         Returns:
             ``True`` if the Scenegraph had to be updated, otherwise ``False``.
@@ -152,10 +154,10 @@ cdef class Node:
         Query the Scenegraph at bounds `aabb`.
 
         Args:
-            aabb: ``foolysh.tools.aabb.AABB``
+            aabb: :class:`foolysh.tools.aabb.AABB`
 
         Returns:
-            ``List`` of ``Node`` instances that intersect with `aabb`.
+            ``list`` of ``Node`` instances that intersect with `aabb`.
         """
         return self._query(aabb)
 
@@ -181,12 +183,12 @@ cdef class Node:
     @property
     def pos(self):
         """
-        ``foolysh.tools.vector2.Vector2`` position of this Node, relative to its
-        parent.
+        :class:`foolysh.tools.vector2.Vector2` position of this Node, relative
+        to its parent.
 
         :setter:
-            * ``foolysh.tools.vector2.Vector2`` -> sets the position to the
-                specified ``foolysh.tools.vector2.Vector2``.
+            * :class:`foolysh.tools.vector2.Vector2` -> sets the position to the
+                specified :class:`foolysh.tools.vector2.Vector2`.
             * ``float``/``int`` -> sets the x and y coordinates to the specified
                 value.
             * ``tuple`` of two ``int``/``float`` -> sets the x and y
@@ -225,7 +227,8 @@ cdef class Node:
         Args:
             other: The Node used as reference.
         Returns:
-            ``foolysh.tools.vector2.Vector2`` Position relative to another Node.
+            :class:`foolysh.tools.vector2.Vector2` Position relative to another
+            Node.
         """
         return self._get_pos_node(other)
 
@@ -257,8 +260,8 @@ cdef class Node:
         ``tuple`` scale of this Node, relative to its parent.
 
         :setter:
-            * ``foolysh.tools.vector2.Vector2`` -> sets the position to the
-                specified ``foolysh.tools.vector2.Vector2``.
+            * :class:`foolysh.tools.vector2.Vector2` -> sets the position to the
+                specified :class:`foolysh.tools.vector2.Vector2`.
             * ``float``/``int`` -> sets the x and y scale to the specified
                 value.
             * ``tuple`` of two ``int``/``float`` -> sets the x and y scale to
@@ -441,12 +444,13 @@ cdef class Node:
     @property
     def rotation_center(self):
         """
-        ``foolysh.tools.vector2.Vector2`` rotation center of this Node, relative
-        to its parent.
+        :class:`foolysh.tools.vector2.Vector2` rotation center of this Node,
+        relative to its parent.
 
         :setter:
-            * ``foolysh.tools.vector2.Vector2`` or ``tuple`` of two ``float``/
-                ``int`` -> sets the rotation center to the specified value.
+            * :class:`foolysh.tools.vector2.Vector2` or ``tuple`` of two
+                ``float`` / ``int`` -> sets the rotation center to the specified
+                value.
             * ``0`` -> Resets the rotation center to the default value.
         """
         return self._get_rotation_center()
@@ -498,8 +502,7 @@ cdef class Node:
     @property
     def origin(self):
         """
-        Enum: ``foolysh.scene.node.Origin`` origin of this Node.
-        (default=``Origin.TOP_LEFT``)
+        :class:`foolysh.tools.common.Origin` origin of this Node. (default = ``Origin.TOP_LEFT``)
         """
         return Origin(deref(self.thisptr).get_origin())
 
@@ -609,7 +612,7 @@ cdef class Node:
     @property
     def aabb(self):
         """
-        ``foolysh.tools.aabb.AABB`` of this node.
+        :class:`foolysh.tools.aabb.AABB` of this node.
         """
         return self._get_aabb()
 
