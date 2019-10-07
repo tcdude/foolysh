@@ -54,19 +54,78 @@ add_task(std::string name, const double delay, const bool with_dt, void* func,
     _tasks.emplace(std::make_pair(name, t));
 }
 
+/**
+ * Remove task ``name``.
+ */
+void tools::TaskManager::
+remove_task(std::string name) {
+    _tasks.erase(name);
+}
+
+/**
+ * To be called every frame.
+ */
 void tools::TaskManager::
 execute() {
     _clock->tick();
     const double dt = _clock->get_dt();
-    for (auto it : _tasks) {
-        Task& t = it.second;
+    for (auto it = _tasks.begin(); it != _tasks.end(); ++it) {
+        auto& t = _tasks[it->first];
+        if (!t.running) {
+            continue;
+        }
         if (t.delay > 0.0) {
             t.remaining -= dt;
         }
         if (t.remaining <= 0.0) {
             const double _dt = (t.delay > 0) ? t.delay - t.remaining : dt;
             _cb(t.func, t.args, t.kwargs, _dt, t.with_dt);
-            t.remaining = t.delay + t.remaining;
+            t.remaining = t.delay;
         }
     }
+}
+
+/**
+ * Change delay for task ``name``.
+ */
+void tools::TaskManager::
+set_delay(std::string name, const double delay) {
+    Task& t = _tasks[name];
+    t.delay = t.remaining = delay;
+}
+
+/**
+ * Pause task ``name``.
+ */
+void tools::TaskManager::
+pause(std::string name) {
+    Task& t = _tasks[name];
+    t.running = false;
+}
+
+/**
+ * Resume task ``name``.
+ */
+void tools::TaskManager::
+resume(std::string name) {
+    Task& t = _tasks[name];
+    t.running = true;
+}
+
+/**
+ * Return ``true`` if task ``name`` is running, otherwise ``false``.
+ */
+bool tools::TaskManager::
+state(std::string name) {
+    Task& t = _tasks[name];
+    return t.running;
+}
+
+/**
+ * Return the delay for task ``name``.
+ */
+double tools::TaskManager::
+get_delay(std::string name) {
+    Task& t = _tasks[name];
+    return t.delay;
 }

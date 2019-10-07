@@ -34,7 +34,7 @@ namespace tools {
         void* func;
         void* args;
         void* kwargs;
-        bool with_dt, running;
+        bool with_dt, running = true;
         double delay, remaining;
     };
 
@@ -51,6 +51,11 @@ namespace tools {
                       void* func, void* args, void* kwargs);
         void remove_task(std::string);
         void execute();
+        void set_delay(std::string name, const double delay);
+        void pause(std::string name);
+        void resume(std::string name);
+        bool state(std::string name);
+        double get_delay(std::string name);
 
     private:
         std::map<std::string, Task> _tasks;

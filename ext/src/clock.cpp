@@ -31,7 +31,7 @@ tick() {
         high_resolution_clock::now().time_since_epoch()).count();
 
     if (_clock_stat.start > 0) {
-        _clock_stat.delta_time = static_cast<double>(current - _clock_stat.current) * 1e-9;
+        _clock_stat.delta_time = (double)(current - _clock_stat.current) * 1e-9;
         _clock_stat.current = current;
     }
     else {
@@ -39,3 +39,20 @@ tick() {
         _clock_stat.delta_time = 0.0;
     }
 }
+
+double tools::Clock::
+get_dt() {
+    if (_clock_stat.start < 0) {
+        tick();
+    }
+    return _clock_stat.delta_time;
+}
+
+double tools::Clock::
+get_time() {
+    if (_clock_stat.start < 0) {
+        tick();
+    }
+    return (double)(_clock_stat.current - _clock_stat.start) * 1e-9;
+}
+
