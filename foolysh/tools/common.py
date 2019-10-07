@@ -2,6 +2,8 @@
 Common constants and functions.
 """
 
+from enum import Enum
+
 __author__ = 'Tiziano Bettio'
 __license__ = 'MIT'
 __version__ = '0.1'
@@ -34,3 +36,19 @@ DEFAULT_CONFIG = {
     }
 }
 
+
+# Enums
+
+class Origin(Enum):
+    """
+    Enum: Origin of a :class:`foolysh.scene.node.Node`.
+    """
+    TOP_LEFT = 0
+    TOP_RIGHT = 1
+    TOP_CENTER = 2
+    CENTER_LEFT = 3
+    CENTER = 4
+    CENTER_RIGHT = 5
+    BOTTOM_LEFT = 6
+    BOTTOM_RIGHT = 7
+    BOTTOM_CENTER = 8
