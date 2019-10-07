@@ -3,8 +3,6 @@
 Cython wrapper of the C++ Node implementation.
 """
 
-from enum import Enum
-
 from .cppnode cimport Node as _Node
 from .cppnode cimport SmallList
 from .cppnode cimport Scale
@@ -14,6 +12,7 @@ from ..tools.cppaabb cimport AABB as _AABB
 from ..tools.aabb cimport AABB
 from ..tools.cppvector2 cimport Vector2 as _Vector2
 from ..tools.vector2 cimport Vector2
+from ..tools.common import Origin
 
 from cython.operator cimport dereference as deref
 
@@ -42,26 +41,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE."""
 
-cdef dict _nodepaths = {}
-
-
-class Origin(Enum):
-    """
-    Enum: Origin of a ``Node``.
-
-    Values:
-        ``{TOP_LEFT, TOP_RIGHT, TOP_CENTER, CENTER_LEFT, CENTER, CENTER_RIGHT,
-        BOTTOM_LEFT, BOTTOM_RIGHT, BOTTOM_CENTER}´´
-    """
-    TOP_LEFT=0
-    TOP_RIGHT=1
-    TOP_CENTER=2
-    CENTER_LEFT=3
-    CENTER=4
-    CENTER_RIGHT=5
-    BOTTOM_LEFT=6
-    BOTTOM_RIGHT=7
-    BOTTOM_CENTER=8
+cdef dict _nodes = {}
 
 
 cdef class Node:
@@ -71,24 +51,32 @@ cdef class Node:
     manipulated and queried.
 
     It also is meant to be subclassed for special purpose Nodes in the
-    Scenegraph, such as the ``ImageNode`` class, designed to hold one or more
-    images.
+    Scenegraph, such as the :class:`~foolysh.scene.node.ImageNode` class,
+    designed to hold one or more images.
 
     .. note::
-        A root Node is provided to the user in ``foolysh.app.App`` and other
-        than some very specific/exotic use cases, the user should not have to
-        worry about calling ``traverse()`` on the root Node, which is handled
+        A root Node is provided to the user in :class:`foolysh.app.App` and
+        other than some very specific/exotic use cases, the user should not have
+        to worry about calling ``traverse()`` on the root Node, which is handled
         automatically by foolysh.
         If you're using a detached Scenegraph, make sure that you call the
         ``traverse()`` method, before accessing properties like
         ``relative_pos``, ``relative_scale`` et al.
     """
     cdef unique_ptr[_Node] thisptr
+    cdef str __name
 
     def __cinit__(self):
         self.thisptr.reset(new _Node())
         # Reference the Node instance to keep it alive
-        _nodepaths[deref(self.thisptr).get_id()] = self
+        _nodes[deref(self.thisptr).get_id()] = self
+
+    def __init__(self, name='Unnamed Node', *args, **kwargs):
+        self.__name = name
+
+    @property
+    def name(self):
+        return self.__name
 
     @property
     def node_id(self):
@@ -102,7 +90,7 @@ cdef class Node:
         Removes the cyclic reference to the wrapped Node so it can get garbage
         collected.
         """
-        _nodepaths.pop(deref(self.thisptr).get_id())
+        _nodes.pop(deref(self.thisptr).get_id())
 
     def attach_node(self):
         """
@@ -117,9 +105,9 @@ cdef class Node:
 
     cdef void _attach_node(self, Node np):
         cdef unique_ptr[_Node] _np
-        _nodepaths.pop(deref(np.thisptr).get_id())
+        _nodes.pop(deref(np.thisptr).get_id())
         _np.reset(new _Node(deref(self.thisptr).attach_node()))
-        _nodepaths[deref(_np).get_id()] = np
+        _nodes[deref(_np).get_id()] = np
         np.thisptr.reset(_np.release())
 
     def reparent_to(self, parent):
@@ -165,7 +153,7 @@ cdef class Node:
         cdef SmallList[int] r = deref(self.thisptr).query(deref(aabb.thisptr))
         cdef list rl = []
         for i in range(r.size()):
-            rl.append(_nodepaths[r[i]])
+            rl.append(_nodes[r[i]])
         return rl
 
     def hide(self):
