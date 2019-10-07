@@ -1,5 +1,5 @@
 """
-Unittests for engine.taskmanager
+Unittests for foolysh.tools
 """
 
 import math
@@ -7,13 +7,13 @@ import math
 # noinspection PyPackageRequirements
 import pytest
 
-from foolysh.tools import vector
+from foolysh.tools import vector2
 from foolysh.tools import aabb
 from foolysh.tools import quadtree
 
 __author__ = 'Tiziano Bettio'
 __license__ = 'MIT'
-__version__ = '0.2'
+__version__ = '0.1'
 __copyright__ = """Copyright (c) 2019 Tiziano Bettio
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -36,99 +36,59 @@ SOFTWARE."""
 
 
 def test_vector_math():
-    v_a = vector.Vector()
-    v_b = vector.Vector(1.0, 1.0)
-    assert v_a - v_b == vector.Vector(-1, -1)
-    assert v_a + v_b * 2 == vector.Vector(2, 2)
-    assert v_a + v_b / 2 == vector.Vector(0.5, 0.5)
-    assert v_b // 3 == vector.Vector()
-    assert 3 * v_b == vector.Vector(3, 3)
-    assert 1 + v_a == vector.Vector(1, 1)
-    assert 1 - v_b == vector.Vector()
+    v_a = vector2.Vector2()
+    v_b = vector2.Vector2(1.0, 1.0)
+    assert v_a - v_b == vector2.Vector2(-1, -1)
+    assert v_a + v_b * 2 == vector2.Vector2(2, 2)
+    assert v_a + v_b / 2 == vector2.Vector2(0.5, 0.5)
+    # assert v_b // 3 == vector2.Vector2()
+    assert 3 * v_b == vector2.Vector2(3, 3)
+    assert 1 + v_a == vector2.Vector2(1, 1)
+    assert 1 - v_b == vector2.Vector2()
     assert v_b.length == math.sqrt(2)
+    assert v_b.magnitude == 2
     assert pytest.approx(v_b.normalized().length) == 1
-    assert v_b.rotate(90).almost_equal(vector.Vector(1, -1))
-    assert v_b.rotate(-90).almost_equal(vector.Vector(-1, 1))
-    with pytest.raises(ValueError) as e_info:
-        v_a.normalize()
-    assert 'zero length' in e_info.value.args[0]
+    v_rot = v_b.rotated(90)
+    assert pytest.approx(v_rot.x, 1)
+    assert pytest.approx(v_rot.y, -1)
+    v_rot = v_b.rotated(-90)
+    assert pytest.approx(v_rot.x, -1)
+    assert pytest.approx(v_rot.y, 1)
+    assert v_a.normalize() is False
     assert v_b.dot(v_b) == 2
-    assert isinstance(v_a.aspoint(), vector.Point) is True
 
 
 def test_aabb():
-    b_a = aabb.AABB((0.0, 0.0, 1.0, 1.0))
-    b_b = aabb.AABB((0.1, 0.1, 0.9, 0.9))
-    b_c = aabb.AABB((0.1, 0.1, 1.0, 1.0))
-    b_d = aabb.AABB((-0.5, -0.5, 0.5, 0.5))
-    p_a = vector.Point(1.0, 1.0)
-    p_b = vector.Point(1 - 1e-7, 1 - 1e-7)
-    assert (b_a < b_b) is True
-    assert (b_a < b_c) is False
-    assert (b_a <= b_c) is True
-    assert (b_a <= p_a) is True
-    assert (b_a < p_a) is False
-    assert (b_a > b_d) is True
-    assert (b_a > p_a) is False
-    assert (b_a >= p_a) is True
-    assert (b_a > p_b) is True
+    b_a = aabb.AABB(0.5, 0.5, 0.5, 0.5)
+    b_b = aabb.AABB(0.5, 0.5, 0.4, 0.4)
+    b_c = aabb.AABB(0.55, 0.55, 0.45, .45)
+    b_d = aabb.AABB(0, 0, 0.5, 0.5)
+    p_a = vector2.Point2(1.0, 1.0)
+    p_b = vector2.Point2(1 - 1e-7, 1 - 1e-7)
+    assert b_a.inside_aabb(b_b) is True
+    assert b_a.inside_aabb(b_c) is True
+    assert b_a.overlap(b_c) is True
+    assert b_a.inside_tup(p_a.x, p_a.y) is True
+    assert b_a.overlap(b_d) is True
+    assert b_a.inside_tup(p_b.x, p_b.y) is True
 
 
 def test_quadtree():
-    qt = quadtree.Quadtree((-1.0, -1.0, 1.0, 1.0), 16)
-    pos_a = aabb.AABB((0.0, 0.0, 1.0, 1.0))
-    pos_b = aabb.AABB((0.1, 0.1, 1.9, 1.9))
-    pos_c = aabb.AABB((-1.1, -1.1, 0.0, 0.0))
-    pos_d = aabb.AABB((-0.5, -0.5, 0.5, 0.5))
-    pos_e = vector.Point(0.45, 0.45)
-    obj_a = (0, 0)
-    obj_b = (1, 1)
-    obj_c = (2, 2)
-    obj_d = (3, 3)
-    obj_e = (4, 4)
-    assert qt.add(obj_a, pos_a) is True
-    assert qt.add(obj_b, pos_b) is False
-    assert qt.add(obj_c, pos_c) is False
-    assert qt.add(obj_d, pos_d) is True
-    assert qt.add(obj_e, pos_e) is True
-    assert qt.item_count == 3
-    result = qt.get_items(pos_d)
-    assert len(result) == 2
-    assert obj_e in result
-    result = qt.get_items(aabb.AABB((-1.0, -1.0, 0.0, 0.0)))
-    assert len(result) == 1
+    qt = quadtree.Quadtree()
+    pos_a = aabb.AABB(0.0, 0.0, 1.0, 1.0)
+    pos_b = aabb.AABB(-100.0, -100.0, 99.0, 99.0)
+    pos_d = aabb.AABB(-0.5, -0.5, 0.5, 0.5)
+    obj_a = 0
+    obj_b = 1
+    obj_d = 3
+    assert qt.insert(obj_a, pos_a) is True
+    assert qt.insert(obj_b, pos_b) is True
+    # assert qt.insert(obj_c, pos_c) is False
+    assert qt.insert(obj_d, pos_d) is True
+    # assert qt.item_count == 3
+    result = qt.query(pos_d)
+    assert len(result) == 3
     assert obj_d in result
-    result = qt.get_items(aabb.AABB((-1.0, -1.0, 0.0, 0.0)), True)
+    result = qt.query(aabb.AABB(-0.5, -0.5, 0.49, 0.49))
     assert len(result) == 2
     assert obj_a in result
-
-
-def test_quadtree_from_pairs():
-    pairs = [
-        (
-            aabb.AABB((0.0, 0.0, 1.0, 1.0)),
-            (0, 0)
-        ),
-        (
-            aabb.AABB((0.1, 0.1, 1.9, 1.9)),
-            (1, 1)
-        ),
-        (
-            aabb.AABB((-1.1, -1.1, 0.0, 0.0)),
-            (2, 2)
-        ),
-        (
-            aabb.AABB((-0.5, -0.5, 0.5, 0.5)),
-            (3, 3)
-        ),
-    ]
-    qt = quadtree.quadtree_from_pairs(pairs, 16)
-    assert qt.add((4, 4), vector.Point(0.45, 0.45)) is True
-    assert qt.aabb.box == (-1.1, -1.1, 1.9, 1.9)
-    assert qt.item_count == 5
-    result = qt.get_items(aabb.AABB((-1.0, -1.0, 0.0, 0.0)))
-    assert len(result) == 1
-    assert (3, 3) in result
-    result = qt.get_items(aabb.AABB((-1.0, -1.0, 0.0, 0.0)), True)
-    assert len(result) == 3
-    assert (0, 0) in result
