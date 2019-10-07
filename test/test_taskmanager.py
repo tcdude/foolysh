@@ -1,5 +1,5 @@
 """
-Unittests for engine.taskmanager
+Unittests for foolysh.taskmanager
 """
 import time
 
@@ -36,25 +36,91 @@ def test_taskmanager():
         assert kwarg_a == 'kwa'
 
     def callback_dt(dt):
-        assert dt
+        assert dt == 0.0
     tm = taskmanager.TaskManager()
-    _ = tm.add_task(
-        'test_task_no_dt', callback_no_dt, 0, False, 'a', 'b', kwarg_a='kwa'
+    tm.add_task(
+        'test_task_no_dt',
+        0,
+        False,
+        callback_no_dt,
+        ('a', 'b'),
+        {'kwarg_a': 'kwa'}
     )
-    _ = tm.add_task('test_task_dt', callback_dt)
+    tm.add_task('test_task_dt', 0, True, callback_dt)
     tm()
 
 
 def test_timing():
-    def callback(counter):
-        counter.append(1)
+    def callback(a):
+        a.append(1)
+
+    cb_counter = []
+    tm = taskmanager.TaskManager()
+    tm.add_task(
+        'counter_task',
+        0.02,
+        False,
+        callback,
+        (cb_counter, )
+    )
+    start_time = time.perf_counter()
+    while time.perf_counter() - start_time < 1:
+        tm()
+    assert sum(cb_counter) == 49
+
+
+def test_pause_resume():
+    def callback(a):
+        a.append(1)
 
     cb_counter = []
     tm = taskmanager.TaskManager()
     task = tm.add_task(
-        'counter_task', callback, 0.02, False, cb_counter
+        'pause_test',
+        0,
+        False,
+        callback,
+        (cb_counter, )
     )
-    start_time = task._last_exec  # time.perf_counter()
-    while time.perf_counter() - start_time < 1:
-        tm()
-    assert sum(cb_counter) == 49
+    tm()
+    assert sum(cb_counter) == 1
+    task.pause()
+    tm()
+    assert task.ispaused is True
+    assert sum(cb_counter) == 1
+    task.resume()
+    tm()
+    assert task.ispaused is False
+    assert sum(cb_counter) == 2
+
+
+def test_delay_change():
+    def callback(t):
+        assert time.perf_counter() - t > 0.5
+
+    tm = taskmanager.TaskManager()
+    tm()
+    task = tm.add_task(
+        'delay_change',
+        0,
+        False,
+        callback,
+        (time.perf_counter(), )
+    )
+    task.delay = 0.5
+    tm()
+    time.sleep(0.5)
+    tm()
+
+
+def test_subscriptable():
+    def callback():
+        pass
+    tm = taskmanager.TaskManager()
+    task = tm.add_task(
+        'subscriptable',
+        0,
+        False,
+        callback
+    )
+    assert task == tm['subscriptable']
