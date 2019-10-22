@@ -47,18 +47,6 @@
  * Both ``Interval`` and ``Animation`` allow for easing in and out and can hold
  * a number of modifiers (pos, angle, ...) that are applied in parallel.
  *
- * Interval / Animation type_flags (+ = Interval Only):
- *  1       Start Pos (+)
- *  2       End Pos
- *  4       Start Angle (+)
- *  8       End Angle
- *  16      Start Rotation Center (+)
- *  32      End Rotation Center
- *  64      Start Scale (+)
- *  128     End Scale
- *  256     Start Depth (+)
- *  512     End Depth
- *  1024    Relative to Node
  */
 
 
@@ -126,8 +114,42 @@ namespace animation {
         bool active = false, has_start = false;
     };
 
+    /**
+     * Reference counted Type, holding data for AnimationType.
+     */
+    struct AnimationData {
+        AnimationData();
+        ~AnimationData();
+
+        double duration, playback_pos = -1.0;
+        double pos_speed = -1.0, scale_speed = -1.0, rotation_speed = -1.0,
+            rotation_center_speed = -1.0, depth_speed = -1.0;
+        scenegraph::Node node;
+        BlendType blend;
+        PositionData pos, center_pos;
+        ScaleData scale;
+        AngleData angle;
+        DepthData depth;
+        int _ref_count, animation_id;
+
+        static ExtFreeList<AnimationData*> _ad;
+    };
+    ExtFreeList<AnimationData*> AnimationData::_ad;
+
+
+    /**
+     * Base class for animations, providing setup and control methods and holds
+     * shared data.
+     */
     class AnimationType {
     public:
+        AnimationType();
+        ~AnimationType();
+        AnimationType(const AnimationType& other);
+        AnimationType(AnimationType&& other) noexcept;
+        AnimationType& operator=(const AnimationType& other);
+        AnimationType& operator=(AnimationType&& other) noexcept;
+
         // Setup
         void set_node(scenegraph::Node n);
         void set_blend(BlendType b);
@@ -160,31 +182,33 @@ namespace animation {
 
         // Control
         virtual void reset();
-        virtual void step(const double dt);
+        virtual double step(const double dt);
         double get_playback_pos();
 
     protected:
-        double duration, playback_pos;
-        scenegraph::Node node;
-        BlendType blend;
-        PositionData pos, center_pos;
-        ScaleData scale;
-        AngleData angle;
-        DepthData depth;
+        AnimationData& _get_animation_data(const int animation_id);
+        int _animation_id;
     };
 
+    /**
+     * Interval with fixed duration.
+     */
     class Interval : public AnimationType {
     public:
-        Interval();
         void set_duration(const double d);
 
         void reset();
-        void step(const double dt);
+        double step(const double dt);
+
+    private:
+        void _update(const double prog);
     };
 
+    /**
+     * Animation with fixed speed, runs until all end states are reached.
+     */
     class Animation : public AnimationType {
     public:
-        Animation();
         void set_pos_speed(const double s);
         void set_scale_speed(const double s);
         void set_rotation_speed(const double s);
@@ -192,14 +216,21 @@ namespace animation {
         void set_depth_speed(const double s);
 
         void reset();
-        void step(const double dt);
+        double step(const double dt);
     };
 
+    /**
+     * Container to hold a sequence of ``AnimationType`` objects.
+     */
     class Sequence {
     public:
+        void append();
     private:
     };
 
+    /**
+     * Interface to control animation.
+     */
     class AnimationManager {
     public:
         void animate(const double dt);

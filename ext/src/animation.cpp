@@ -64,6 +64,98 @@ lerp(double pos, double total, BlendType blend) {
 }
 
 
+// AnimationData
+
+/**
+ *
+ */
+animation::AnimationData::
+AnimationData(){
+    _ref_count = 1;
+}
+
+
+// AnimationType Rule of 5
+
+/**
+ * Default Constructor: Create a new AnimationData instance.
+ */
+animation::AnimationType::
+AnimationType() {
+    _animation_id = AnimationData::_ad.insert(new AnimationData());
+    AnimationData::_ad[_animation_id]->animation_id = _animation_id;
+
+}
+
+/**
+ * Destructor: Decrements AnimationData ref_count, deletes AnimationData if
+ * ref_count drops to zero.
+ */
+animation::AnimationType::
+~AnimationType() {
+    if (_animation_id > -1) {
+        AnimationData& ad = _get_animation_data(_animation_id);
+        if (ad._ref_count == 1) {
+            /* If ours is the last reference, delete the AnimationData */
+            AnimationData::_ad.erase(_animation_id);
+        }
+        else {
+            --ad._ref_count;
+        }
+    }
+}
+
+/**
+ * Copy Constructor. Creates a copy of AnimationType ``other`` with access to
+ * the same AnimationData instance.
+ */
+animation::AnimationType::
+AnimationType(const AnimationType& other) {
+    _animation_id = other._animation_id;
+    AnimationData& ad = _get_animation_data(_animation_id);
+    ++ad._ref_count;
+}
+
+/**
+ * Move Constructor. Invalidates ``other``.
+ */
+animation::AnimationType::
+AnimationType(AnimationType&& other) noexcept {
+    _animation_id = other._animation_id;
+    other._animation_id = -1;
+}
+
+/**
+ * Copy Assignment Operator. Creates a copy of AnimationType ``other`` with
+ * access to the same AnimationData instance.
+ */
+animation::AnimationType& animation::AnimationType::
+operator=(const AnimationType& other) {
+    if (AnimationData::_ad.active(_animation_id)) {
+        AnimationData& ad = _get_animation_data(_animation_id);
+        --ad._ref_count;
+    }
+    _animation_id = other._animation_id;
+    AnimationData& ad = _get_animation_data(_animation_id);
+    ++ad._ref_count;
+    return *this;
+}
+
+/**
+ * Move Assignment Operator. Invalidates ``other``.
+ */
+animation::AnimationType& animation::AnimationType::
+operator=(AnimationType&& other) noexcept {
+    if (AnimationData::_ad.active(_animation_id)) {
+        AnimationData& ad = _get_animation_data(_animation_id);
+        --ad._ref_count;
+    }
+    _animation_id = other._animation_id;
+    other._animation_id = -1;
+    return *this;
+}
+
+
 // AnimationType - Setup
 
 /**
@@ -71,7 +163,8 @@ lerp(double pos, double total, BlendType blend) {
  */
 void animation::AnimationType::
 set_node(scenegraph::Node n) {
-    node = n;
+    AnimationData& ad = _get_animation_data(_animation_id);
+    ad.node = n;
 }
 
 /**
@@ -79,7 +172,8 @@ set_node(scenegraph::Node n) {
  */
 void animation::AnimationType::
 set_blend(BlendType b) {
-    blend = b;
+    AnimationData& ad = _get_animation_data(_animation_id);
+    ad.blend = b;
 }
 
 /**
@@ -87,11 +181,12 @@ set_blend(BlendType b) {
  */
 void animation::AnimationType::
 add_pos(tools::Vector2 end) {
-    pos.active = true;
-    pos.end = end;
-    pos.has_start = false;
-    if (pos.relative_node) {
-        pos.relative_node.reset(nullptr);
+    AnimationData& ad = _get_animation_data(_animation_id);
+    ad.pos.active = true;
+    ad.pos.end = end;
+    ad.pos.has_start = false;
+    if (ad.pos.relative_node) {
+        ad.pos.relative_node.reset(nullptr);
     }
 }
 
@@ -101,10 +196,11 @@ add_pos(tools::Vector2 end) {
  */
 void animation::AnimationType::
 add_pos(tools::Vector2 end, scenegraph::Node relative_node) {
-    pos.active = true;
-    pos.end = end;
-    pos.has_start = false;
-    pos.relative_node.reset(scenegraph::Node(relative_node));
+    AnimationData& ad = _get_animation_data(_animation_id);
+    ad.pos.active = true;
+    ad.pos.end = end;
+    ad.pos.has_start = false;
+    ad.pos.relative_node.reset(scenegraph::Node(relative_node));
 }
 
 /**
@@ -112,12 +208,13 @@ add_pos(tools::Vector2 end, scenegraph::Node relative_node) {
  */
 void animation::AnimationType::
 add_pos(tools::Vector2 start, tools::Vector2 end) {
-    pos.active = true;
-    pos.start = start;
-    pos.end = end;
-    pos.has_start = true;
-    if (pos.relative_node) {
-        pos.relative_node.reset(nullptr);
+    AnimationData& ad = _get_animation_data(_animation_id);
+    ad.pos.active = true;
+    ad.pos.start = start;
+    ad.pos.end = end;
+    ad.pos.has_start = true;
+    if (ad.pos.relative_node) {
+        ad.pos.relative_node.reset(nullptr);
     }
 }
 
@@ -128,11 +225,12 @@ add_pos(tools::Vector2 start, tools::Vector2 end) {
 void animation::AnimationType::
 add_pos(tools::Vector2 start, tools::Vector2 end,
         scenegraph::Node relative_node) {
-    pos.active = true;
-    pos.start = start;
-    pos.end = end;
-    pos.has_start = true;
-    pos.relative_node.reset(scenegraph::Node(relative_node));
+    AnimationData& ad = _get_animation_data(_animation_id);
+    ad.pos.active = true;
+    ad.pos.start = start;
+    ad.pos.end = end;
+    ad.pos.has_start = true;
+    ad.pos.relative_node.reset(scenegraph::Node(relative_node));
 }
 
 /**
@@ -140,11 +238,12 @@ add_pos(tools::Vector2 start, tools::Vector2 end,
  */
 void animation::AnimationType::
 add_scale(scenegraph::Scale end) {
-    scale.active = true;
-    scale.end = end;
-    scale.has_start = false;
-    if (scale.relative_node) {
-        scale.relative_node.reset(nullptr);
+    AnimationData& ad = _get_animation_data(_animation_id);
+    ad.scale.active = true;
+    ad.scale.end = end;
+    ad.scale.has_start = false;
+    if (ad.scale.relative_node) {
+        ad.scale.relative_node.reset(nullptr);
     }
 }
 
@@ -154,10 +253,11 @@ add_scale(scenegraph::Scale end) {
  */
 void animation::AnimationType::
 add_scale(scenegraph::Scale end, scenegraph::Node relative_node) {
-    scale.active = true;
-    scale.end = end;
-    scale.has_start = false;
-    scale.relative_node.reset(new scenegraph::Node(relative_node));
+    AnimationData& ad = _get_animation_data(_animation_id);
+    ad.scale.active = true;
+    ad.scale.end = end;
+    ad.scale.has_start = false;
+    ad.scale.relative_node.reset(new scenegraph::Node(relative_node));
 }
 
 /**
@@ -165,12 +265,13 @@ add_scale(scenegraph::Scale end, scenegraph::Node relative_node) {
  */
 void animation::AnimationType::
 add_scale(scenegraph::Scale start, scenegraph::Scale end) {
-    scale.active = true;
-    scale.start = start;
-    scale.end = end;
-    scale.has_start = true;
-    if (scale.relative_node) {
-        scale.relative_node.reset(nullptr);
+    AnimationData& ad = _get_animation_data(_animation_id);
+    ad.scale.active = true;
+    ad.scale.start = start;
+    ad.scale.end = end;
+    ad.scale.has_start = true;
+    if (ad.scale.relative_node) {
+        ad.scale.relative_node.reset(nullptr);
     }
 }
 
@@ -181,11 +282,12 @@ add_scale(scenegraph::Scale start, scenegraph::Scale end) {
 void animation::AnimationType::
 add_scale(scenegraph::Scale start, scenegraph::Scale end,
           scenegraph::Node relative_node) {
-    scale.active = true;
-    scale.start = start;
-    scale.end = end;
-    scale.has_start = false;
-    scale.relative_node.reset(new scenegraph::Node(relative_node));
+    AnimationData& ad = _get_animation_data(_animation_id);
+    ad.scale.active = true;
+    ad.scale.start = start;
+    ad.scale.end = end;
+    ad.scale.has_start = false;
+    ad.scale.relative_node.reset(new scenegraph::Node(relative_node));
 }
 
 /**
@@ -233,11 +335,12 @@ add_rotation(double start, double end) {
  */
 void animation::AnimationType::
 add_rotation(double start, double end, scenegraph::Node relative_node) {
-    angle.active = true;
-    angle.end = start;
-    angle.end = end;
-    angle.has_start = true;
-    angle.relative_node.reset(new scenegraph::Node(relative_node));
+    AnimationData& ad = _get_animation_data(_animation_id);
+    ad.angle.active = true;
+    ad.angle.end = start;
+    ad.angle.end = end;
+    ad.angle.has_start = true;
+    ad.angle.relative_node.reset(new scenegraph::Node(relative_node));
 }
 
 /**
@@ -246,9 +349,10 @@ add_rotation(double start, double end, scenegraph::Node relative_node) {
  */
 void animation::AnimationType::
 add_rotation_center(tools::Vector2 end) {
-    center_pos.active = true;
-    center_pos.end = end;
-    center_pos.has_start = false;
+    AnimationData& ad = _get_animation_data(_animation_id);
+    ad.center_pos.active = true;
+    ad.center_pos.end = end;
+    ad.center_pos.has_start = false;
 }
 
 /**
@@ -257,10 +361,11 @@ add_rotation_center(tools::Vector2 end) {
  */
 void animation::AnimationType::
 add_rotation_center(tools::Vector2 start, tools::Vector2 end) {
-    center_pos.active = true;
-    center_pos.start = start;
-    center_pos.end = end;
-    center_pos.has_start = true;
+    AnimationData& ad = _get_animation_data(_animation_id);
+    ad.center_pos.active = true;
+    ad.center_pos.start = start;
+    ad.center_pos.end = end;
+    ad.center_pos.has_start = true;
 }
 
 /**
@@ -268,11 +373,12 @@ add_rotation_center(tools::Vector2 start, tools::Vector2 end) {
  */
 void animation::AnimationType::
 add_depth(int end) {
-    depth.active = true;
-    depth.end = end;
-    depth.has_start = false;
-    if (depth.relative_node) {
-        depth.relative_node.reset(nullptr);
+    AnimationData& ad = _get_animation_data(_animation_id);
+    ad.depth.active = true;
+    ad.depth.end = end;
+    ad.depth.has_start = false;
+    if (ad.depth.relative_node) {
+        ad.depth.relative_node.reset(nullptr);
     }
 }
 
@@ -282,10 +388,11 @@ add_depth(int end) {
  */
 void animation::AnimationType::
 add_depth(int end, scenegraph::Node relative_node) {
-    depth.active = true;
-    depth.end = end;
-    depth.has_start = false;
-    depth.relative_node.reset(new scenegraph::Node(relative_node));
+    AnimationData& ad = _get_animation_data(_animation_id);
+    ad.depth.active = true;
+    ad.depth.end = end;
+    ad.depth.has_start = false;
+    ad.depth.relative_node.reset(new scenegraph::Node(relative_node));
 }
 
 /**
@@ -293,12 +400,13 @@ add_depth(int end, scenegraph::Node relative_node) {
  */
 void animation::AnimationType::
 add_depth(int start, int end) {
-    depth.active = true;
-    depth.start = start;
-    depth.end = end;
-    depth.has_start = true;
-    if (depth.relative_node) {
-        depth.relative_node.reset(nullptr);
+    AnimationData& ad = _get_animation_data(_animation_id);
+    ad.depth.active = true;
+    ad.depth.start = start;
+    ad.depth.end = end;
+    ad.depth.has_start = true;
+    if (ad.depth.relative_node) {
+        ad.depth.relative_node.reset(nullptr);
     }
 }
 
@@ -308,9 +416,11 @@ add_depth(int start, int end) {
  */
 void animation::AnimationType::
 add_depth(int start, int end, scenegraph::Node relative_node) {
-    depth.active = true;
-    depth.start = start;
-    depth.end = end;
-    depth.has_start = true;
-    depth.relative_node.reset(new scenegraph::Node(relative_node));
+    AnimationData& ad = _get_animation_data(_animation_id);
+    ad.depth.active = true;
+    ad.depth.start = start;
+    ad.depth.end = end;
+    ad.depth.has_start = true;
+    ad.depth.relative_node.reset(new scenegraph::Node(relative_node));
+}
 }
