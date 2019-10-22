@@ -504,4 +504,112 @@ _get_animation_data(const int animation_id) {
     }
     return *AnimationData::_ad[animation_id];
 }
+
+
+// Interval
+
+/**
+ * Set the duration in seconds.
+ */
+void animation::Interval::
+set_duration(const double d) {
+    AnimationData& ad = _get_animation_data(_animation_id);
+    ad.duration = d;
+}
+
+/**
+ * Reset to initial state. Updates start states, for the active animation types,
+ * where none have been explicitly specified.
+ */
+void animation::Interval::
+reset() {
+    AnimationType::reset();
+}
+
+/**
+ * Returns -1.0 if the Interval is not finished, otherwise returns the amount
+ * of ``dt`` seconds remaining after the Interval was complete.
+ */
+double animation::Interval::
+step(const double dt) {
+    AnimationData& ad = _get_animation_data(_animation_id);
+
+    if (ad.playback_pos == -1.0) {
+        ad.playback_pos = 0.0;
+    }
+
+    ad.playback_pos += dt;
+    if (ad.playback_pos >= ad.duration) {
+        _update(1.0);
+        return ad.playback_pos - ad.duration;
+    }
+
+    _update(lerp(ad.playback_pos, ad.duration, ad.blend));
+
+    return -1.0;
+}
+
+/**
+ * Update the underlying Node
+ */
+void animation::Interval::
+_update(const double prog) {
+    // position
+    if (ad.pos.active) {
+        if (ad.pos.relative_node) {
+            ad.node.set_pos(
+                ad.pos.relative_node,
+                (ad.pos.end - ad.pos.start) * prog + ad.pos.start);
+        }
+        else {
+            ad.node.set_pos((ad.pos.end - ad.pos.start) * prog + ad.pos.start);
+        }
+    }
+
+    // rotation_center
+    if (ad.center_pos.active) {
+        ad.node.set_rotation_center(
+            (ad.center_pos.end - ad.center_pos.start)
+            * prog + ad.center_pos.start);
+    }
+
+    // scale
+    if (ad.scale.active) {
+        if (ad.scale.relative_node) {
+            ad.node.set_scale(
+                ad.scale.relative_node,
+                (ad.scale.end - ad.scale.start) * prog + ad.scale.start);
+        }
+        else {
+            ad.node.set_scale(
+                (ad.scale.end - ad.scale.start) * prog + ad.scale.start);
+        }
+    }
+
+    // rotation
+    if (ad.angle.active) {
+        if (ad.angle.relative_node) {
+            ad.node.set_angle(
+                ad.angle.relative_node,
+                (ad.angle.end - ad.angle.start) * prog + ad.angle.start);
+        }
+        else {
+            ad.node.set_angle(
+                (ad.angle.end - ad.angle.start) * prog + ad.angle.start);
+        }
+    }
+
+    // depth
+    if (ad.depth.active) {
+        if (ad.depth.relative_node) {
+            ad.node.set_depth(
+                ad.depth.relative_node,
+                (ad.depth.end - ad.dept.start) * prog + ad.depth.start);
+        }
+        else {
+            ad.node.set_depth(
+                (ad.depth.end - ad.dept.start) * prog + ad.depth.start);
+        }
+    }
+}
 }
