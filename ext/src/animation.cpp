@@ -21,6 +21,7 @@
  */
 
 #include <stdexcept>
+#include <algorithm>
 
 #include "animation.hpp"
 #include "node.hpp"
@@ -422,5 +423,85 @@ add_depth(int start, int end, scenegraph::Node relative_node) {
     ad.depth.end = end;
     ad.depth.has_start = true;
     ad.depth.relative_node.reset(new scenegraph::Node(relative_node));
+}
+
+
+// AnimationType - Control
+
+/**
+ * Reset command that needs to be overridden in subclasses.
+ */
+virtual void animation::AnimationType::
+reset() {
+    AnimationData& ad = _get_animation_data(_animation_id);
+    ad.playback_pos = -1.0;
+    if (ad.pos.active && !ad.pos.has_start) {
+        if (ad.pos.relative_node) {
+            ad.pos.start = ad.node.get_pos(ad.pos.relative_node);
+        }
+        else {
+            ad.pos.start = ad.node.get_pos();
+        }
+    }
+
+    if (ad.center_pos.active && !ad.center_pos.has_start) {
+        ad.pos.start = ad.node.get_rotation_center();
+    }
+
+    if (ad.scale.active && !ad.scale.has_start) {
+        if (ad.scale.relative_node) {
+            ad.scale.start = ad.node.get_scale(ad.scale.relative_node);
+        }
+        else {
+            ad.scale.start = ad.node.get_scale();
+        }
+    }
+
+    if (ad.angle.active && !ad.angle.has_start) {
+        if (ad.angle.relative_node) {
+            ad.angle.start = ad.node.get_angle(ad.angle.relative_node);
+        }
+        else {
+            ad.angle.start = ad.node.get_angle();
+        }
+    }
+
+    if (ad.depth.active && !ad.depth.has_start) {
+        if (ad.depth.relative_node) {
+            ad.depth.start = ad.node.get_depth(ad.depth.relative_node);
+        }
+        else {
+            ad.depth.start = ad.node.get_depth();
+        }
+    }
+}
+
+/**
+ * Step command that needs to be overridden in subclasses.
+ */
+virtual double animation::AnimationType::
+step(const double dt) {
+    return 0.0;
+}
+
+/**
+ * Returns the current playback position in seconds.
+ */
+double animation::AnimationType::
+get_playback_pos() {
+    AnimationData& ad = _get_animation_data(_animation_id);
+    return ad.playback_pos;
+}
+
+/**
+ * Helper method to retrieve the AnimationData for the specified
+ * ``animation_id``.
+ */
+animation::AnimationData& animation::AnimationType::
+_get_animation_data(const int animation_id) {
+    if (!AnimationData::_ad.active(animation_id)) {
+        throw std::logic_error("Tried to access invalid AnimationData");
+    }
+    return *AnimationData::_ad[animation_id];
 }
 }
