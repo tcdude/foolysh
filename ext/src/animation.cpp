@@ -612,4 +612,78 @@ _update(const double prog) {
         }
     }
 }
+
+
+// Animation
+
+/**
+ * Reset to initial state. Updates start states, for the active animation types,
+ * where none have been explicitly specified and translates speed into duration.
+ */
+void animation::Animation::
+reset() {
+    AnimationType::reset();
+    AnimationData& ad = _get_animation_data(_animation_id);
+    double duration = -1.0;
+
+    if (ad.pos.active) {
+        if (ad.pos_speed < 0.0) {
+            throw std::logic_error("Position animation specified without
+                                    speed");
+        }
+        double tmp_d = (ad.pos.end - ad.pos.start).length() / ad.pos_speed;
+        if (tmp_d > duration) {
+            duration = tmp_d;
+        }
+    }
+
+    if (ad.center_pos.active) {
+        if (ad.rotation_center_speed < 0.0) {
+            throw std::logic_error("Rotation center animation specified without
+                                    speed");
+        }
+        double tmp_d = (ad.center_pos.end - ad.center_pos.start).length()
+                       / ad.rotation_center_speed;
+        if (tmp_d > duration) {
+            duration = tmp_d;
+        }
+    }
+
+    if (ad.scale.active) {
+        if (ad.scale_speed < 0.0) {
+            throw std::logic_error("Scale animation specified without
+                                    speed");
+        }
+        double tmp_d = std::max(
+            std::abs(ad.scale.end.sx - ad.scale.start.sx) / ad.scale_speed,
+            std::abs(ad.scale.end.sy - ad.scale.start.sy) / ad.scale_speed);
+        if (tmp_d > duration) {
+            duration = tmp_d;
+        }
+    }
+
+    if (ad.angle.active) {
+        if (ad.rotation_speed < 0.0) {
+            throw std::logic_error("Rotation animation specified without
+                                    speed");
+        }
+        double tmp_d = std::abs(
+            ad.angle.end - ad.angle.start) / ad.rotation_speed;
+        if (tmp_d > duration) {
+            duration = tmp_d;
+        }
+    }
+
+    if (ad.depth.active) {
+        if (ad.depth_speed < 0.0) {
+            throw std::logic_error("Depth animation specified without
+                                    speed");
+        }
+        double tmp_d = std::abs(
+            ad.depth.end - ad.depth.start) / ad.depth_speed;
+        if (tmp_d > duration) {
+            duration = tmp_d;
+        }
+    }
+}
 }
