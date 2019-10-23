@@ -122,7 +122,7 @@ namespace animation {
         ~AnimationData();
 
         double duration, playback_pos = -1.0;
-        double pos_speed = -1.0, scale_speed = -1.0, rotation_speed = -1.0,
+        double pos_speed = -1.0, scale_speed = -1.0, rotation_speed = 0.0,
             rotation_center_speed = -1.0, depth_speed = -1.0;
         scenegraph::Node node;
         BlendType blend;

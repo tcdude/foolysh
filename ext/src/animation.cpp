@@ -663,7 +663,7 @@ reset() {
     }
 
     if (ad.angle.active) {
-        if (ad.rotation_speed < 0.0) {
+        if (ad.rotation_speed == 0.0) {
             throw std::logic_error("Rotation animation specified without
                                     speed");
         }
