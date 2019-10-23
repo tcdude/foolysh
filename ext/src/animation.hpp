@@ -124,6 +124,8 @@ namespace animation {
         double duration, playback_pos = -1.0;
         double pos_speed = -1.0, scale_speed = -1.0, rotation_speed = 0.0,
             rotation_center_speed = -1.0, depth_speed = -1.0;
+        double dur_pos, dur_scalex, dur_scaley, dur_angle, dur_center_pos,
+            dur_depth;
         scenegraph::Node node;
         BlendType blend;
         PositionData pos, center_pos;

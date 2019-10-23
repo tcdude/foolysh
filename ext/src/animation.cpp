@@ -632,6 +632,7 @@ reset() {
                                     speed");
         }
         double tmp_d = (ad.pos.end - ad.pos.start).length() / ad.pos_speed;
+        ad.dur_pos = tmp_d;
         if (tmp_d > duration) {
             duration = tmp_d;
         }
@@ -644,6 +645,7 @@ reset() {
         }
         double tmp_d = (ad.center_pos.end - ad.center_pos.start).length()
                        / ad.rotation_center_speed;
+        ad.dur_center_pos = tmp_d;
         if (tmp_d > duration) {
             duration = tmp_d;
         }
@@ -654,9 +656,12 @@ reset() {
             throw std::logic_error("Scale animation specified without
                                     speed");
         }
-        double tmp_d = std::max(
-            std::abs(ad.scale.end.sx - ad.scale.start.sx) / ad.scale_speed,
-            std::abs(ad.scale.end.sy - ad.scale.start.sy) / ad.scale_speed);
+        ad.dur_scalex = std::abs(
+            ad.scale.end.sx - ad.scale.start.sx) / ad.scale_speed;
+
+        ad.dur_scaley = std::abs(
+            ad.scale.end.sy - ad.scale.start.sy) / ad.scale_speed;
+        double tmp_d = std::max(ad.dur_scalex, ad.dur_scaley);
         if (tmp_d > duration) {
             duration = tmp_d;
         }
@@ -667,9 +672,9 @@ reset() {
             throw std::logic_error("Rotation animation specified without
                                     speed");
         }
-        double tmp_d = std::abs(
+        ad.dur_angle = std::abs(
             ad.angle.end - ad.angle.start) / ad.rotation_speed;
-        if (tmp_d > duration) {
+        if (ad.dur_angle > duration) {
             duration = tmp_d;
         }
     }
@@ -679,7 +684,7 @@ reset() {
             throw std::logic_error("Depth animation specified without
                                     speed");
         }
-        double tmp_d = std::abs(
+        ad.dur_depth = std::abs(
             ad.depth.end - ad.depth.start) / ad.depth_speed;
         if (tmp_d > duration) {
             duration = tmp_d;
