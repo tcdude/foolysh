@@ -691,4 +691,171 @@ reset() {
         }
     }
 }
+
+/**
+ * Returns -1.0 if the Animation is not finished, otherwise returns the amount
+ * of ``dt`` seconds remaining after the Animation was complete.
+ */
+double animation::Animation::
+step(const double dt) {
+    AnimationData& ad = _get_animation_data(_animation_id);
+    if (ad.playback_pos == -1.0) {
+        ad.playback_pos = 0.0;
+        return -1.0;
+    }
+
+    double rdt = -1.0;
+    ad.playback_pos += dt;
+
+    // position
+    if (ad.pos.active) {
+        tools::Vector2 p = (ad.pos.relative_node)
+                        ? ad.node.get_pos(ad.pos.relative_node)
+                        : ad.node.get_pos();
+        if (p != ad.pos.end) {
+            if (ad.playback_pos >= ad.dur_pos) {
+                if (ad.pos.relative_node) {
+                    ad.node.set_pos(ad.pos.relative_node, ad.pos.end);
+                }
+                else {
+                    ad.node.set_pos(ad.pos.end);
+                }
+            }
+            else {
+                double prog = lerp(ad.playback_pos, ad.dur_pos, ad.blend);
+                if (ad.pos.relative_node) {
+                    ad.node.set_pos(
+                        ad.pos.relative_node,
+                        (ad.pos.end - ad.pos.start) * prog + ad.pos.start);
+                }
+                else {
+                    ad.node.set_pos(
+                        (ad.pos.end - ad.pos.start) * prog + ad.pos.start);
+                }
+            }
+        }
+    }
+
+    // rotation_center
+    if (ad.center_pos.active) {
+        tools::Vector2 p = ad.node.get_rotation_center();
+        if (p != ad.center_pos.end) {
+            if (ad.playback_pos >= ad.dur_center_pos) {
+                ad.node.set_rotation_center(ad.center_pos.end);
+            }
+            else {
+                double prog = lerp(ad.playback_pos, ad.dur_center_pos,
+                    ad.blend);
+                ad.node.set_rotation_center(
+                    (ad.center_pos.end - ad.center_pos.start) * prog
+                    + ad.center_pos.start);
+            }
+        }
+    }
+
+    // scale
+    if (ad.scale.active) {
+        scenegraph::Scale s = (ad.scale.relative_node)
+                            ? ad.node.get_scale(ad.scale.relative_node)
+                            : ad.node.get_scale();
+        scenegraph::Scale new_scale = s;
+        if (s.sx != ad.scale.end.sx) {
+            if (ad.playback_pos >= ad.dur_scalex) {
+                new_scale.sx = ad.scale.end.sx;
+            }
+            else {
+                double prog = lerp(ad.playback_pos, ad.dur_scalex, ad.blend);
+                new_scale.sx = (ad.scale.end.sx - ad.scale.end.sx) * prog
+                    + ad.scale.start.sx;
+            }
+        }
+        if (s.sy != ad.scale.end.sy) {
+            if (ad.playback_pos >= ad.dur_scaley) {
+                new_scale.sy = ad.scale.end.sy;
+            }
+            else {
+                double prog = lerp(ad.playback_pos, ad.dur_scaley, ad.blend);
+                new_scale.sx = (ad.scale.end.sy - ad.scale.end.sy) * prog
+                    + ad.scale.start.sy;
+            }
+        }
+
+        if (s != new_scale) {
+            if (ad.scale.relative_node) {
+                ad.node.set_scale(ad.scale.relative_node, new_scale);
+            }
+            else {
+                ad.node.set_scale(new_scale);
+            }
+        }
+        else {
+            rdt = -1.0;
+        }
+    }
+
+    // rotation
+    if (ad.angle.active) {
+        double a = (ad.angle.relative_node)
+                    ? ad.node.get_angle(ad.angle.relative_node)
+                    : ad.node.get_angle();
+        if (a != ad.angle.end) {
+            if (ad.playback_pos >= ad.dur_angle) {
+                if (ad.angle.relative_node) {
+                    ad.node.set_angle(ad.angle.relative_node, ad.angle.end);
+                }
+                else {
+                    ad.node.set_angle(ad.angle.end);
+                }
+            }
+            else {
+                double prog = lerp(ad.playback_pos, ad.dur_angle, ad.blend);
+                if (ad.angle.relative_node) {
+                    ad.node.set_angle(
+                        ad.angle.relative_node,
+                        (ad.angle.end - ad.angle.start) * prog + ad.angle.start
+                    );
+                }
+                else {
+                    ad.node.set_angle(
+                        (ad.angle.end - ad.angle.start) * prog + ad.angle.start
+                    );
+                }
+            }
+        }
+    }
+
+    // depth
+    if (ad.depth.active) {
+        int depth = (ad.depth.relative_node)
+                    ? ad.node.get_depth(ad.depth.relative_node)
+                    : ad.node.get_depth();
+        if (depth != ad.depth.end) {
+            if (ad.playback_pos >= ad.dur_depth) {
+                if (ad.depth.relative_node) {
+                    ad.node.set_depth(ad.depth.relative_node, ad.depth.end);
+                }
+                else {
+                    ad.node.set_depth(ad.depth.end);
+                }
+            }
+            else {
+                double prog = lerp(ad.playback_pos, ad.dur_depth, ad.blend);
+                if (ad.depth.relative_node) {
+                    ad.node.set_depth(
+                        ad.depth.relative_node,
+                        (ad.depth.end - ad.depth.start) * prog + ad.depth.start
+                    );
+                }
+                else {
+                    ad.node.set_depth(
+                        (ad.depth.end - ad.depth.start) * prog + ad.depth.start
+                    );
+                }
+            }
+        }
+    }
+    if (ad.playback_pos >= ad.duration) {
+        return ad.playback_pos - ad.duration;
+    }
+    return -1.0;
 }
