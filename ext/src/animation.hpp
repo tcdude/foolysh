@@ -186,6 +186,7 @@ namespace animation {
         virtual void reset();
         virtual double step(const double dt);
         double get_playback_pos();
+        virtual std::unique_ptr<AnimationType> get_copy();
 
     protected:
         AnimationData& _get_animation_data(const int animation_id);
@@ -201,6 +202,7 @@ namespace animation {
 
         void reset();
         double step(const double dt);
+        std::unique_ptr<AnimationType> get_copy();
 
     private:
         void _update(const double prog);
@@ -219,6 +221,7 @@ namespace animation {
 
         void reset();
         double step(const double dt);
+        std::unique_ptr<AnimationType> get_copy();
     };
 
     /**
@@ -226,8 +229,12 @@ namespace animation {
      */
     class Sequence {
     public:
-        void append();
+        void append(AnimationType& a);
+        void reset();
+        double step(const double dt);
     private:
+        std::vector<std::unique_ptr<AnimationType>> _v;
+        int _active = -1;
     };
 
     /**

@@ -494,6 +494,39 @@ get_playback_pos() {
 }
 
 /**
+ *
+ */
+virtual std::unique_ptr<animation::AnimationType> animation::AnimationType::
+get_copy() {
+    std::unique_ptr<AnimationType> ptr;
+    ptr.reset(new AnimationType());
+    AnimationData& ad = _get_animation_data();
+    AnimationData& ptr_ad = ptr->_get_animation_data();
+
+    ptr_ad.duration = ad.duration;
+    ptr_ad.playback_pos = ad.playback_pos;
+    ptr_ad.pos_speed = ad.pos_speed;
+    ptr_ad.scale_speed = ad.scale_speed;
+    ptr_ad.rotation_speed = ad.rotation_speed;
+    ptr_ad.rotation_center_speed = ad.rotation_center_speed;
+    ptr_ad.depth_speed = ad.depth_speed;
+    ptr_ad.dur_pos = ad.dur_pos;
+    ptr_ad.dur_scalex = ad.dur_scalex;
+    ptr_ad.dur_scaley = ad.dur_scaley;
+    ptr_ad.dur_angle = ad.dur_angle;
+    ptr_ad.dur_center_pos = ad.dur_center_pos;
+    ptr_ad.dur_depth = ad.dur_depth;
+    ptr_ad.node = ad.node;
+    ptr_ad.blend = ad.blend;
+    ptr_ad.pos = ad.pos;
+    ptr_ad.center_pos = ad.center_pos;
+    ptr_ad.scale = ad.scale;
+    ptr_ad.angle = ad.angle;
+    ptr_ad.depth = ad.depth;
+    return ptr;
+}
+
+/**
  * Helper method to retrieve the AnimationData for the specified
  * ``animation_id``.
  */
@@ -611,6 +644,14 @@ _update(const double prog) {
                 (ad.depth.end - ad.dept.start) * prog + ad.depth.start);
         }
     }
+}
+
+/**
+ *
+ */
+std::unique_ptr<animation::AnimationType> animation::Interval::
+get_copy() {
+    return AnimationType::get_copy();
 }
 
 
@@ -858,4 +899,51 @@ step(const double dt) {
         return ad.playback_pos - ad.duration;
     }
     return -1.0;
+}
+
+/**
+ *
+ */
+std::unique_ptr<animation::AnimationType> animation::Animation::
+get_copy() {
+    return AnimationType::get_copy();
+}
+
+
+// Sequence
+
+/**
+ *
+ */
+void animation::Sequence::
+append(animation::AnimationType& a) {
+    _v.push_back(a.get_copy());
+}
+
+/**
+ *
+ */
+void animation::Sequence::
+reset() {
+    _active = -1;
+}
+
+/**
+ *
+ */
+double animation::Sequence::
+step(const double dt) {
+    if (_active < 0) {
+        _active = 0;
+        _v[0]->reset();
+    }
+    double rdt = _v[_active]->step(dt);
+    if (rdt >= 0.0) {
+        ++_active;
+        if (_active == _v.size()) {
+            return rdt;
+        }
+        return step(rdt);
+    }
+    return rdt;
 }
