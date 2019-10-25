@@ -529,9 +529,9 @@ get_copy() {
 /**
  *
  */
-char animation::AnimationType::
+virtual char animation::AnimationType::
 active_animations() {
-    return _active_anim;
+    return 0;
 }
 
 /**
@@ -666,6 +666,31 @@ _update(const double prog) {
 std::unique_ptr<animation::AnimationType> animation::Interval::
 get_copy() {
     return AnimationType::get_copy();
+}
+
+/**
+ *
+ */
+char animation::Interval::
+active_animations() {
+    char active_anim = 0;
+    AnimationData& ad = _get_animation_data(_animation_id);
+    if (ad.pos.active) {
+        active_anim = active_anim | 1;
+    }
+    if (ad.center_pos.active) {
+        active_anim = active_anim | 2;
+    }
+    if (ad.scale.active) {
+        active_anim = active_anim | 4;
+    }
+    if (ad.angle.active) {
+        active_anim = active_anim | 8;
+    }
+    if (ad.depth.active) {
+        active_anim = active_anim | 16;
+    }
+    return active_anim;
 }
 
 
@@ -925,6 +950,33 @@ get_copy() {
     return AnimationType::get_copy();
 }
 
+/**
+ *
+ */
+char animation::Animation::
+active_animations() {
+    char active_anim = 0;
+    AnimationData& ad = _get_animation_data(_animation_id);
+    if (ad.pos.active && ad.playback_pos < ad.dur_pos) {
+        active_anim = active_anim | 1;
+    }
+    if (ad.center_pos.active && ad.playback_pos < ad.dur_center_pos) {
+        active_anim = active_anim | 2;
+    }
+    if (ad.scale.active && ad.playback_pos < ad.dur_scalex) {
+        active_anim = active_anim | 4;
+    }
+    if (ad.scale.active && ad.playback_pos < ad.dur_scaley) {
+        active_anim = active_anim | 4;
+    }
+    if (ad.angle.active && ad.playback_pos < ad.dur_angle) {
+        active_anim = active_anim | 8;
+    }
+    if (ad.depth.active && ad.playback_pos < ad.dur_depth) {
+        active_anim = active_anim | 16;
+    }
+    return active_anim;
+}
 
 // Sequence
 
@@ -941,7 +993,12 @@ append(animation::AnimationType& a) {
  */
 void animation::Sequence::
 reset() {
-    _active = -1;
+    if (!_v.size()) {
+        throw std::runtime_error("Tried to reset empty Sequence.");
+    }
+    _active = 0;
+    _v[0]->reset();
+    _active_anim = _v[0]->active_animations();
 }
 
 /**
@@ -949,11 +1006,10 @@ reset() {
  */
 double animation::Sequence::
 step(const double dt) {
-    _active_anim = 0;
-    if (_active < 0) {
-        _active = 0;
-        _v[0]->reset();
+    if (!_v.size()) {
+        throw std::runtime_error("Tried to step empty Sequence.");
     }
+    _active_anim = 0;
     double rdt = _v[_active]->step(dt);
     _active_anim = _v[_active]->active_animations();
     while (rdt >= 0.0) {
@@ -961,6 +1017,8 @@ step(const double dt) {
         if (_active == _v.size()) {
             return rdt;
         }
+
+        _v[_active]->reset();
         rdt = step(rdt);
         _active_anim = _active_anim | _v[_active]->active_animations();
     }

@@ -187,12 +187,11 @@ namespace animation {
         virtual double step(const double dt);
         double get_playback_pos();
         virtual std::unique_ptr<AnimationType> get_copy();
-        char active_animations();
+        virtual char active_animations();
 
     protected:
         AnimationData& _get_animation_data(const int animation_id);
         int _animation_id;
-        char _active_anim = 0;
     };
 
     /**
@@ -205,6 +204,7 @@ namespace animation {
         void reset();
         double step(const double dt);
         std::unique_ptr<AnimationType> get_copy();
+        char active_animations();
 
     private:
         void _update(const double prog);
@@ -224,6 +224,7 @@ namespace animation {
         void reset();
         double step(const double dt);
         std::unique_ptr<AnimationType> get_copy();
+        char active_animations();
     };
 
     /**
