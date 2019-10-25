@@ -527,6 +527,14 @@ get_copy() {
 }
 
 /**
+ *
+ */
+char animation::AnimationType::
+active_animations() {
+    return _active_anim;
+}
+
+/**
  * Helper method to retrieve the AnimationData for the specified
  * ``animation_id``.
  */
@@ -565,6 +573,7 @@ reset() {
  */
 double animation::Interval::
 step(const double dt) {
+    _active_anim = 0;
     AnimationData& ad = _get_animation_data(_animation_id);
 
     if (ad.playback_pos == -1.0) {
@@ -597,6 +606,7 @@ _update(const double prog) {
         else {
             ad.node.set_pos((ad.pos.end - ad.pos.start) * prog + ad.pos.start);
         }
+        _active_anim = _active_anim | 1;
     }
 
     // rotation_center
@@ -604,6 +614,7 @@ _update(const double prog) {
         ad.node.set_rotation_center(
             (ad.center_pos.end - ad.center_pos.start)
             * prog + ad.center_pos.start);
+        _active_anim = _active_anim | 2;
     }
 
     // scale
@@ -617,6 +628,7 @@ _update(const double prog) {
             ad.node.set_scale(
                 (ad.scale.end - ad.scale.start) * prog + ad.scale.start);
         }
+        _active_anim = _active_anim | 4;
     }
 
     // rotation
@@ -630,6 +642,7 @@ _update(const double prog) {
             ad.node.set_angle(
                 (ad.angle.end - ad.angle.start) * prog + ad.angle.start);
         }
+        _active_anim = _active_anim | 8;
     }
 
     // depth
@@ -643,6 +656,7 @@ _update(const double prog) {
             ad.node.set_depth(
                 (ad.depth.end - ad.dept.start) * prog + ad.depth.start);
         }
+        _active_anim = _active_anim | 16;
     }
 }
 
@@ -739,13 +753,13 @@ reset() {
  */
 double animation::Animation::
 step(const double dt) {
+    _active_anim = 0;
     AnimationData& ad = _get_animation_data(_animation_id);
     if (ad.playback_pos == -1.0) {
         ad.playback_pos = 0.0;
         return -1.0;
     }
 
-    double rdt = -1.0;
     ad.playback_pos += dt;
 
     // position
@@ -774,6 +788,7 @@ step(const double dt) {
                         (ad.pos.end - ad.pos.start) * prog + ad.pos.start);
                 }
             }
+            _active_anim = _active_anim | 1;
         }
     }
 
@@ -791,6 +806,7 @@ step(const double dt) {
                     (ad.center_pos.end - ad.center_pos.start) * prog
                     + ad.center_pos.start);
             }
+            _active_anim = _active_anim | 2;
         }
     }
 
@@ -828,9 +844,7 @@ step(const double dt) {
             else {
                 ad.node.set_scale(new_scale);
             }
-        }
-        else {
-            rdt = -1.0;
+            _active_anim = _active_anim | 4;
         }
     }
 
@@ -862,6 +876,7 @@ step(const double dt) {
                     );
                 }
             }
+            _active_anim = _active_anim | 8;
         }
     }
 
@@ -893,6 +908,7 @@ step(const double dt) {
                     );
                 }
             }
+            _active_anim = _active_anim | 16;
         }
     }
     if (ad.playback_pos >= ad.duration) {
@@ -933,17 +949,28 @@ reset() {
  */
 double animation::Sequence::
 step(const double dt) {
+    _active_anim = 0;
     if (_active < 0) {
         _active = 0;
         _v[0]->reset();
     }
     double rdt = _v[_active]->step(dt);
-    if (rdt >= 0.0) {
+    _active_anim = _v[_active]->active_animations();
+    while (rdt >= 0.0) {
         ++_active;
         if (_active == _v.size()) {
             return rdt;
         }
-        return step(rdt);
+        rdt = step(rdt);
+        _active_anim = _active_anim | _v[_active]->active_animations();
     }
     return rdt;
+}
+
+/**
+ *
+ */
+char animation::Sequence::
+active_animations() {
+    return _active_anim;
 }

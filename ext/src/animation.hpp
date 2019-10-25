@@ -128,10 +128,10 @@ namespace animation {
             dur_depth;
         scenegraph::Node node;
         BlendType blend;
-        PositionData pos, center_pos;
-        ScaleData scale;
-        AngleData angle;
-        DepthData depth;
+        PositionData pos, center_pos;   // flags: 1, 2
+        ScaleData scale;                // flags: 4
+        AngleData angle;                // flags: 8
+        DepthData depth;                // flags: 16
         int _ref_count, animation_id;
 
         static ExtFreeList<AnimationData*> _ad;
@@ -187,10 +187,12 @@ namespace animation {
         virtual double step(const double dt);
         double get_playback_pos();
         virtual std::unique_ptr<AnimationType> get_copy();
+        char active_animations();
 
     protected:
         AnimationData& _get_animation_data(const int animation_id);
         int _animation_id;
+        char _active_anim = 0;
     };
 
     /**
@@ -232,9 +234,11 @@ namespace animation {
         void append(AnimationType& a);
         void reset();
         double step(const double dt);
+        char active_animations();
     private:
         std::vector<std::unique_ptr<AnimationType>> _v;
         int _active = -1;
+        char _active_anim = 0;
     };
 
     /**
