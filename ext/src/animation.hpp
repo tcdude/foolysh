@@ -188,6 +188,7 @@ namespace animation {
         double get_playback_pos();
         virtual std::unique_ptr<AnimationType> get_copy();
         virtual char active_animations();
+        int node_id();
 
     protected:
         AnimationData& _get_animation_data(const int animation_id);
@@ -228,6 +229,14 @@ namespace animation {
     };
 
     /**
+     *
+     */
+    struct ActiveAnimation {
+        int node_id;
+        char active_anim = 0;
+    };
+
+    /**
      * Container to hold a sequence of ``AnimationType`` objects.
      */
     class Sequence {
@@ -235,11 +244,13 @@ namespace animation {
         void append(AnimationType& a);
         void reset();
         double step(const double dt);
-        char active_animations();
+        tools::SmallList<ActiveAnimation> active_animations();
+        void loop(const bool l);
     private:
         std::vector<std::unique_ptr<AnimationType>> _v;
         int _active = -1;
-        char _active_anim = 0;
+        tools::SmallList<ActiveAnimation> _active_anim;
+        bool _loop = false;
     };
 
     /**

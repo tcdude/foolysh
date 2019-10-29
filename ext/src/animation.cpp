@@ -535,6 +535,15 @@ active_animations() {
 }
 
 /**
+ *
+ */
+int animation::AnimationType::
+node_id() {
+    AnimationData& ad = _get_animation_data();
+    return ad.node.get_id();
+}
+
+/**
  * Helper method to retrieve the AnimationData for the specified
  * ``animation_id``.
  */
@@ -1009,18 +1018,32 @@ step(const double dt) {
     if (!_v.size()) {
         throw std::runtime_error("Tried to step empty Sequence.");
     }
-    _active_anim = 0;
-    double rdt = _v[_active]->step(dt);
-    _active_anim = _v[_active]->active_animations();
+    while (_active_anim.size()) {
+        _active_anim.pop_back();
+    }
+    double rdt = 1.0;
     while (rdt >= 0.0) {
+        rdt = _v[_active]->step(dt);
+        ActiveAnimation aa;
+        aa.node_id = _v[_active]->node_id();
+        aa.active_anim = _v[_active]->active_animations();
+        _active_anim.push_back(aa);
+
+        if (rdt < 0.0) {
+            break;
+        }
+
         ++_active;
         if (_active == _v.size()) {
-            return rdt;
+            if (_loop) {
+                _active = 0;
+            }
+            else {
+                return rdt;
+            }
         }
 
         _v[_active]->reset();
-        rdt = step(rdt);
-        _active_anim = _active_anim | _v[_active]->active_animations();
     }
     return rdt;
 }
@@ -1028,7 +1051,15 @@ step(const double dt) {
 /**
  *
  */
-char animation::Sequence::
+tools::SmallList animation::Sequence::
 active_animations() {
     return _active_anim;
+}
+
+/**
+ *
+ */
+void animation::Sequence::
+loop(const bool l) {
+    _loop = l;
 }
