@@ -115,6 +115,11 @@ namespace animation {
     };
 
     /**
+     * Custom Types
+     */
+    typedef std::map<int, char> ActiveAnimationMap;
+
+    /**
      * Reference counted Type, holding data for AnimationType.
      */
     struct AnimationData {
@@ -184,14 +189,14 @@ namespace animation {
 
         // Control
         virtual void reset();
-        virtual double step(const double dt);
+        virtual double step(const double dt, ActiveAnimationMap& aam);
         double get_playback_pos();
         virtual std::unique_ptr<AnimationType> get_copy();
-        virtual char active_animations();
         int node_id();
 
     protected:
         AnimationData& _get_animation_data(const int animation_id);
+        virtual char active_animations();
         int _animation_id;
     };
 
@@ -203,8 +208,10 @@ namespace animation {
         void set_duration(const double d);
 
         void reset();
-        double step(const double dt);
+        double step(const double dt, ActiveAnimationMap& aam);
         std::unique_ptr<AnimationType> get_copy();
+
+    protected:
         char active_animations();
 
     private:
@@ -223,17 +230,11 @@ namespace animation {
         void set_depth_speed(const double s);
 
         void reset();
-        double step(const double dt);
+        double step(const double dt, ActiveAnimationMap& aam);
         std::unique_ptr<AnimationType> get_copy();
-        char active_animations();
-    };
 
-    /**
-     *
-     */
-    struct ActiveAnimation {
-        int node_id;
-        char active_anim = 0;
+    protected:
+        char active_animations();
     };
 
     /**
@@ -243,13 +244,11 @@ namespace animation {
     public:
         void append(AnimationType& a);
         void reset();
-        double step(const double dt);
-        tools::SmallList<ActiveAnimation> active_animations();
+        double step(const double dt, ActiveAnimationMap& aam);
         void loop(const bool l);
     private:
         std::vector<std::unique_ptr<AnimationType>> _v;
         int _active = -1;
-        tools::SmallList<ActiveAnimation> _active_anim;
         bool _loop = false;
     };
 
