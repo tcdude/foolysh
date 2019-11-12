@@ -63,8 +63,6 @@ cdef class Node:
         ``traverse()`` method, before accessing properties like
         ``relative_pos``, ``relative_scale`` et al.
     """
-    cdef unique_ptr[_Node] thisptr
-    cdef str __name
 
     def __cinit__(self):
         self.thisptr.reset(new _Node())
