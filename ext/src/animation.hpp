@@ -54,19 +54,13 @@
 #define ANIMATION_HPP
 
 #include "list_t.hpp"
+#include "vector2.hpp"
+#include "node.hpp"
 #include <utility>
 #include <map>
 #include <memory>
 #include <vector>
 
-namespace scenegraph {
-    class Node;
-    struct Scale;
-}
-
-namespace tools {
-    class Vector2;
-}
 
 namespace animation {
     enum BlendType {
@@ -115,11 +109,6 @@ namespace animation {
     };
 
     /**
-     * Custom Types
-     */
-    typedef std::map<int, char> ActiveAnimationMap;
-
-    /**
      * Reference counted Type, holding data for AnimationType.
      */
     struct AnimationData {
@@ -144,6 +133,7 @@ namespace animation {
     ExtFreeList<AnimationData*> AnimationData::_ad;
 
 
+    typedef std::map<int, char> ActiveAnimationMap;
     /**
      * Base class for animations, providing setup and control methods and holds
      * shared data.

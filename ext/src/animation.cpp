@@ -201,7 +201,7 @@ add_pos(tools::Vector2 end, scenegraph::Node relative_node) {
     ad.pos.active = true;
     ad.pos.end = end;
     ad.pos.has_start = false;
-    ad.pos.relative_node.reset(scenegraph::Node(relative_node));
+    ad.pos.relative_node.reset(new scenegraph::Node(relative_node));
 }
 
 /**
@@ -231,7 +231,7 @@ add_pos(tools::Vector2 start, tools::Vector2 end,
     ad.pos.start = start;
     ad.pos.end = end;
     ad.pos.has_start = true;
-    ad.pos.relative_node.reset(scenegraph::Node(relative_node));
+    ad.pos.relative_node.reset(new scenegraph::Node(relative_node));
 }
 
 /**
@@ -296,11 +296,12 @@ add_scale(scenegraph::Scale start, scenegraph::Scale end,
  */
 void animation::AnimationType::
 add_rotation(double end) {
-    angle.active = true;
-    angle.end = end;
-    angle.has_start = false;
-    if (angle.relative_node) {
-        angle.relative_node.reset(nullptr);
+    AnimationData& ad = _get_animation_data(_animation_id);
+    ad.angle.active = true;
+    ad.angle.end = end;
+    ad.angle.has_start = false;
+    if (ad.angle.relative_node) {
+        ad.angle.relative_node.reset(nullptr);
     }
 }
 
@@ -310,10 +311,11 @@ add_rotation(double end) {
  */
 void animation::AnimationType::
 add_rotation(double end, scenegraph::Node relative_node) {
-    angle.active = true;
-    angle.end = end;
-    angle.has_start = false;
-    angle.relative_node.reset(new scenegraph::Node(relative_node));
+    AnimationData& ad = _get_animation_data(_animation_id);
+    ad.angle.active = true;
+    ad.angle.end = end;
+    ad.angle.has_start = false;
+    ad.angle.relative_node.reset(new scenegraph::Node(relative_node));
 }
 
 /**
@@ -321,12 +323,13 @@ add_rotation(double end, scenegraph::Node relative_node) {
  */
 void animation::AnimationType::
 add_rotation(double start, double end) {
-    angle.active = true;
-    angle.start = start;
-    angle.end = end;
-    angle.has_start = true;
-    if (angle.relative_node) {
-        angle.relative_node.reset(nullptr);
+    AnimationData& ad = _get_animation_data(_animation_id);
+    ad.angle.active = true;
+    ad.angle.start = start;
+    ad.angle.end = end;
+    ad.angle.has_start = true;
+    if (ad.angle.relative_node) {
+        ad.angle.relative_node.reset(nullptr);
     }
 }
 
@@ -431,13 +434,13 @@ add_depth(int start, int end, scenegraph::Node relative_node) {
 /**
  * Reset command that needs to be overridden in subclasses.
  */
-virtual void animation::AnimationType::
+void animation::AnimationType::
 reset() {
     AnimationData& ad = _get_animation_data(_animation_id);
     ad.playback_pos = -1.0;
     if (ad.pos.active && !ad.pos.has_start) {
         if (ad.pos.relative_node) {
-            ad.pos.start = ad.node.get_pos(ad.pos.relative_node);
+            ad.pos.start = ad.node.get_pos(*ad.pos.relative_node);
         }
         else {
             ad.pos.start = ad.node.get_pos();
@@ -450,7 +453,7 @@ reset() {
 
     if (ad.scale.active && !ad.scale.has_start) {
         if (ad.scale.relative_node) {
-            ad.scale.start = ad.node.get_scale(ad.scale.relative_node);
+            ad.scale.start = ad.node.get_scale(*ad.scale.relative_node);
         }
         else {
             ad.scale.start = ad.node.get_scale();
@@ -459,7 +462,7 @@ reset() {
 
     if (ad.angle.active && !ad.angle.has_start) {
         if (ad.angle.relative_node) {
-            ad.angle.start = ad.node.get_angle(ad.angle.relative_node);
+            ad.angle.start = ad.node.get_angle(*ad.angle.relative_node);
         }
         else {
             ad.angle.start = ad.node.get_angle();
@@ -468,7 +471,7 @@ reset() {
 
     if (ad.depth.active && !ad.depth.has_start) {
         if (ad.depth.relative_node) {
-            ad.depth.start = ad.node.get_depth(ad.depth.relative_node);
+            ad.depth.start = ad.node.get_depth(*ad.depth.relative_node);
         }
         else {
             ad.depth.start = ad.node.get_depth();
@@ -479,8 +482,8 @@ reset() {
 /**
  * Step command that needs to be overridden in subclasses.
  */
-virtual double animation::AnimationType::
-step(const double dt) {
+double animation::AnimationType::
+step(const double dt, ActiveAnimationMap& aam) {
     return 0.0;
 }
 
@@ -496,12 +499,12 @@ get_playback_pos() {
 /**
  *
  */
-virtual std::unique_ptr<animation::AnimationType> animation::AnimationType::
+std::unique_ptr<animation::AnimationType> animation::AnimationType::
 get_copy() {
     std::unique_ptr<AnimationType> ptr;
     ptr.reset(new AnimationType());
-    AnimationData& ad = _get_animation_data();
-    AnimationData& ptr_ad = ptr->_get_animation_data();
+    AnimationData& ad = _get_animation_data(_animation_id);
+    AnimationData& ptr_ad = ptr->_get_animation_data(ptr->_animation_id);
 
     ptr_ad.duration = ad.duration;
     ptr_ad.playback_pos = ad.playback_pos;
@@ -518,18 +521,49 @@ get_copy() {
     ptr_ad.dur_depth = ad.dur_depth;
     ptr_ad.node = ad.node;
     ptr_ad.blend = ad.blend;
-    ptr_ad.pos = ad.pos;
-    ptr_ad.center_pos = ad.center_pos;
-    ptr_ad.scale = ad.scale;
-    ptr_ad.angle = ad.angle;
-    ptr_ad.depth = ad.depth;
+    ptr_ad.pos.start = ad.pos.start;
+    ptr_ad.pos.end = ad.pos.end;
+    if (ad.pos.relative_node) {
+		ptr_ad.pos.relative_node.reset(new scenegraph::Node(
+					*ad.pos.relative_node));
+	}
+    ptr_ad.pos.active = ad.pos.active;
+    ptr_ad.pos.has_start = ad.pos.has_start;
+    ptr_ad.center_pos.start = ad.center_pos.start;
+    ptr_ad.center_pos.end = ad.center_pos.end;
+    ptr_ad.center_pos.active = ad.center_pos.active;
+    ptr_ad.center_pos.has_start = ad.center_pos.has_start;
+    ptr_ad.scale.start = ad.scale.start;
+    ptr_ad.scale.end = ad.scale.end;
+    if (ad.scale.relative_node) {
+		ptr_ad.scale.relative_node.reset(new scenegraph::Node(
+					*ad.scale.relative_node));
+	}
+    ptr_ad.scale.active = ad.scale.active;
+    ptr_ad.scale.has_start = ad.scale.has_start;
+    ptr_ad.angle.start = ad.angle.start;
+    ptr_ad.angle.end = ad.angle.end;
+    if (ad.angle.relative_node) {
+	    ptr_ad.angle.relative_node.reset(new scenegraph::Node(
+	    			*ad.angle.relative_node));
+	}
+    ptr_ad.angle.active = ad.angle.active;
+    ptr_ad.angle.has_start = ad.angle.has_start;
+    ptr_ad.depth.start = ad.depth.start;
+    ptr_ad.depth.end = ad.depth.end;
+    if (ad.depth.relative_node) {
+    	ptr_ad.depth.relative_node.reset(new scenegraph::Node(
+    				*ad.depth.relative_node));
+    }
+    ptr_ad.depth.active = ad.depth.active;
+    ptr_ad.depth.has_start = ad.depth.has_start;
     return ptr;
 }
 
 /**
  *
  */
-virtual char animation::AnimationType::
+char animation::AnimationType::
 active_animations() {
     return 0;
 }
@@ -539,7 +573,7 @@ active_animations() {
  */
 int animation::AnimationType::
 node_id() {
-    AnimationData& ad = _get_animation_data();
+    AnimationData& ad = _get_animation_data(_animation_id);
     return ad.node.get_id();
 }
 
@@ -589,12 +623,12 @@ step(const double dt, ActiveAnimationMap& aam) {
     char active_anim = active_animations();
     auto search = aam.find(node_id);
     if (search != aam.end()) {
-        if (aam[node_id] & active_anim > 0) {
+        if ((aam[node_id] & active_anim) > 0) {
             return -2.0;
         }
     }
     else {
-        aam.emplace(std::pair(node_id, 0));
+        aam[node_id] = 0;
     }
     aam[node_id] = aam[node_id] | active_anim;
 
@@ -618,35 +652,36 @@ step(const double dt, ActiveAnimationMap& aam) {
  */
 void animation::Interval::
 _update(const double prog) {
+    AnimationData& ad = _get_animation_data(_animation_id);
     // position
     if (ad.pos.active) {
+		tools::Vector2 v = tools::Vector2(
+				(ad.pos.end - ad.pos.start) * prog + ad.pos.start);
         if (ad.pos.relative_node) {
-            ad.node.set_pos(
-                ad.pos.relative_node,
-                (ad.pos.end - ad.pos.start) * prog + ad.pos.start);
+            ad.node.set_pos(*ad.pos.relative_node, v);
         }
         else {
-            ad.node.set_pos((ad.pos.end - ad.pos.start) * prog + ad.pos.start);
+            ad.node.set_pos(v);
         }
     }
 
     // rotation_center
     if (ad.center_pos.active) {
-        ad.node.set_rotation_center(
-            (ad.center_pos.end - ad.center_pos.start)
-            * prog + ad.center_pos.start);
+		tools::Vector2 v = tools::Vector2(
+				(ad.center_pos.end - ad.center_pos.start) * prog
+				+ ad.center_pos.start);
+        ad.node.set_rotation_center(v);
     }
 
     // scale
     if (ad.scale.active) {
+		scenegraph::Scale s = (ad.scale.end - ad.scale.start)
+			* prog + ad.scale.start;
         if (ad.scale.relative_node) {
-            ad.node.set_scale(
-                ad.scale.relative_node,
-                (ad.scale.end - ad.scale.start) * prog + ad.scale.start);
+            ad.node.set_scale(*ad.scale.relative_node, s);
         }
         else {
-            ad.node.set_scale(
-                (ad.scale.end - ad.scale.start) * prog + ad.scale.start);
+            ad.node.set_scale(s);
         }
     }
 
@@ -654,7 +689,7 @@ _update(const double prog) {
     if (ad.angle.active) {
         if (ad.angle.relative_node) {
             ad.node.set_angle(
-                ad.angle.relative_node,
+                *ad.angle.relative_node,
                 (ad.angle.end - ad.angle.start) * prog + ad.angle.start);
         }
         else {
@@ -667,12 +702,12 @@ _update(const double prog) {
     if (ad.depth.active) {
         if (ad.depth.relative_node) {
             ad.node.set_depth(
-                ad.depth.relative_node,
-                (ad.depth.end - ad.dept.start) * prog + ad.depth.start);
+                *ad.depth.relative_node,
+                (ad.depth.end - ad.depth.start) * prog + ad.depth.start);
         }
         else {
             ad.node.set_depth(
-                (ad.depth.end - ad.dept.start) * prog + ad.depth.start);
+                (ad.depth.end - ad.depth.start) * prog + ad.depth.start);
         }
     }
 }
@@ -725,8 +760,8 @@ reset() {
 
     if (ad.pos.active) {
         if (ad.pos_speed < 0.0) {
-            throw std::logic_error("Position animation specified without
-                                    speed");
+            throw std::logic_error("Position animation specified without "
+                                   "speed");
         }
         double tmp_d = (ad.pos.end - ad.pos.start).length() / ad.pos_speed;
         ad.dur_pos = tmp_d;
@@ -737,8 +772,8 @@ reset() {
 
     if (ad.center_pos.active) {
         if (ad.rotation_center_speed < 0.0) {
-            throw std::logic_error("Rotation center animation specified without
-                                    speed");
+            throw std::logic_error("Rotation center animation specified "
+								   "without speed");
         }
         double tmp_d = (ad.center_pos.end - ad.center_pos.start).length()
                        / ad.rotation_center_speed;
@@ -750,8 +785,8 @@ reset() {
 
     if (ad.scale.active) {
         if (ad.scale_speed < 0.0) {
-            throw std::logic_error("Scale animation specified without
-                                    speed");
+            throw std::logic_error("Scale animation specified without "
+                                   "speed");
         }
         ad.dur_scalex = std::abs(
             ad.scale.end.sx - ad.scale.start.sx) / ad.scale_speed;
@@ -766,31 +801,31 @@ reset() {
 
     if (ad.angle.active) {
         if (ad.rotation_speed == 0.0) {
-            throw std::logic_error("Rotation animation specified without
-                                    speed");
+            throw std::logic_error("Rotation animation specified without "
+                                   "speed");
         }
         ad.dur_angle = std::abs(
             ad.angle.end - ad.angle.start) / ad.rotation_speed;
         if (ad.dur_angle > duration) {
-            duration = tmp_d;
+            duration = ad.dur_angle;
         }
     }
 
     if (ad.depth.active) {
         if (ad.depth_speed < 0.0) {
-            throw std::logic_error("Depth animation specified without
-                                    speed");
+            throw std::logic_error("Depth animation specified without "
+                                   "speed");
         }
         ad.dur_depth = std::abs(
             ad.depth.end - ad.depth.start) / ad.depth_speed;
-        if (tmp_d > duration) {
-            duration = tmp_d;
+        if (ad.dur_depth > duration) {
+            duration = ad.dur_depth;
         }
     }
 
     if (ad.duration == -1.0) {
-        throw std::logic_error("Tried to reset an animation w/o any modifier
-                                active");
+        throw std::logic_error("Tried to reset an animation w/o any modifier "
+                               "active");
     }
 }
 
@@ -813,12 +848,12 @@ step(const double dt, ActiveAnimationMap& aam) {
     char active_anim = active_animations();
     auto search = aam.find(node_id);
     if (search != aam.end()) {
-        if (aam[node_id] & active_anim > 0) {
+        if ((aam[node_id] & active_anim) > 0) {
             return -2.0;
         }
     }
     else {
-        aam.emplace(std::pair(node_id, 0));
+        aam[node_id] = 0;
     }
     aam[node_id] = aam[node_id] | active_anim;
 
@@ -827,12 +862,12 @@ step(const double dt, ActiveAnimationMap& aam) {
     // position
     if (ad.pos.active) {
         tools::Vector2 p = (ad.pos.relative_node)
-                        ? ad.node.get_pos(ad.pos.relative_node)
+                        ? ad.node.get_pos(*ad.pos.relative_node)
                         : ad.node.get_pos();
         if (p != ad.pos.end) {
             if (ad.playback_pos >= ad.dur_pos) {
                 if (ad.pos.relative_node) {
-                    ad.node.set_pos(ad.pos.relative_node, ad.pos.end);
+                    ad.node.set_pos(*ad.pos.relative_node, ad.pos.end);
                 }
                 else {
                     ad.node.set_pos(ad.pos.end);
@@ -840,14 +875,13 @@ step(const double dt, ActiveAnimationMap& aam) {
             }
             else {
                 double prog = lerp(ad.playback_pos, ad.dur_pos, ad.blend);
+				tools::Vector2 v = tools::Vector2((ad.pos.end - ad.pos.start)
+						* prog + ad.pos.start);
                 if (ad.pos.relative_node) {
-                    ad.node.set_pos(
-                        ad.pos.relative_node,
-                        (ad.pos.end - ad.pos.start) * prog + ad.pos.start);
+                    ad.node.set_pos(*ad.pos.relative_node, v);
                 }
                 else {
-                    ad.node.set_pos(
-                        (ad.pos.end - ad.pos.start) * prog + ad.pos.start);
+                    ad.node.set_pos(v);
                 }
             }
         }
@@ -863,9 +897,10 @@ step(const double dt, ActiveAnimationMap& aam) {
             else {
                 double prog = lerp(ad.playback_pos, ad.dur_center_pos,
                     ad.blend);
-                ad.node.set_rotation_center(
-                    (ad.center_pos.end - ad.center_pos.start) * prog
-                    + ad.center_pos.start);
+				tools::Vector2 v = tools::Vector2(
+						(ad.center_pos.end - ad.center_pos.start) * prog
+						+ ad.center_pos.start);
+                ad.node.set_rotation_center(v);
             }
         }
     }
@@ -873,7 +908,7 @@ step(const double dt, ActiveAnimationMap& aam) {
     // scale
     if (ad.scale.active) {
         scenegraph::Scale s = (ad.scale.relative_node)
-                            ? ad.node.get_scale(ad.scale.relative_node)
+                            ? ad.node.get_scale(*ad.scale.relative_node)
                             : ad.node.get_scale();
         scenegraph::Scale new_scale = s;
         if (s.sx != ad.scale.end.sx) {
@@ -899,7 +934,7 @@ step(const double dt, ActiveAnimationMap& aam) {
 
         if (s != new_scale) {
             if (ad.scale.relative_node) {
-                ad.node.set_scale(ad.scale.relative_node, new_scale);
+                ad.node.set_scale(*ad.scale.relative_node, new_scale);
             }
             else {
                 ad.node.set_scale(new_scale);
@@ -910,12 +945,12 @@ step(const double dt, ActiveAnimationMap& aam) {
     // rotation
     if (ad.angle.active) {
         double a = (ad.angle.relative_node)
-                    ? ad.node.get_angle(ad.angle.relative_node)
+                    ? ad.node.get_angle(*ad.angle.relative_node)
                     : ad.node.get_angle();
         if (a != ad.angle.end) {
             if (ad.playback_pos >= ad.dur_angle) {
                 if (ad.angle.relative_node) {
-                    ad.node.set_angle(ad.angle.relative_node, ad.angle.end);
+                    ad.node.set_angle(*ad.angle.relative_node, ad.angle.end);
                 }
                 else {
                     ad.node.set_angle(ad.angle.end);
@@ -925,7 +960,7 @@ step(const double dt, ActiveAnimationMap& aam) {
                 double prog = lerp(ad.playback_pos, ad.dur_angle, ad.blend);
                 if (ad.angle.relative_node) {
                     ad.node.set_angle(
-                        ad.angle.relative_node,
+                        *ad.angle.relative_node,
                         (ad.angle.end - ad.angle.start) * prog + ad.angle.start
                     );
                 }
@@ -941,12 +976,12 @@ step(const double dt, ActiveAnimationMap& aam) {
     // depth
     if (ad.depth.active) {
         int depth = (ad.depth.relative_node)
-                    ? ad.node.get_depth(ad.depth.relative_node)
+                    ? ad.node.get_depth(*ad.depth.relative_node)
                     : ad.node.get_depth();
         if (depth != ad.depth.end) {
             if (ad.playback_pos >= ad.dur_depth) {
                 if (ad.depth.relative_node) {
-                    ad.node.set_depth(ad.depth.relative_node, ad.depth.end);
+                    ad.node.set_depth(*ad.depth.relative_node, ad.depth.end);
                 }
                 else {
                     ad.node.set_depth(ad.depth.end);
@@ -956,7 +991,7 @@ step(const double dt, ActiveAnimationMap& aam) {
                 double prog = lerp(ad.playback_pos, ad.dur_depth, ad.blend);
                 if (ad.depth.relative_node) {
                     ad.node.set_depth(
-                        ad.depth.relative_node,
+                        *ad.depth.relative_node,
                         (ad.depth.end - ad.depth.start) * prog + ad.depth.start
                     );
                 }
@@ -1030,20 +1065,19 @@ reset() {
     }
     _active = 0;
     _v[0]->reset();
-    _active_anim = _v[0]->active_animations();
 }
 
 /**
  *
  */
 double animation::Sequence::
-step(const double dt) {
+step(const double dt, ActiveAnimationMap& aam) {
     if (!_v.size()) {
         throw std::runtime_error("Tried to step empty Sequence.");
     }
     double rdt = 1.0;
     while (rdt >= 0.0) {
-        rdt = _v[_active]->step(dt);
+        rdt = _v[_active]->step(dt, aam);
         if (rdt < 0.0) {
             break;
         }
