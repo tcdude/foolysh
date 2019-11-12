@@ -243,17 +243,69 @@ namespace animation {
     };
 
     /**
-     * Interface to control animation.
+     * Custom Types:
+     * ActiveAnimationMap:
+     *      std::map<int, char> holding flags of currently active animations.
+     *      1 = position
+     *      2 = rotation center
+     *      4 = scale
+     *      8 = angle
+     *      16 = depth
+     * AnimationStatusMap:
+     *      std::map<int, char> holding playback status for animations.
+     *      0 = stopped / uninitialized
+     *      1 = paused
+     *      2 = start playback
+     *      3 = playing
+     *      4 = conflict
+     */
+    typedef std::unique_ptr<AnimationType> AnimationTypePtr;
+    typedef std::unique_ptr<Sequence> SequencePtr;
+    typedef ActiveAnimationMap AnimationStatusMap;
+    typedef std::map<int, AnimationTypePtr, std::greater<int>> AnimationMap;
+    typedef std::map<int, SequencePtr, std::greater<int>> SequenceMap;
+
+    /**
+     * Interface to control animation. Provides methods to create Interval,
+     * Animation and Sequence instances, managed by the AnimationManager.
      */
     class AnimationManager {
     public:
-        void animate(const double dt);
-    private:
-        std::map<int, std::pair<int, int>> _active_animations;
-        std::map<int, scenegraph::Node> _nodes;
+        int new_interval();
+        int new_animation();
+        int new_sequence();
+        Interval& get_interval(const int i_id);
+        Animation& get_animation(const int a_id);
+        Sequence& get_sequence(const int s_id);
+        void remove_interval(const int i_id);
+        void remove_animation(const int a_id);
+        void remove_sequence(const int s_id);
+        void play_interval(const int i_id);
+        void play_animation(const int a_id);
+        void play_sequence(const int s_id);
+        void pause_interval(const int i_id);
+        void pause_animation(const int a_id);
+        void pause_sequence(const int s_id);
+        void resume_interval(const int i_id);
+        void resume_animation(const int a_id);
+        void resume_sequence(const int s_id);
+        void stop_interval(const int i_id);
+        void stop_animation(const int a_id);
+        void stop_sequence(const int s_id);
+        char get_interval_status(const int i_id);
+        char get_animation_status(const int a_id);
+        char get_sequence_status(const int s_id);
 
-        void _update_active(const double dt);
-        void _execute_delta(const double dt);
+        void animate(const double dt);
+
+    private:
+        ActiveAnimationMap _aam;
+        AnimationMap _anims;
+        SequenceMap _seqs;
+        AnimationStatusMap _anim_status;
+        AnimationStatusMap _seq_status;
+        int _max_anim = -1;
+        int _max_seq = -1;
     };
 
 }  // namespace animation

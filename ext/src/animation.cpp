@@ -1104,3 +1104,366 @@ void animation::Sequence::
 loop(const bool l) {
     _loop = l;
 }
+
+
+// AnimationManager
+
+/**
+ * Returns the id of a new and empty Interval.
+ */
+int animation::AnimationManager::
+new_interval() {
+    ++_max_anim;
+    _anims[_max_anim] = std::unique_ptr<AnimationType>(new Interval());
+    _anim_status[_max_anim] = 0;
+    return _max_anim;
+}
+
+/**
+ * Returns the id of a new and empty Animation.
+ */
+int animation::AnimationManager::
+new_animation() {
+    ++_max_anim;
+    _anims[_max_anim] = std::unique_ptr<AnimationType>(new Animation());
+    _anim_status[_max_anim] = 0;
+    return _max_anim;
+}
+
+/**
+ * Returns the id of a new and empty Sequence.
+ */
+int animation::AnimationManager::
+new_sequence() {
+    ++_max_seq;
+    _seqs[_max_seq] = std::unique_ptr<Sequence>(new Sequence());
+    _seq_status[_max_seq] = 0;
+    return _max_seq;
+}
+
+/**
+ * Return a Interval reference for the specified id.
+ */
+animation::Interval& animation::AnimationManager::
+get_interval(const int i_id) {
+    if (_anims.find(i_id) == _anims.end()) {
+        throw std::range_error("Specified id is not an active Interval");
+    }
+    return (Interval&) *_anims[i_id];
+}
+
+/**
+ * Return a Animation reference for the specified id.
+ */
+animation::Animation& animation::AnimationManager::
+get_animation(const int a_id) {
+    if (_anims.find(a_id) == _anims.end()) {
+        throw std::range_error("Specified id is not an active Animation");
+    }
+    return (Animation&) *_anims[a_id];
+}
+
+/**
+ * Return a Sequence reference for the specified id.
+ */
+animation::Sequence& animation::AnimationManager::
+get_sequence(const int s_id) {
+    if (_seqs.find(s_id) == _seqs.end()) {
+        throw std::range_error("Specified id is not an active Sequence");
+    }
+    return *_seqs[s_id];
+}
+
+/**
+ * Removes the specified Interval.
+ */
+void animation::AnimationManager::
+remove_interval(const int i_id) {
+    if (_anims.find(i_id) == _anims.end()) {
+        throw std::range_error("Specified id is not an active Interval");
+    }
+    _anim_status.erase(i_id);
+    _anims.erase(i_id);
+}
+
+/**
+ * Removes the specified Animation.
+ */void animation::AnimationManager::
+remove_animation(const int a_id) {
+    if (_anims.find(a_id) == _anims.end()) {
+        throw std::range_error("Specified id is not an active Animation");
+    }
+    _anim_status.erase(a_id);
+    _anims.erase(a_id);
+}
+
+/**
+ * Removes the specified Sequence.
+ */
+void animation::AnimationManager::
+remove_sequence(const int s_id) {
+    if (_seqs.find(s_id) == _seqs.end()) {
+        throw std::range_error("Specified id is not an active Sequence");
+    }
+    _seq_status.erase(s_id);
+    _seqs.erase(s_id);
+}
+
+/**
+ * Play Interval from beginning.
+ */
+void animation::AnimationManager::
+play_interval(const int i_id) {
+    auto search = _anim_status.find(i_id);
+    if (search != _anim_status.end()) {
+        _anim_status[i_id] = 2;
+    }
+    else {
+        throw std::range_error("Specified id is not an active Interval");
+    }
+}
+
+/**
+ * Play Animation from beginning.
+ */
+void animation::AnimationManager::
+play_animation(const int a_id) {
+    auto search = _anim_status.find(a_id);
+    if (search != _anim_status.end()) {
+        _anim_status[a_id] = 2;
+    }
+    else {
+        throw std::range_error("Specified id is not an active Animation");
+    }
+}
+
+/**
+ * Play Sequence from beginning.
+ */
+void animation::AnimationManager::
+play_sequence(const int s_id) {
+    auto search = _seq_status.find(s_id);
+    if (search != _seq_status.end()) {
+        _seq_status[s_id] = 2;
+    }
+    else {
+        throw std::range_error("Specified id is not an active Sequence");
+    }
+}
+
+/**
+ * Pause Interval.
+ */
+void animation::AnimationManager::
+pause_interval(const int i_id) {
+    auto search = _anim_status.find(i_id);
+    if (search != _anim_status.end()) {
+        if (_anim_status[i_id] != 3) {
+            throw std::logic_error("Unable to pause Interval, not playing");
+        }
+        _anim_status[i_id] = 1;
+    }
+    else {
+        throw std::range_error("Specified id is not an active Interval");
+    }
+}
+
+/**
+ * Pause Animation.
+ */
+void animation::AnimationManager::
+pause_animation(const int a_id) {
+    auto search = _anim_status.find(a_id);
+    if (search != _anim_status.end()) {
+        if (_anim_status[a_id] != 3) {
+            throw std::logic_error("Unable to pause Animation, not playing");
+        }
+        _anim_status[a_id] = 1;
+    }
+    else {
+        throw std::range_error("Specified id is not an active Animation");
+    }
+}
+
+/**
+ * Pause Sequence.
+ */
+void animation::AnimationManager::
+pause_sequence(const int s_id) {
+    auto search = _seq_status.find(s_id);
+    if (search != _seq_status.end()) {
+        if (_seq_status[s_id] != 3) {
+            throw std::logic_error("Unable to pause Sequence, not playing");
+        }
+        _seq_status[s_id] = 1;
+    }
+    else {
+        throw std::range_error("Specified id is not an active Sequence");
+    }
+}
+
+/**
+ * Resume Interval.
+ */
+void animation::AnimationManager::
+resume_interval(const int i_id) {
+    auto search = _anim_status.find(i_id);
+    if (search != _anim_status.end()) {
+        if (_anim_status[i_id] != 1) {
+            throw std::logic_error("Unable to resume Interval, not paused");
+        }
+        _anim_status[i_id] = 3;
+    }
+    else {
+        throw std::range_error("Specified id is not an active Interval");
+    }
+}
+
+/**
+ * Resume Animation.
+ */
+void animation::AnimationManager::
+resume_animation(const int a_id) {
+    auto search = _anim_status.find(a_id);
+    if (search != _anim_status.end()) {
+        if (_anim_status[a_id] != 1) {
+            throw std::logic_error("Unable to resume Animation, not paused");
+        }
+        _anim_status[a_id] = 3;
+    }
+    else {
+        throw std::range_error("Specified id is not an active Animation");
+    }
+}
+
+/**
+ * Resume Sequence.
+ */
+void animation::AnimationManager::
+resume_sequence(const int s_id) {
+    auto search = _seq_status.find(s_id);
+    if (search != _seq_status.end()) {
+        if (_seq_status[s_id] != 1) {
+            throw std::logic_error("Unable to resume Sequence, not paused");
+        }
+        _seq_status[s_id] = 3;
+    }
+    else {
+        throw std::range_error("Specified id is not an active Sequence");
+    }
+}
+
+/**
+ * Stop Interval.
+ */
+void animation::AnimationManager::
+stop_interval(const int i_id) {
+    auto search = _anim_status.find(i_id);
+    if (search != _anim_status.end()) {
+        _anim_status[i_id] = 0;
+    }
+    else {
+        throw std::range_error("Specified id is not an active Interval");
+    }
+}
+
+/**
+ * Stop Animation.
+ */
+void animation::AnimationManager::
+stop_animation(const int a_id) {
+    auto search = _anim_status.find(a_id);
+    if (search != _anim_status.end()) {
+        _anim_status[a_id] = 0;
+    }
+    else {
+        throw std::range_error("Specified id is not an active Animation");
+    }
+}
+
+/**
+ * Stop Sequence.
+ */
+void animation::AnimationManager::
+stop_sequence(const int s_id) {
+    auto search = _seq_status.find(s_id);
+    if (search != _seq_status.end()) {
+        _seq_status[s_id] = 0;
+    }
+    else {
+        throw std::range_error("Specified id is not an active Sequence");
+    }
+}
+
+/**
+ * Return playback status of an Interval.
+ */
+char animation::AnimationManager::
+get_interval_status(const int i_id) {
+	auto search = _anim_status.find(i_id);
+	if (search == _anim_status.end()) {
+		throw std::range_error("Specified id is not an active Interval/"
+							   "Animation.");
+	}
+	return _anim_status[i_id];
+}
+
+/**
+ * Return playback status of an Animation.
+ */
+char animation::AnimationManager::
+get_animation_status(const int a_id) {
+	return get_interval_status(a_id);
+}
+
+/**
+ * Return playback status of an Interval.
+ */
+char animation::AnimationManager::
+get_sequence_status(const int s_id) {
+	auto search = _seq_status.find(s_id);
+	if (search == _seq_status.end()) {
+		throw std::range_error("Specified id is not an active Sequence.");
+	}
+	return _seq_status[s_id];
+}
+
+/**
+ * Advance animation playback by ``dt`` seconds.
+ */
+void animation::AnimationManager::
+animate(const double dt) {
+	_aam.clear();
+	// Animations/Intervals
+	for (auto it = _anims.begin(); it != _anims.end(); ++it) {
+		if (_anim_status[it->first] < 2) {
+			continue;
+		}
+		else if (_anim_status[it->first] == 2) {
+			it->second->reset();
+			_anim_status[it->first] = 3;
+		}
+		const double r = it->second->step(dt, _aam);
+		if (r == -2.0) {
+			_anim_status[it->first] = 0;
+			// TODO: Log conflict
+			continue;
+		}
+	}
+	// Sequences
+	for (auto it = _seqs.begin(); it != _seqs.end(); ++it) {
+		if (_seq_status[it->first] < 2) {
+			continue;
+		}
+		else if (_seq_status[it->first] == 2) {
+			it->second->reset();
+			_seq_status[it->first] = 3;
+		}
+		const double r = it->second->step(dt, _aam);
+		if (r == -2.0) {
+			_seq_status[it->first] = 0;
+			// TODO: Log conflict
+			continue;
+		}
+	}
+}
