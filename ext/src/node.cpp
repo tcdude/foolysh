@@ -492,7 +492,7 @@ operator=(const Node& other) {
 }
 
 /**
- * Move Assignment Operator. Invalidates ``other``.
+ * Move Assignment Operator. Invalidates ``other``. TODO: This doesn't seem right!
  */
 scenegraph::Node& scenegraph::Node::
 operator=(Node&& other) noexcept {
@@ -873,7 +873,8 @@ set_angle(double a, bool radians) {
     }
     NodeData& nd = _get_node_data(_node_id);
     if (a != nd._angle) {
-        nd._angle = clamp_angle(a);
+        // nd._angle = clamp_angle(a);
+        nd._angle = a;
         nd._propagate_dirty();
     }
 }
@@ -887,11 +888,12 @@ set_angle(Node& other, double a, bool radians) {
     if (radians) {
         a = a * to_deg;
     }
-    a = clamp_angle(a);
+    // a = clamp_angle(a);
     _check_dirty(*this, other);
     double rel_a = other.get_relative_angle() + a - get_angle()
                    + get_relative_angle();
-    set_angle(clamp_angle(rel_a), false);
+    // set_angle(clamp_angle(rel_a), false);
+    set_angle(rel_a, false);
 }
 
 /**
@@ -916,7 +918,7 @@ double scenegraph::Node::
 get_angle(Node& other, bool radians) {
     _check_dirty(*this, other);
     double a_rel = other.get_relative_angle() - get_relative_angle();
-    a_rel = clamp_angle(a_rel);
+    // a_rel = clamp_angle(a_rel);
 
     if (radians) {
         return a_rel * to_rad;

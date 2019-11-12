@@ -56,10 +56,28 @@ namespace scenegraph {
 
     struct Scale {
         double sx = 1.0, sy = 1.0;
+        Scale operator+(const Scale& rhs) {
+            Scale s;
+            s.sx = sx + rhs.sx;
+            s.sy = sy + rhs.sy;
+            return s;
+        }
+        Scale operator-(const Scale& rhs) {
+            Scale s;
+            s.sx = sx - rhs.sx;
+            s.sy = sy - rhs.sy;
+            return s;
+        }
         Scale operator*(const Scale& rhs) {
             Scale s;
             s.sx = sx * rhs.sx;
             s.sy = sy * rhs.sy;
+            return s;
+        }
+        Scale operator*(const double rhs) {
+            Scale s;
+            s.sx = sx * rhs;
+            s.sy = sy * rhs;
             return s;
         }
         bool operator==(const double rhs) {
@@ -67,6 +85,12 @@ namespace scenegraph {
         }
         bool operator!=(const double rhs) {
             return (sx != rhs || sy != rhs);
+        }
+        bool operator==(const Scale& rhs) {
+            return (sx == rhs.sx && sy == rhs.sy);
+        }
+        bool operator!=(const Scale& rhs) {
+            return (sx != rhs.sx || sy != rhs.sy);
         }
     };
 
@@ -93,7 +117,7 @@ namespace scenegraph {
     struct NodeData {
         NodeData();
         ~NodeData();
-        NodeData& operator=(const NodeData& other);
+        //NodeData& operator=(const NodeData& other);
 
         bool _traverse();
         SmallList<int> _query(AABB& aabb);

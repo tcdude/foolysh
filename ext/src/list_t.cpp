@@ -323,7 +323,7 @@ clear() {
 template <class T>
 int tools::ExtFreeList<T>::
 range() const {
-    return static_cast<int>(data.size());
+    return static_cast<int>(data.size()) - free_count;
 }
 
 /**
