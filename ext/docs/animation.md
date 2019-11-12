@@ -41,28 +41,53 @@ allow to accomplish an animation in one line
 
 ```python
 # Create an Interval that moves "my_node" to "destination_node" in 2 seconds:
-ival1 = pos_interval(node=my_node, duration=2, stop=destination_node)
+ival1 = PosInterval(node=my_node, duration=2, stop=destination_node)
 
-# Add rotation around its current rotation center for 720° at 180° per
-# second to "ival", created above:
-ival1 += rot_animation(node=my_node, speed=180, stop=720)
+# Add a scale interval to an existing interval, NOT specifying a duration:
+ival1 += ScaleInterval(node=my_node, stop=1)
+
+# Setting blend type of ival1:
+ival1.set_blend = Blend.EaseOut
+
+# Modify duration of ival1:
+ival.duration = 2.5
 
 # Create a second interval, using a combined interval with blending:
-ival2 = pos_scale_interval(
+ival2 = PosScaleInterval(
   node=my_node,
   duration=5,
+  start=(Vector2(-20, -10), 1),
   stop=(Vector2(20, 10), 120),
-  blend_flags=Blend.IN|Blend.OUT
+  blend_flags=Blend.EaseInOut
 )
 
-# Combine multiple intervals to a Sequence:
-seq = Sequence(
+# Create a rotation animation around its current rotation center from 0° to
+# 720° at a speed of 180° per second:
+anim1 = RotAnimation(node=my_node, speed=180, start=0, stop=720)
+
+# Create a depth animation:
+anim2 = DepthAnimation(node=my_node, speed=12, stop=15)
+
+# Combine multiple intervals and animations to a Sequence:
+seq1 = Sequence(
   ival1,
+  anim2,
   ival2
 )
 
+# Multiple Sequence instances can manipulate the same Node, as long as the
+# animations don't conflict with each other:
+seq2 = Sequence(
+  anim1,
+)
+
 # Animate the sequence, starting with the next frame update:
-seq.play()
+seq1.play()
+
+# Loop a sequence until manually stopped (or conflict occurrence):
+seq2.loop()
+
+# seq1 and seq2 will run in parallel, as long as no conflicts occur.
 ```
 
 
@@ -100,8 +125,10 @@ animation on multiple Nodes simultaneously.
 
 Responsible to execute single steps of [Sequence](#sequence) /
 [Interval](#interval) instances. Animations are registered and controlled
-through the AnimationManager. AnimationManager is allowed to manipulate Node
-instances directly.
+through the AnimationManager. ~~AnimationManager is allowed to manipulate Node
+instances directly.~~ Each Animation/Interval/Sequence directly manipulate the
+Node instance, while the AnimationManager controls if a step will be executed,
+to prevent conflicts.
 
 Provides convenience methods for creating Animations.
 
@@ -124,8 +151,11 @@ Represents a parametric Node manipulation with the possibility of specifying:
   * **Relative to Node:** whether the states supplied should be applied relative
     to another Node
 
-Animations get transformed automatically into an [Interval](#interval), which
-is the base component of the entire Animation System.
+~~Animations get transformed automatically into an [Interval](#interval), which
+is the base component of the entire Animation System.~~ Animations get executed
+in a similar fashion to [Interval](#interval), with the principal difference,
+that due to varying duration of combined animations, parts of an animation can
+finish prior to completing the entire animation.
 
 
 ### Interval
