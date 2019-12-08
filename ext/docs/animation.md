@@ -50,7 +50,7 @@ ival1 += ScaleInterval(node=my_node, stop=1)
 ival1.set_blend = Blend.EaseOut
 
 # Modify duration of ival1:
-ival.duration = 2.5
+ival1.duration = 2.5
 
 # Create a second interval, using a combined interval with blending:
 ival2 = PosScaleInterval(
