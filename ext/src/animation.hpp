@@ -132,13 +132,24 @@ namespace animation {
     };
     ExtFreeList<AnimationData*> AnimationData::_ad;
 
-
     typedef std::map<int, char> ActiveAnimationMap;
+
+    /**
+     * Base class for Animation, Interval and Sequence (playable objects).
+     */
+    class AnimationBase {
+    public:
+        virtual void reset();
+        virtual double step(const double dt, ActiveAnimationMap& aam);
+        virtual std::unique_ptr<AnimationBase> get_copy();
+        virtual void loop(const bool l);
+    };
+
     /**
      * Base class for animations, providing setup and control methods and holds
      * shared data.
      */
-    class AnimationType {
+    class AnimationType : public AnimationBase {
     public:
         AnimationType();
         ~AnimationType();
@@ -178,10 +189,9 @@ namespace animation {
         void add_depth(int start, int end, scenegraph::Node relative_node);
 
         // Control
-        virtual void reset();
-        virtual double step(const double dt, ActiveAnimationMap& aam);
+        void reset();
         double get_playback_pos();
-        virtual std::unique_ptr<AnimationType> get_copy();
+        std::unique_ptr<AnimationBase> get_copy();
         int node_id();
 
     protected:
@@ -199,7 +209,7 @@ namespace animation {
 
         void reset();
         double step(const double dt, ActiveAnimationMap& aam);
-        std::unique_ptr<AnimationType> get_copy();
+        std::unique_ptr<AnimationBase> get_copy();
 
     protected:
         char active_animations();
@@ -221,7 +231,7 @@ namespace animation {
 
         void reset();
         double step(const double dt, ActiveAnimationMap& aam);
-        std::unique_ptr<AnimationType> get_copy();
+        std::unique_ptr<AnimationBase> get_copy();
 
     protected:
         char active_animations();
@@ -230,15 +240,16 @@ namespace animation {
     /**
      * Container to hold a sequence of ``AnimationType`` objects.
      */
-    class Sequence {
+    class Sequence : public AnimationBase {
     public:
-        void append(AnimationType& a);
+        void append(AnimationBase& a);
         void reset();
         double step(const double dt, ActiveAnimationMap& aam);
         void loop(const bool l);
+        std::unique_ptr<AnimationBase> get_copy();
     private:
-        std::vector<std::unique_ptr<AnimationType>> _v;
-        int _active = -1;
+        std::vector<std::unique_ptr<AnimationBase>> _v;
+        std::vector<std::unique_ptr<AnimationBase>>::size_type _active = 0;
         bool _loop = false;
     };
 

@@ -75,6 +75,41 @@ AnimationData(){
     _ref_count = 1;
 }
 
+// AnimationBase
+
+/**
+ * Reset command that needs to be overridden in subclasses.
+ */
+void animation::AnimationBase::
+reset() {
+    throw std::runtime_error("Cannot be called from AnimationBase class.");
+}
+
+/**
+ * Step command that needs to be overridden in subclasses.
+ */
+double animation::AnimationBase::
+step(const double dt, ActiveAnimationMap& aam) {
+    return 0.0;
+}
+
+/**
+ * Retrieve a copy of the Animation. Needs to be overridden in subclasses.
+ */
+std::unique_ptr<animation::AnimationBase> animation::AnimationBase::
+get_copy() {
+    throw std::runtime_error("Cannot be called from AnimationBase class.");
+}
+
+/**
+ * Virtual method to set looping behavior. Currently only implemented for
+ * Sequence.
+ */
+void animation::AnimationBase::
+loop(const bool l) {
+    throw std::runtime_error("Invalid sub-type for loop().");
+}
+
 
 // AnimationType Rule of 5
 
@@ -480,14 +515,6 @@ reset() {
 }
 
 /**
- * Step command that needs to be overridden in subclasses.
- */
-double animation::AnimationType::
-step(const double dt, ActiveAnimationMap& aam) {
-    return 0.0;
-}
-
-/**
  * Returns the current playback position in seconds.
  */
 double animation::AnimationType::
@@ -499,7 +526,7 @@ get_playback_pos() {
 /**
  *
  */
-std::unique_ptr<animation::AnimationType> animation::AnimationType::
+std::unique_ptr<animation::AnimationBase> animation::AnimationType::
 get_copy() {
     std::unique_ptr<AnimationType> ptr;
     ptr.reset(new AnimationType());
@@ -715,7 +742,7 @@ _update(const double prog) {
 /**
  *
  */
-std::unique_ptr<animation::AnimationType> animation::Interval::
+std::unique_ptr<animation::AnimationBase> animation::Interval::
 get_copy() {
     return AnimationType::get_copy();
 }
@@ -1012,7 +1039,7 @@ step(const double dt, ActiveAnimationMap& aam) {
 /**
  *
  */
-std::unique_ptr<animation::AnimationType> animation::Animation::
+std::unique_ptr<animation::AnimationBase> animation::Animation::
 get_copy() {
     return AnimationType::get_copy();
 }
@@ -1051,8 +1078,11 @@ active_animations() {
  *
  */
 void animation::Sequence::
-append(animation::AnimationType& a) {
+append(animation::AnimationBase& a) {
     _v.push_back(a.get_copy());
+
+    // Make sure no sequences with loop = true are appended.
+    _v[_v.size() - 1]->loop(false);
 }
 
 /**
@@ -1105,6 +1135,19 @@ loop(const bool l) {
     _loop = l;
 }
 
+/**
+ *
+ */
+std::unique_ptr<animation::AnimationBase> animation::Sequence::
+get_copy() {
+    std::unique_ptr<AnimationBase> ptr;
+    ptr.reset(new Sequence());
+    Sequence& sq = static_cast<Sequence&>(*ptr);
+    for (auto it = _v.begin(); it != _v.end(); ++it) {
+        sq.append((AnimationBase&) *it);
+    }
+    return ptr;
+}
 
 // AnimationManager
 
@@ -1413,6 +1456,10 @@ get_interval_status(const int i_id) {
  */
 char animation::AnimationManager::
 get_animation_status(const int a_id) {
+	auto search = _anim_status.find(a_id);
+	if (search == _anim_status.end()) {
+		throw std::range_error("Specified id is not an active Animation.");
+	}
 	return get_interval_status(a_id);
 }
 
@@ -1445,7 +1492,7 @@ animate(const double dt) {
 		}
 		const double r = it->second->step(dt, _aam);
 		if (r == -2.0) {
-			_anim_status[it->first] = 0;
+			_anim_status[it->first] = 4;
 			// TODO: Log conflict
 			continue;
 		}
@@ -1461,9 +1508,12 @@ animate(const double dt) {
 		}
 		const double r = it->second->step(dt, _aam);
 		if (r == -2.0) {
-			_seq_status[it->first] = 0;
+			_seq_status[it->first] = 4;
 			// TODO: Log conflict
 			continue;
 		}
+        else if (r >= 0.0) {
+            _seq_status[it->first] = 0;
+        }
 	}
 }
