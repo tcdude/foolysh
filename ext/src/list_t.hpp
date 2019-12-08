@@ -67,6 +67,7 @@ namespace tools {
         void push_back(const T& element);
         T pop_back();
         int size();
+        void clear();
         T& operator[](int n);
         const T& operator[](int n) const;
     private:

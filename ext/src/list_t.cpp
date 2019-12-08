@@ -238,6 +238,18 @@ size() {
  *
  */
 template <class T>
+void tools::SmallList<T>::
+clear() {
+    if (_is_vec) {
+        _v.clear();
+    }
+    _size = 0;
+}
+
+/**
+ *
+ */
+template <class T>
 T& tools::SmallList<T>::
 operator[](int n) {
     if (_is_vec) {
