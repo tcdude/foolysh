@@ -140,7 +140,7 @@ _traverse() {
  *
  */
 SmallList<int> scenegraph::NodeData::
-_query(AABB& aabb) {
+_query(AABB& aabb, const bool depth_sorted) {
     int root_node_id = _node_data_id;
     while (NodeData::_nd[root_node_id]->_parent > -1) {
         root_node_id = NodeData::_nd[root_node_id]->_parent;
@@ -156,6 +156,21 @@ _query(AABB& aabb) {
         if (!nd._hidden) {
             result.push_back(node_id);
         }
+    }
+    if (!depth_sorted) {
+        return result;
+    }
+
+    // TODO: learn how to implement Random Access Iterator!!!
+    std::vector<DepthData> v;
+    v.reserve(result.size());
+    for (auto i=0; i < result.size(); ++i) {
+        v.push_back(DepthData(result[i], NodeData::_nd[result[i]]->_r_depth));
+    }
+    result.clear();
+    std::sort(v.begin(), v.end());
+    for (auto& it : v) {
+        result.push_back(it.node_id);
     }
     return result;
 }
@@ -573,8 +588,8 @@ traverse() {
  * the last call to traverse().
  */
 SmallList<int> scenegraph::Node::
-query(AABB& aabb) {
-    return _get_node_data(_node_id)._query(aabb);
+query(AABB& aabb, const bool depth_sorted) {
+    return _get_node_data(_node_id)._query(aabb, depth_sorted);
 }
 
 /**

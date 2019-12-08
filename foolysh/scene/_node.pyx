@@ -135,7 +135,7 @@ cdef class Node:
         """
         return deref(self.thisptr).traverse()
 
-    def query(self, aabb):
+    def query(self, aabb, depth_sorted=True):
         """
         Query the Scenegraph at bounds `aabb`.
 
@@ -145,10 +145,13 @@ cdef class Node:
         Returns:
             ``list`` of ``Node`` instances that intersect with `aabb`.
         """
-        return self._query(aabb)
+        return self._query(aabb, depth_sorted)
 
-    cdef list _query(self, AABB aabb) except +:
-        cdef SmallList[int] r = deref(self.thisptr).query(deref(aabb.thisptr))
+    cdef list _query(self, AABB aabb, bint depth_sorted) except +:
+        cdef SmallList[int] r = deref(self.thisptr).query(
+            deref(aabb.thisptr),
+            depth_sorted
+        )
         cdef list rl = []
         for i in range(r.size()):
             rl.append(_nodes[r[i]])

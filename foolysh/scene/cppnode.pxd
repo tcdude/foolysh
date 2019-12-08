@@ -100,7 +100,7 @@ cdef extern from "src/node.hpp" namespace "scenegraph":
         void reparent_to(Node&) except +
         void reparent_to(const int) except +
         bint traverse() except +
-        SmallList[int] query(AABB&) except +
+        SmallList[int] query(AABB&, const bint) except +
         void hide()
         void show()
 

@@ -120,7 +120,7 @@ namespace scenegraph {
         //NodeData& operator=(const NodeData& other);
 
         bool _traverse();
-        SmallList<int> _query(AABB& aabb);
+        SmallList<int> _query(AABB& aabb, const bool depth_sorted);
         void _insert_child(const int node_id);
         void _remove_child(const int node_id);
         void _propagate_dirty();
@@ -149,6 +149,14 @@ namespace scenegraph {
     int NodeData::_max_qt_leaf_elements = 8;
     int NodeData::_max_qt_depth = 8;
 
+    struct DepthData {
+        DepthData(const int nid, const int d) : node_id(nid), depth(d) {}
+        int node_id, depth;
+        inline bool operator<(const DepthData& other) {
+            return (depth < other.depth);
+        }
+    };
+
     class Node {
     public:
         Node();
@@ -162,7 +170,7 @@ namespace scenegraph {
         void reparent_to(Node& parent);
         void reparent_to(const int parent);
         bool traverse();
-        SmallList<int> query(AABB& aabb);
+        SmallList<int> query(AABB& aabb, const bool depth_sorted = true);
         void hide();
         void show();
 

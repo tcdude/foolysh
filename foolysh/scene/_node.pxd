@@ -15,7 +15,7 @@ cdef class Node:
     cpdef void remove(self)
     cdef void _attach_node(self, Node np)
     cdef void _reparent_to(self, Node parent) except +
-    cdef list _query(self, AABB aabb) except +
+    cdef list _query(self, AABB aabb, bint depth_sorted) except +
     cdef Vector2 _get_pos(self)
     cdef void _set_pos_single(self, const double v)
     cdef void _set_pos(self, const double x, const double y)
