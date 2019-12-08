@@ -776,6 +776,45 @@ active_animations() {
 // Animation
 
 /**
+ *
+ */
+void animation::Animation::
+set_pos_speed(const double s) {
+    _get_animation_data(_animation_id).pos_speed = s;
+}
+
+/**
+ *
+ */
+void animation::Animation::
+set_scale_speed(const double s) {
+    _get_animation_data(_animation_id).scale_speed = s;
+}
+
+/**
+ *
+ */
+void animation::Animation::
+set_rotation_speed(const double s) {
+    _get_animation_data(_animation_id).rotation_speed = s;
+}
+
+/**
+ *
+ */
+void animation::Animation::
+set_rotation_center_speed(const double s) {
+    _get_animation_data(_animation_id).rotation_center_speed = s;
+}
+
+/**
+ *
+ */
+void animation::Animation::set_depth_speed(const double s) {
+    _get_animation_data(_animation_id).depth_speed = s;
+}
+
+/**
  * Reset to initial state. Updates start states, for the active animation types,
  * where none have been explicitly specified and translates speed into duration.
  */
