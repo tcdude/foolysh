@@ -55,29 +55,25 @@ namespace scenegraph {
     };
 
     struct Scale {
-        double sx = 1.0, sy = 1.0;
+        Scale() : sx(1.0), sy(1.0) {}
+        Scale(const double _s) : sx(_s), sy(_s) {}
+        Scale(const double _sx, const double _sy) : sx(_sx), sy(_sy) {}
+
+        double sx, sy;
         Scale operator+(const Scale& rhs) {
-            Scale s;
-            s.sx = sx + rhs.sx;
-            s.sy = sy + rhs.sy;
+            Scale s = {sx + rhs.sx, sy + rhs.sy};
             return s;
         }
         Scale operator-(const Scale& rhs) {
-            Scale s;
-            s.sx = sx - rhs.sx;
-            s.sy = sy - rhs.sy;
+            Scale s = {sx - rhs.sx, sy - rhs.sy};
             return s;
         }
         Scale operator*(const Scale& rhs) {
-            Scale s;
-            s.sx = sx * rhs.sx;
-            s.sy = sy * rhs.sy;
+            Scale s = {sx * rhs.sx, sy * rhs.sy};
             return s;
         }
         Scale operator*(const double rhs) {
-            Scale s;
-            s.sx = sx * rhs;
-            s.sy = sy * rhs;
+            Scale s = {sx * rhs, sy * rhs};
             return s;
         }
         bool operator==(const double rhs) {
