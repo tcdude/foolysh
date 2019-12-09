@@ -110,17 +110,20 @@ namespace scenegraph {
         AABB aabb;
     };
 
+    struct SceneGraphDataHandler;
+
     struct NodeData {
         NodeData();
         ~NodeData();
         //NodeData& operator=(const NodeData& other);
 
-        bool _traverse();
-        SmallList<int> _query(AABB& aabb, const bool depth_sorted);
-        void _insert_child(const int node_id);
-        void _remove_child(const int node_id);
-        void _propagate_dirty();
-        void _update_relative();
+        bool _traverse(SceneGraphDataHandler& sgdh);
+        SmallList<int> _query(SceneGraphDataHandler& sgdh, AABB& aabb,
+                              const bool depth_sorted);
+        void _insert_child(SceneGraphDataHandler& sgdh, const int node_id);
+        void _remove_child(SceneGraphDataHandler& sgdh, const int node_id);
+        void _propagate_dirty(SceneGraphDataHandler& sgdh);
+        void _update_relative(SceneGraphDataHandler& sgdh);
         Vector2 _get_offset();
 
         Vector2 _position, _r_position, _tl_position, _rot_center;
@@ -136,14 +139,20 @@ namespace scenegraph {
         AABB _aabb;
         unsigned int _ref_count;
 
-        static ExtFreeList<ChildNode> _child_nodes;
-        static ExtFreeList<NodeData*> _nd;
+        // static ExtFreeList<ChildNode> _child_nodes;
+        // static ExtFreeList<NodeData*> _nd;
         static int _max_qt_leaf_elements, _max_qt_depth;
     };
-    ExtFreeList<NodeData*> NodeData::_nd;
-    ExtFreeList<ChildNode> NodeData::_child_nodes;
+
+    // ExtFreeList<NodeData*> NodeData::_nd;
+    // ExtFreeList<ChildNode> NodeData::_child_nodes;
     int NodeData::_max_qt_leaf_elements = 8;
     int NodeData::_max_qt_depth = 8;
+
+    struct SceneGraphDataHandler {
+        ExtFreeList<ChildNode> _child_nodes;
+        ExtFreeList<NodeData*> _nd;
+    };
 
     struct DepthData {
         DepthData(const int nid, const int d) : node_id(nid), depth(d) {}
@@ -155,7 +164,7 @@ namespace scenegraph {
 
     class Node {
     public:
-        Node();
+        Node(SceneGraphDataHandler& sgdh);
         ~Node();
         Node(const Node& other);
         Node(Node&& other) noexcept;
@@ -215,13 +224,14 @@ namespace scenegraph {
 
         AABB get_aabb();
 
+        SceneGraphDataHandler& _sgdh;
+
     private:
         inline NodeData& _get_root();
         inline NodeData& _get_node_data(const int node_id);
         inline void _check_dirty(Node& node_a, Node& node_b);
 
         int _node_id;
-
     };
 }  // namespace scenegraph
 

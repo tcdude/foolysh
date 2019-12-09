@@ -63,12 +63,12 @@ scenegraph::NodeData::
  *
  */
 bool scenegraph::NodeData::
-_traverse() {
+_traverse(SceneGraphDataHandler& sgdh) {
     int root_node_id = _node_data_id;
-    while (NodeData::_nd[root_node_id]->_parent > -1) {
-        root_node_id = NodeData::_nd[root_node_id]->_parent;
+    while (sgdh._nd[root_node_id]->_parent > -1) {
+        root_node_id = sgdh._nd[root_node_id]->_parent;
     }
-    NodeData& root = *NodeData::_nd[root_node_id];
+    NodeData& root = *sgdh._nd[root_node_id];
     if (!root._dirty) {
         return false;
     }
@@ -81,11 +81,11 @@ _traverse() {
     to_process.push_back(root._node_data_id);
     while(to_process.size() > 0) {
         const int node_id = to_process.pop_back();
-        NodeData& nd = *NodeData::_nd[node_id];
+        NodeData& nd = *sgdh._nd[node_id];
         if (nd._dirty) {
             int child_id = nd._first_child;
             while (child_id != -1) {
-                ChildNode& cn = NodeData::_child_nodes[child_id];
+                ChildNode& cn = sgdh._child_nodes[child_id];
                 to_process.push_back(cn.node_id);
                 child_id = cn.next;
             }
@@ -94,7 +94,7 @@ _traverse() {
             qe.node_id = (nd._isnew) ? -1 : nd._node_data_id;
             qe.aabb = nd._aabb;
             root._tmp_quadtree_entry.push_back(qe);
-            nd._update_relative();
+            nd._update_relative(sgdh);
             x_max = std::max(x_max, nd._aabb.x + nd._aabb.hw);
             y_max = std::max(y_max, nd._aabb.y + nd._aabb.hh);
             x_min = std::min(x_min, nd._aabb.x - nd._aabb.hw);
@@ -140,19 +140,19 @@ _traverse() {
  *
  */
 SmallList<int> scenegraph::NodeData::
-_query(AABB& aabb, const bool depth_sorted) {
+_query(SceneGraphDataHandler& sgdh, AABB& aabb, const bool depth_sorted) {
     int root_node_id = _node_data_id;
-    while (NodeData::_nd[root_node_id]->_parent > -1) {
-        root_node_id = NodeData::_nd[root_node_id]->_parent;
+    while (sgdh._nd[root_node_id]->_parent > -1) {
+        root_node_id = sgdh._nd[root_node_id]->_parent;
     }
-    NodeData& root = *NodeData::_nd[root_node_id];
+    NodeData& root = *sgdh._nd[root_node_id];
     if (!root._quadtree) {
         throw std::logic_error("Quadtree not built yet");
     }
     SmallList<int> result, qt_result = root._quadtree->query(aabb);
     while (qt_result.size() > 0) {
         const int node_id = qt_result.pop_back();
-        NodeData& nd = *NodeData::_nd[node_id];
+        NodeData& nd = *sgdh._nd[node_id];
         if (!nd._hidden) {
             result.push_back(node_id);
         }
@@ -165,7 +165,7 @@ _query(AABB& aabb, const bool depth_sorted) {
     std::vector<DepthData> v;
     v.reserve(result.size());
     for (auto i=0; i < result.size(); ++i) {
-        v.push_back(DepthData(result[i], NodeData::_nd[result[i]]->_r_depth));
+        v.push_back(DepthData(result[i], sgdh._nd[result[i]]->_r_depth));
     }
     result.clear();
     std::sort(v.begin(), v.end());
@@ -179,34 +179,34 @@ _query(AABB& aabb, const bool depth_sorted) {
  * Insert Node with ``node_id`` as child.
  */
 void scenegraph::NodeData::
-_insert_child(const int node_id) {
+_insert_child(SceneGraphDataHandler& sgdh, const int node_id) {
     ChildNode cnp;
     cnp.node_id = node_id;
-    const int cnp_id = NodeData::_child_nodes.insert(cnp);
+    const int cnp_id = sgdh._child_nodes.insert(cnp);
     if (_first_child == -1) {
         _first_child = cnp_id;
     }
     else {
         int current = _first_child;
-        int next = NodeData::_child_nodes[current].next;
+        int next = sgdh._child_nodes[current].next;
         while (next != -1) {
             current = next;
-            next = NodeData::_child_nodes[next].next;
+            next = sgdh._child_nodes[next].next;
         }
-        NodeData::_child_nodes[current].next = cnp_id;
+        sgdh._child_nodes[current].next = cnp_id;
     }
-    _propagate_dirty();
+    _propagate_dirty(sgdh);
 }
 
 /**
  * Remove Node with ``node_id`` from children.
  */
 void scenegraph::NodeData::
-_remove_child(const int node_id) {
+_remove_child(SceneGraphDataHandler& sgdh, const int node_id) {
     if (_first_child == -1) {
         throw std::range_error("No children");
     }
-    ExtFreeList<ChildNode>& cnps = NodeData::_child_nodes;
+    ExtFreeList<ChildNode>& cnps = sgdh._child_nodes;
     if (!cnps.active(_first_child)) {
         throw std::range_error("Child is not present");
     }
@@ -236,11 +236,11 @@ _remove_child(const int node_id) {
  * direct path to the root Node.
  */
 void scenegraph::NodeData::
-_propagate_dirty() {
+_propagate_dirty(SceneGraphDataHandler& sgdh) {
     if (_parent > -1) {
         int parent = _parent;
         while (parent > -1) {
-            NodeData& nd = *NodeData::_nd[parent];
+            NodeData& nd = *sgdh._nd[parent];
             nd._dirty = true;
             parent = nd._parent;
         }
@@ -250,8 +250,8 @@ _propagate_dirty() {
         to_process.push_back(_first_child);
         while (to_process.size() > 0) {
             const int cnp_id = to_process.pop_back();
-            ChildNode& cnp = NodeData::_child_nodes[cnp_id];
-            NodeData& nd = *NodeData::_nd[cnp.node_id];
+            ChildNode& cnp = sgdh._child_nodes[cnp_id];
+            NodeData& nd = *sgdh._nd[cnp.node_id];
             if (cnp.next > -1) {
                 to_process.push_back(cnp.next);
             }
@@ -268,13 +268,13 @@ _propagate_dirty() {
  * Updates all relative values according to its parent.
  */
 void scenegraph::NodeData::
-_update_relative() {
+_update_relative(SceneGraphDataHandler& sgdh) {
     Vector2 local_origin;  // origin of local coordinate system
     Scale base_scale;
     double base_angle;
     bool base_dist_rel;
     if (_parent > -1) {
-        NodeData& parent = *NodeData::_nd[_parent];
+        NodeData& parent = *sgdh._nd[_parent];
         local_origin = parent._r_position;
         base_scale = parent._r_scale;
         base_angle = parent._r_angle;
@@ -448,9 +448,9 @@ _get_offset() {
  * Default Constructor.
  */
 scenegraph::Node::
-Node() {
-    _node_id = NodeData::_nd.insert(new NodeData());
-    NodeData::_nd[_node_id]->_node_data_id = _node_id;
+Node(SceneGraphDataHandler& sgdh) : _sgdh(sgdh) {
+    _node_id = _sgdh._nd.insert(new NodeData());
+    _sgdh._nd[_node_id]->_node_data_id = _node_id;
 }
 
 /**
@@ -462,7 +462,7 @@ scenegraph::Node::
         NodeData& nd = _get_node_data(_node_id);
         if (nd._ref_count == 1) {
             /* If ours is the last reference, delete the NodeData */
-            NodeData::_nd.erase(_node_id);
+            _sgdh._nd.erase(_node_id);
         }
         else {
             --nd._ref_count;
@@ -475,7 +475,7 @@ scenegraph::Node::
  * NodeData instance.
  */
 scenegraph::Node::
-Node(const Node& other) {
+Node(const Node& other) : _sgdh(other._sgdh) {
     _node_id = other._node_id;
     NodeData& nd = _get_node_data(_node_id);
     ++nd._ref_count;
@@ -485,7 +485,7 @@ Node(const Node& other) {
  * Move Constructor. Invalidates ``other``.
  */
 scenegraph::Node::
-Node(Node&& other) noexcept {
+Node(Node&& other) noexcept  : _sgdh(other._sgdh) {
     _node_id = other._node_id;
     other._node_id = -1;
 }
@@ -496,11 +496,12 @@ Node(Node&& other) noexcept {
  */
 scenegraph::Node& scenegraph::Node::
 operator=(const Node& other) {
-    if (NodeData::_nd.active(_node_id)) {
+    if (other._sgdh._nd.active(_node_id)) {
         NodeData& nd = _get_node_data(_node_id);
         --nd._ref_count;
     }
     _node_id = other._node_id;
+    _sgdh = other._sgdh;
     NodeData& nd = _get_node_data(_node_id);
     ++nd._ref_count;
     return *this;
@@ -511,11 +512,12 @@ operator=(const Node& other) {
  */
 scenegraph::Node& scenegraph::Node::
 operator=(Node&& other) noexcept {
-    if (NodeData::_nd.active(_node_id)) {
+    if (other._sgdh._nd.active(_node_id)) {
         NodeData& nd = _get_node_data(_node_id);
         --nd._ref_count;
     }
     _node_id = other._node_id;
+    _sgdh = other._sgdh;
     NodeData& nd = _get_node_data(_node_id);
     ++nd._ref_count;
     return *this;
@@ -526,14 +528,14 @@ operator=(Node&& other) noexcept {
  */
 scenegraph::Node scenegraph::Node::
 attach_node() {
-    Node n;
+    Node n = {_sgdh};
     NodeData& cnd = _get_node_data(n._node_id);
     NodeData& tnd = _get_node_data(_node_id);
     cnd._parent = _node_id;
     cnd._distance_relative = tnd._distance_relative;
     cnd._origin = tnd._origin;
-    tnd._insert_child(n._node_id);
-    tnd._propagate_dirty();
+    tnd._insert_child(_sgdh, n._node_id);
+    tnd._propagate_dirty(_sgdh);
     return n;
 }
 
@@ -550,7 +552,7 @@ reparent_to(Node& parent) {
  */
 void scenegraph::Node::
 reparent_to(const int parent) {
-    int _p_id = NodeData::_nd[parent]->_parent;
+    int _p_id = _sgdh._nd[parent]->_parent;
     while (_p_id > -1) {
         if (_p_id == _node_id) {
             throw std::logic_error("Unable to reparent: new parent is a child "
@@ -562,16 +564,15 @@ reparent_to(const int parent) {
 
     NodeData& nd = _get_node_data(_node_id);
     if (nd._parent > -1) {
-        NodeData& pnd = *NodeData::_nd[nd._parent];
-        pnd._remove_child(_node_id);
+        NodeData& pnd = *_sgdh._nd[nd._parent];
+        pnd._remove_child(_sgdh, _node_id);
     }
     nd._tmp_quadtree_entry.clear();
 
     nd._parent = parent;
-    NodeData& pnd = *NodeData::_nd[nd._parent];
-    pnd._insert_child(_node_id);
-    std::cout << "here++" << std::endl;
-    nd._propagate_dirty();
+    NodeData& pnd = *_sgdh._nd[nd._parent];
+    pnd._insert_child(_sgdh, _node_id);
+    nd._propagate_dirty(_sgdh);
 }
 
 /**
@@ -580,7 +581,7 @@ reparent_to(const int parent) {
  */
 bool scenegraph::Node::
 traverse() {
-    return _get_node_data(_node_id)._traverse();
+    return _get_node_data(_node_id)._traverse(_sgdh);
 }
 
 /**
@@ -589,7 +590,7 @@ traverse() {
  */
 SmallList<int> scenegraph::Node::
 query(AABB& aabb, const bool depth_sorted) {
-    return _get_node_data(_node_id)._query(aabb, depth_sorted);
+    return _get_node_data(_node_id)._query(_sgdh, aabb, depth_sorted);
 }
 
 /**
@@ -600,7 +601,7 @@ hide() {
     NodeData& nd = _get_node_data(_node_id);
     if (!nd._hidden) {
         nd._hidden = true;
-        nd._propagate_dirty();
+        nd._propagate_dirty(_sgdh);
     }
 }
 
@@ -612,7 +613,7 @@ show() {
     NodeData& nd = _get_node_data(_node_id);
     if (nd._hidden) {
         nd._hidden = false;
-        nd._propagate_dirty();
+        nd._propagate_dirty(_sgdh);
     }
 }
 
@@ -621,14 +622,14 @@ show() {
  */
 inline scenegraph::NodeData& scenegraph::Node::
 _get_root() {
-    if (!NodeData::_nd.active(_node_id)) {
+    if (!_sgdh._nd.active(_node_id)) {
         throw std::logic_error("Tried to access invalid NodeData");
     }
     int search_id = _node_id;
-    while (NodeData::_nd[search_id]->_parent > -1) {
-        search_id = NodeData::_nd[search_id]->_parent;
+    while (_sgdh._nd[search_id]->_parent > -1) {
+        search_id = _sgdh._nd[search_id]->_parent;
     }
-    return *NodeData::_nd[search_id];
+    return *_sgdh._nd[search_id];
 }
 
 /**
@@ -636,10 +637,11 @@ _get_root() {
  */
 inline scenegraph::NodeData& scenegraph::Node::
 _get_node_data(const int node_id) {
-    if (!NodeData::_nd.active(node_id)) {
+    std::cout << &_sgdh._nd << std::endl;
+    if (!_sgdh._nd.active(node_id)) {
         throw std::logic_error("Tried to access invalid NodeData");
     }
-    return *NodeData::_nd[node_id];
+    return *_sgdh._nd[node_id];
 }
 
 /**
@@ -671,7 +673,7 @@ set_pos(const double v) {
     if (nd._position[0] != v || nd._position[1] != v) {
         nd._position[0] = v;
         nd._position[1] = v;
-        nd._propagate_dirty();
+        nd._propagate_dirty(_sgdh);
     }
 }
 
@@ -696,7 +698,7 @@ set_pos(const double x, const double y) {
     if (nd._position[0] != x || nd._position[1] != y) {
         nd._position[0] = x;
         nd._position[1] = y;
-        nd._propagate_dirty();
+        nd._propagate_dirty(_sgdh);
     }
 }
 
@@ -721,7 +723,7 @@ set_pos(Vector2& p) {
     NodeData& nd = _get_node_data(_node_id);
     if (nd._position != p) {
         nd._position = p;
-        nd._propagate_dirty();
+        nd._propagate_dirty(_sgdh);
     }
 }
 
@@ -765,7 +767,7 @@ set_scale(const double s) {
     NodeData& nd = _get_node_data(_node_id);
     if (nd._scale.sx != s || nd._scale.sy != s) {
         nd._scale.sx = nd._scale.sy = s;
-        nd._propagate_dirty();
+        nd._propagate_dirty(_sgdh);
     }
 }
 
@@ -799,7 +801,7 @@ set_scale(const double sx, const double sy) {
     if (nd._scale.sx != sx || nd._scale.sy != sy) {
         nd._scale.sx = sx;
         nd._scale.sy = sy;
-        nd._propagate_dirty();
+        nd._propagate_dirty(_sgdh);
     }
 }
 
@@ -833,7 +835,7 @@ set_scale(const Scale& s) {
     if (nd._scale.sx != s.sx || nd._scale.sy != s.sy) {
         nd._scale.sx = s.sx;
         nd._scale.sy = s.sy;
-        nd._propagate_dirty();
+        nd._propagate_dirty(_sgdh);
     }
 }
 
@@ -890,7 +892,7 @@ set_angle(double a, bool radians) {
     if (a != nd._angle) {
         // nd._angle = clamp_angle(a);
         nd._angle = a;
-        nd._propagate_dirty();
+        nd._propagate_dirty(_sgdh);
     }
 }
 
@@ -952,7 +954,7 @@ set_rotation_center(const double x, const double y) {
     if (nd._rot_center[0] != x || nd._rot_center[1] != y) {
         nd._rot_center[0] = x;
         nd._rot_center[1] = y;
-        nd._propagate_dirty();
+        nd._propagate_dirty(_sgdh);
     }
 }
 
@@ -965,7 +967,7 @@ set_rotation_center(Vector2& c) {
     if (nd._rot_center != c) {
         nd._rot_center[0] = c[0];
         nd._rot_center[1] = c[1];
-        nd._propagate_dirty();
+        nd._propagate_dirty(_sgdh);
     }
 }
 
@@ -985,7 +987,7 @@ set_depth(const int d) {
     NodeData& nd = _get_node_data(_node_id);
     if (nd._depth != d) {
         nd._depth = d;
-        nd._propagate_dirty();
+        nd._propagate_dirty(_sgdh);
     }
 }
 
@@ -1024,7 +1026,7 @@ set_origin(Origin o) {
     NodeData& nd = _get_node_data(_node_id);
     if (nd._origin != o) {
         nd._origin = o;
-        nd._propagate_dirty();  // Necessary?
+        nd._propagate_dirty(_sgdh);  // Necessary?
     }
 }
 
@@ -1084,7 +1086,7 @@ set_size(const Size& s) {
     NodeData& nd = _get_node_data(_node_id);
     if (s.w >= 0.0 && s.h >= 0.0) {
         nd._size = s;
-        nd._propagate_dirty();
+        nd._propagate_dirty(_sgdh);
     }
     else {
         throw std::domain_error("Size must be positive.");
@@ -1122,7 +1124,7 @@ set_distance_relative(const bool v) {
     NodeData& nd = _get_node_data(_node_id);
     if (v != nd._distance_relative) {
         nd._distance_relative = v;
-        nd._propagate_dirty();
+        nd._propagate_dirty(_sgdh);
     }
 }
 

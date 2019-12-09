@@ -120,7 +120,7 @@ namespace animation {
             rotation_center_speed = -1.0, depth_speed = -1.0;
         double dur_pos, dur_scalex, dur_scaley, dur_angle, dur_center_pos,
             dur_depth;
-        scenegraph::Node node;
+        std::unique_ptr<scenegraph::Node> node;
         BlendType blend;
         PositionData pos, center_pos;   // flags: 1, 2
         ScaleData scale;                // flags: 4
@@ -159,7 +159,7 @@ namespace animation {
         AnimationType& operator=(AnimationType&& other) noexcept;
 
         // Setup
-        void set_node(scenegraph::Node n);
+        void set_node(scenegraph::Node& n);
         void set_blend(BlendType b);
 
         void add_pos(tools::Vector2 end);
