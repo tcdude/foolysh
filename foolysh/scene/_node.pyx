@@ -4,6 +4,7 @@ Cython wrapper of the C++ Node implementation.
 """
 
 from .cppnode cimport Node as _Node
+from .cppnode cimport SceneGraphDataHandler as _SceneGraphDataHandler
 from .cppnode cimport SmallList
 from .cppnode cimport Scale
 from .cppnode cimport Size
@@ -44,6 +45,11 @@ SOFTWARE."""
 cdef dict _nodes = {}
 
 
+cdef class SceneGraphDataHandler:
+    def __cinit__(self):
+        self.thisptr.reset(new _SceneGraphDataHandler())
+
+
 cdef class Node:
     """
     The ``Node`` class provides the interface to the Scenegraph. A single
@@ -65,7 +71,11 @@ cdef class Node:
     """
 
     def __cinit__(self):
-        self.thisptr.reset(new _Node())
+        from . import SGDH
+        self._setup(SGDH)
+
+    cdef void _setup(self, SceneGraphDataHandler sgdh):
+        self.thisptr.reset(new _Node(deref(sgdh.thisptr)))
         # Reference the Node instance to keep it alive
         _nodes[deref(self.thisptr).get_id()] = self
 

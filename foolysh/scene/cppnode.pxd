@@ -92,8 +92,11 @@ cdef extern from "src/node.hpp" namespace "scenegraph":
         bint operator==(const double)
         bint operator!=(const double)
 
+    cdef cppclass SceneGraphDataHandler:
+        pass
+
     cdef cppclass Node:
-        Node() except +
+        Node(SceneGraphDataHandler&) except +
         Node(const Node&) except +
 
         Node attach_node()

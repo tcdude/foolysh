@@ -1,6 +1,7 @@
 # distutils: language = c++
 
 from .cppnode cimport Node as _Node
+from .cppnode cimport SceneGraphDataHandler as _SceneGraphDataHandler
 from .cppnode cimport Origin as _Origin
 from ..tools.aabb cimport AABB
 from ..tools.vector2 cimport Vector2
@@ -8,9 +9,15 @@ from ..tools.vector2 cimport Vector2
 from libcpp.memory cimport unique_ptr
 
 
+cdef class SceneGraphDataHandler:
+    cdef unique_ptr[_SceneGraphDataHandler] thisptr
+
+
 cdef class Node:
     cdef unique_ptr[_Node] thisptr
     cdef str __name
+
+    cdef void _setup(self, SceneGraphDataHandler sgdh)
 
     cpdef void remove(self)
     cdef void _attach_node(self, Node np)
