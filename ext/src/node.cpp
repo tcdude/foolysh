@@ -637,7 +637,6 @@ _get_root() {
  */
 inline scenegraph::NodeData& scenegraph::Node::
 _get_node_data(const int node_id) {
-    std::cout << &_sgdh._nd << std::endl;
     if (!_sgdh._nd.active(node_id)) {
         throw std::logic_error("Tried to access invalid NodeData");
     }
