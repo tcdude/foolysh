@@ -38,9 +38,6 @@ cdef extern from "src/quadtree.cpp":
 cdef extern from "src/quadtree.hpp":
     pass
 
-cdef extern from "src/list_t.cpp":
-    pass
-
 cdef extern from "src/list_t.hpp" namespace "tools":
     cdef cppclass FreeList[T]:
         FreeList()
