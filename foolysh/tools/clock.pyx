@@ -67,10 +67,10 @@ cdef class Clock:
     cpdef void tick(self):
         """
         When calling this, measures time and updates current and delta time.
-        
+
         .. note::
             Use this to measure steps, if you're using a separate :class:`Clock`
             instance from the one provided in :class:`~foolysh.app.App`, where
-            this method has been overridden to prevent direct access. 
+            this method has been overridden to prevent direct access.
         """
         deref(self.thisptr).tick()
