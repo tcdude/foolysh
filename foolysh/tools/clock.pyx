@@ -45,6 +45,9 @@ cdef class Clock:
     """
     cdef unique_ptr[_Clock] thisptr
 
+    def __cinit__(self, *args, **kwargs):
+        self.thisptr.reset(new _Clock())
+
     cpdef double get_dt(self):
         """
         Returns:
