@@ -168,7 +168,7 @@ _query(SceneGraphDataHandler& sgdh, AABB& aabb, const bool depth_sorted) {
         v.push_back(DepthData(result[i], sgdh._nd[result[i]]->_r_depth));
     }
     result.clear();
-    std::sort(v.begin(), v.end());
+    std::sort(v.begin(), v.end(), comp_depth_data);
     for (auto& it : v) {
         result.push_back(it.node_id);
     }

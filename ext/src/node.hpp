@@ -157,10 +157,11 @@ namespace scenegraph {
     struct DepthData {
         DepthData(const int nid, const int d) : node_id(nid), depth(d) {}
         int node_id, depth;
-        inline bool operator<(const DepthData& other) {
-            return (depth < other.depth);
-        }
     };
+
+    inline bool comp_depth_data(const DepthData& a, const DepthData& b) {
+        return a.depth < b.depth;
+    }
 
     class Node {
     public:
