@@ -115,7 +115,6 @@ namespace scenegraph {
     struct NodeData {
         NodeData();
         ~NodeData();
-        //NodeData& operator=(const NodeData& other);
 
         bool _traverse(SceneGraphDataHandler& sgdh);
         SmallList<int> _query(SceneGraphDataHandler& sgdh, AABB& aabb,
@@ -139,13 +138,9 @@ namespace scenegraph {
         AABB _aabb;
         unsigned int _ref_count;
 
-        // static ExtFreeList<ChildNode> _child_nodes;
-        // static ExtFreeList<NodeData*> _nd;
         static int _max_qt_leaf_elements, _max_qt_depth;
     };
 
-    // ExtFreeList<NodeData*> NodeData::_nd;
-    // ExtFreeList<ChildNode> NodeData::_child_nodes;
     int NodeData::_max_qt_leaf_elements = 8;
     int NodeData::_max_qt_depth = 8;
 
