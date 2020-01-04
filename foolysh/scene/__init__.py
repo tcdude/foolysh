@@ -2,7 +2,7 @@
 Scene Graph implementation...
 """
 
-from ._node import SceneGraphDataHandler
+from .node import SceneGraphDataHandler
 
 __author__ = 'Tiziano Bettio'
 __license__ = 'MIT'

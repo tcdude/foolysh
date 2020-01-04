@@ -10,7 +10,7 @@ from cython.operator cimport dereference as deref
 from libcpp.memory cimport unique_ptr
 
 from .scene.cppnode cimport Node as _Node
-from .scene._node cimport Node
+from .scene.node cimport Node
 from .scene.cppnode cimport Scale as _Scale
 from .tools.cppvector2 cimport Vector2 as _Vector2
 from .tools.vector2 cimport Vector2
@@ -266,7 +266,7 @@ cdef class AnimationType(AnimationBase):
 
     def set_node(self, node):
         """
-        Set the :class:`~foolysh.scene._node.Node` that will be manipulated
+        Set the :class:`~foolysh.scene.node.Node` that will be manipulated
         """
         if not isinstance(node, Node):
             raise TypeError
@@ -288,7 +288,7 @@ cdef class AnimationType(AnimationBase):
             v1: :class:`~foolysh.tools.vector2.Vector2` end position or start
                 position, if `v2` is provided.
             v2: :class:`~foolysh.tools.vector2.Vector2` see `v1`.
-            rel: :class:`~foolysh.scene._node.Node` optional relative Node.
+            rel: :class:`~foolysh.scene.node.Node` optional relative Node.
         """
         v1a = isinstance(v1, Vector2)
         v2a = isinstance(v2, Vector2)
@@ -397,7 +397,7 @@ cdef class AnimationType(AnimationBase):
             s1: ``float``/``tuple[float, float]`` end scale or start scale, if
                 `s2` is provided.
             s2: ``float``/``tuple[float, float]`` see `s1`.
-            rel: :class:`~foolysh.scene._node.Node` optional relative Node.
+            rel: :class:`~foolysh.scene.node.Node` optional relative Node.
         """
         if isinstance(s1, (int, float)):
             s1 = (s1, ) * 2
@@ -542,7 +542,7 @@ cdef class AnimationType(AnimationBase):
             d1: ``float`` end angle in degrees or start angle, if `d2` is
                 provided.
             d2: ``float`` see `d1`.
-            rel: :class:`~foolysh.scene._node.Node` optional relative Node.
+            rel: :class:`~foolysh.scene.node.Node` optional relative Node.
         """
         if isinstance(d1, (int, float)):
             d1a = True
@@ -731,7 +731,7 @@ cdef class AnimationType(AnimationBase):
         Args:
             d1: ``int`` end depth or start depth, if `d2` is provided.
             d2: ``int`` see `d1`.
-            rel: :class:`~foolysh.scene._node.Node` optional relative Node.
+            rel: :class:`~foolysh.scene.node.Node` optional relative Node.
         """
         if isinstance(d1, int):
             d1a = True
@@ -1052,12 +1052,12 @@ def PosInterval(node, duration, v1, v2=None, rel=None):
     modifier.
 
     Args:
-        node: :class:`~foolysh.scene._node.Node` the manipulated node instance.
+        node: :class:`~foolysh.scene.node.Node` the manipulated node instance.
         duration: ``float`` duration of the Interval in seconds.
         v1: :class:`~foolysh.tools.vector2.Vector2` the end or start position,
             depending on whether `v2` is provided.
         v2: see `v1`
-        rel: :class:`~foolysh.scene._node.Node` optional relative node.
+        rel: :class:`~foolysh.scene.node.Node` optional relative node.
     """
     ival = Interval(node)
     ival.set_duration(duration)
@@ -1070,12 +1070,12 @@ def ScaleInterval(node, duration, s1, s2=None, rel=None):
     Factory method to create an :class:`Interval` instance with scale modifier.
 
     Args:
-        node: :class:`~foolysh.scene._node.Node` the manipulated node instance.
+        node: :class:`~foolysh.scene.node.Node` the manipulated node instance.
         duration: ``float`` duration of the Interval in seconds.
         s1: ``float``/``tuple`` the end or start scale, depending on whether
             `s2` is provided.
         s2: see `s1`
-        rel: :class:`~foolysh.scene._node.Node` optional relative node.
+        rel: :class:`~foolysh.scene.node.Node` optional relative node.
     """
     ival = Interval(node)
     ival.set_duration(duration)
@@ -1089,12 +1089,12 @@ def RotationInterval(node, duration, d1, d2=None, rel=None):
     modifier.
 
     Args:
-        node: :class:`~foolysh.scene._node.Node` the manipulated node instance.
+        node: :class:`~foolysh.scene.node.Node` the manipulated node instance.
         duration: ``float`` duration of the Interval in seconds.
         d1: ``float`` the end or start angle in degrees, depending on whether
             `d2` is provided.
         d2: see `d1`
-        rel: :class:`~foolysh.scene._node.Node` optional relative node.
+        rel: :class:`~foolysh.scene.node.Node` optional relative node.
     """
     ival = Interval(node)
     ival.set_duration(duration)
@@ -1108,7 +1108,7 @@ def RotationCenterInterval(node, duration, v1, v2=None):
     modifier.
 
     Args:
-        node: :class:`~foolysh.scene._node.Node` the manipulated node instance.
+        node: :class:`~foolysh.scene.node.Node` the manipulated node instance.
         duration: ``float`` duration of the Interval in seconds.
         v1: :class:`~foolysh.tools.vector2.Vector2` the end or start position of
             the rotation center, depending on whether `v2` is provided.
@@ -1125,12 +1125,12 @@ def DepthInterval(node, duration, d1, d2=None, rel=None):
     Factory method to create an :class:`Interval` instance with depth modifier.
 
     Args:
-        node: :class:`~foolysh.scene._node.Node` the manipulated node instance.
+        node: :class:`~foolysh.scene.node.Node` the manipulated node instance.
         duration: ``float`` duration of the Interval in seconds.
         d1: ``int`` the end or start depth, depending on whether `d2` is
             provided.
         d2: see `d1`
-        rel: :class:`~foolysh.scene._node.Node` optional relative node.
+        rel: :class:`~foolysh.scene.node.Node` optional relative node.
     """
     ival = Interval(node)
     ival.set_duration(duration)
@@ -1144,12 +1144,12 @@ def PosAnimation(node, speed, v1, v2=None, rel=None):
     modifier.
 
     Args:
-        node: :class:`~foolysh.scene._node.Node` the manipulated node instance.
+        node: :class:`~foolysh.scene.node.Node` the manipulated node instance.
         speed: ``float`` speed of the Animation in units per second.
         v1: :class:`~foolysh.tools.vector2.Vector2` the end or start position,
             depending on whether `v2` is provided.
         v2: see `v1`
-        rel: :class:`~foolysh.scene._node.Node` optional relative node.
+        rel: :class:`~foolysh.scene.node.Node` optional relative node.
     """
     anim = Animation(node)
     anim.set_pos_speed(speed)
@@ -1162,12 +1162,12 @@ def ScaleAnimation(node, speed, s1, s2=None, rel=None):
     Factory method to create an :class:`Animation` instance with scale modifier.
 
     Args:
-        node: :class:`~foolysh.scene._node.Node` the manipulated node instance.
+        node: :class:`~foolysh.scene.node.Node` the manipulated node instance.
         speed: ``float`` speed of the Animation in units per second.
         s1: ``float``/``tuple`` the end or start scale, depending on whether
             `s2` is provided.
         s2: see `s1`
-        rel: :class:`~foolysh.scene._node.Node` optional relative node.
+        rel: :class:`~foolysh.scene.node.Node` optional relative node.
     """
     anim = Animation(node)
     anim.set_scale_speed(speed)
@@ -1181,12 +1181,12 @@ def RotationAnimation(node, speed, d1, d2=None, rel=None):
     modifier.
 
     Args:
-        node: :class:`~foolysh.scene._node.Node` the manipulated node instance.
+        node: :class:`~foolysh.scene.node.Node` the manipulated node instance.
         speed: ``float`` speed of the Animation in units per second.
         d1: ``float`` the end or start angle in degrees, depending on whether
             `d2` is provided.
         d2: see `d1`
-        rel: :class:`~foolysh.scene._node.Node` optional relative node.
+        rel: :class:`~foolysh.scene.node.Node` optional relative node.
     """
     anim = Animation(node)
     anim.set_rotation_speed(speed)
@@ -1200,7 +1200,7 @@ def RotationCenterAnimation(node, speed, v1, v2=None):
     modifier.
 
     Args:
-        node: :class:`~foolysh.scene._node.Node` the manipulated node instance.
+        node: :class:`~foolysh.scene.node.Node` the manipulated node instance.
         speed: ``float`` speed of the Animation in units per second.
         v1: :class:`~foolysh.tools.vector2.Vector2` the end or start position of
             the rotation center, depending on whether `v2` is provided.
@@ -1217,12 +1217,12 @@ def DepthAnimation(node, speed, d1, d2=None, rel=None):
     Factory method to create an :class:`Animation` instance with depth modifier.
 
     Args:
-        node: :class:`~foolysh.scene._node.Node` the manipulated node instance.
+        node: :class:`~foolysh.scene.node.Node` the manipulated node instance.
         speed: ``float`` speed of the Animation in units per second.
         d1: ``int`` the end or start depth, depending on whether `d2` is
             provided.
         d2: see `d1`
-        rel: :class:`~foolysh.scene._node.Node` optional relative node.
+        rel: :class:`~foolysh.scene.node.Node` optional relative node.
     """
     anim = Animation(node)
     anim.set_depth_speed(speed)

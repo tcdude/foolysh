@@ -22,7 +22,7 @@ from libcpp.memory cimport unique_ptr
 __author__ = 'Tiziano Bettio'
 __license__ = 'MIT'
 __version__ = '0.1'
-__copyright__ = """Copyright (c) 2019 Tiziano Bettio
+__copyright__ = """Copyright (c) 2020 Tiziano Bettio
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -60,6 +60,9 @@ cdef class Node:
     Scenegraph, such as the :class:`~foolysh.scene.node.ImageNode` class,
     designed to hold one or more images.
 
+    Args:
+        name: ``str`` -> optional custom identifier of the node instance.
+
     .. note::
         A root Node is provided to the user in :class:`foolysh.app.App` and
         other than some very specific/exotic use cases, the user should not have
@@ -67,10 +70,10 @@ cdef class Node:
         automatically by foolysh.
         If you're using a detached Scenegraph, make sure that you call the
         ``traverse()`` method, before accessing properties like
-        ``relative_pos``, ``relative_scale`` et al.
+        ``relative_pos``, ``relative_scale``, ...
     """
 
-    def __cinit__(self):
+    def __cinit__(self, *args, **kwargs):
         from . import SGDH
         self._setup(SGDH)
 
@@ -84,7 +87,19 @@ cdef class Node:
 
     @property
     def name(self):
+        """
+        ``str`` custom identifier of the node instance.
+
+        :setter:
+            ``str`` -> change custom identifier.
+        """
         return self.__name
+
+    @name.setter
+    def name(self, value):
+        if not isinstance(value, str):
+            raise TypeError
+        self.__name = value
 
     @property
     def node_id(self):
@@ -100,14 +115,18 @@ cdef class Node:
         """
         _nodes.pop(deref(self.thisptr).get_id())
 
-    def attach_node(self):
+    def attach_node(self, name='Unnamed Node'):
         """
         Attach a new child node to this Node.
+
+        Args:
+            name: ``str`` -> optional custom identifier of the node instance.
 
         Returns:
             ``Node``
         """
         np = Node.__new__(Node)
+        np.name = name
         self._attach_node(np)
         return np
 
@@ -627,4 +646,63 @@ cdef class Node:
         return f'{type(self).__name__}{str(self)}'
 
     def __str__(self):
-        return f'(id:{self.node_id})'
+        return f'({self.name}:{self.node_id})'
+
+
+cdef class ImageNode(Node):
+    """
+    Node type, that additionally holds a :attr:`image` property to the
+    :class:`Node`.
+    """
+    def __init__(self, name=None, image=None):
+        super(ImageNode, self).__init__(name=name)
+        self._images = []            # type: List[str]
+        self._current_index = -1
+        if image is not None:
+            self.add_image(image)
+
+    @property
+    def image(self):
+        # type: () -> str
+        """The current active image."""
+        if self._current_index == -1:
+            raise RuntimeError('No image added yet.')
+        return self._images[self._current_index]
+
+    @property
+    def index(self):
+        # type: () -> int
+        """The index of the currently active image."""
+        if self._current_index == -1:
+            raise RuntimeError('No image added yet.')
+        return self._current_index
+
+    @index.setter
+    def index(self, value):
+        # type: (Optional[int]) -> None
+        """
+        Loads the first image or optionally the image with index ``item``
+        """
+        if not isinstance(value, int):
+            raise TypeError
+        if not -1 < value < len(self._images):
+            raise IndexError('Invalid index')
+        if value != self._current_index:
+            self._current_index = value
+
+    def add_image(self, image):
+        # type: (str) -> int
+        """
+        Add an image to the ``ImageNode``.
+
+        Args:
+            image: ``str`` -> the image path relative to the asset directory.
+
+        Returns:
+            ``int`` -> the image index.
+        """
+        self._images.append(image)
+        idx = len(self._images) - 1
+        if idx == 0:
+            self.index = idx
+        return idx
