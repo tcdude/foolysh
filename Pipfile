@@ -6,6 +6,8 @@ verify_ssl = true
 [dev-packages]
 pylint = "*"
 pytest = "*"
+sphinx = "*"
+sphinx-rtd-theme = "*"
 
 [packages]
 cython = "*"
