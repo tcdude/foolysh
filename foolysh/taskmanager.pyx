@@ -166,9 +166,9 @@ cdef class TaskManager:
     cpdef Task add_task(
         self,
         name,
-        const double delay,
-        const bool with_dt,
         cb,
+        double delay=0.0,
+        bool with_dt=True,
         args=None,
         kwargs=None
     ):
@@ -177,10 +177,12 @@ cdef class TaskManager:
 
         Args:
             name: ``str`` unique name of the task.
-            delay: ``float`` delay of execution in seconds.
-            with_dt: whether the keyword argument ``dt`` should be added to the
-                call to ``cb`` with the delta time since the last call.
             cb: ``callable`` the callback method to be invoked by the task.
+            delay: ``float`` optional delay of execution in seconds (default =
+                ``0``).
+            with_dt: whether the keyword argument ``dt`` should be added to the
+                call to ``cb`` with the delta time since the last call (default
+                = ``True``).
             args: ``tuple`` of optional positional arguments
             kwargs: ``dict`` of optional keyword arguments
 
