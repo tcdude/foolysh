@@ -6,15 +6,14 @@ import pytest
 
 from foolysh.scene import layout
 from foolysh.scene import node
-from foolysh.scene import nodepath
 from foolysh.scene import viewport
 from foolysh import tools
 from foolysh.tools import aabb
 
 __author__ = 'Tiziano Bettio'
 __license__ = 'MIT'
-__version__ = '0.2'
-__copyright__ = """Copyright (c) 2019 Tiziano Bettio
+__version__ = '0.1'
+__copyright__ = """Copyright (c) 2020 Tiziano Bettio
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
