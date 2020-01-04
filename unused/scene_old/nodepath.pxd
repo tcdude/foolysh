@@ -6,7 +6,7 @@ from ..tools.quadtree cimport Quadtree
 __author__ = 'Tiziano Bettio'
 __license__ = 'MIT'
 __version__ = '0.1'
-__copyright__ = """Copyright (c) 2019 Tiziano Bettio
+__copyright__ = """Copyright (c) 2020 Tiziano Bettio
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
