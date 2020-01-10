@@ -3,7 +3,7 @@ Provides the Config class to handle engine and user specific configuration.
 """
 
 import configparser
-import glob
+import pathlib
 import os
 
 from plyer import storagepath
@@ -35,25 +35,24 @@ SOFTWARE."""
 
 
 def _find_config_file():
-    chk_loc = glob.glob('**/foolysh.ini', recursive=True)
+    chk_loc = pathlib.Path('.').glob('**/foolysh.ini')
+    chk_loc = [str(f) for f in chk_loc]
     if chk_loc:
         if len(chk_loc) == 1:
             return os.path.abspath(chk_loc[0])
         raise ValueError('found multiple "foolysh.ini" files in the '
                          'current working directory.')
-    chk_loc = glob.glob(
-        os.path.join(storagepath.get_application_dir(), '**/foolish.ini'),
-        recursive=True
+    chk_loc = pathlib.Path(storagepath.get_application_dir()).glob(
+        '**/foolish.ini',
     )
+    chk_loc = [str(f) for f in chk_loc]
     if chk_loc:
         if len(chk_loc) == 1:
             return os.path.abspath(chk_loc[0])
         raise ValueError('found multiple "foolysh.ini" files in the '
                          'application directory.')
-    chk_loc = glob.glob(
-        os.path.join(storagepath.get_home_dir(), '**/foolish.ini'),
-        recursive=True
-    )
+    chk_loc = pathlib.Path(storagepath.get_home_dir()).glob('**/foolish.ini')
+    chk_loc = [str(f) for f in chk_loc]
     if chk_loc:
         if len(chk_loc) == 1:
             return os.path.abspath(chk_loc[0])
