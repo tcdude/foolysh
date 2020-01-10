@@ -52,10 +52,6 @@ cdef void _run_callback(
     _kw = <object> kw
     if with_dt:
         _kw['dt'] = dt
-        print('with dt')
-    elif 'dt' in _kw:
-        print('removed dt!!!')
-        _kw.pop('dt')
     (<object> f)(*_a, **_kw)
 
 
