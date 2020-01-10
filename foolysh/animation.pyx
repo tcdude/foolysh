@@ -1241,7 +1241,10 @@ cdef class AnimationManager:
         application and :meth:`AnimationManager.animate` is called each frame
         automatically.
     """
-    cpdef void animate(self, const double dt):
+    def animate(self, dt, **kwargs):
+        self._animate(dt)
+
+    cdef void _animate(self, const double dt):
         """Advance active animations by `dt` seconds."""
         deref(__am).animate(dt)
         self.clean_up()
