@@ -121,7 +121,7 @@ namespace animation {
         double dur_pos, dur_scalex, dur_scaley, dur_angle, dur_center_pos,
             dur_depth;
         std::unique_ptr<scenegraph::Node> node;
-        BlendType blend;
+        BlendType blend = NO_BLEND;
         PositionData pos, center_pos;   // flags: 1, 2
         ScaleData scale;                // flags: 4
         AngleData angle;                // flags: 8
