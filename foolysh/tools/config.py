@@ -73,7 +73,8 @@ def _find_config_file():
     parser = configparser.ConfigParser()
     parser.read_dict(common.DEFAULT_CONFIG)
     fpath = os.path.join(basedir, 'foolysh.ini')
-    parser.write(open(fpath, 'w'))
+    with open(fpath, 'w') as f:
+        parser.write(f)
     return fpath
 
 
@@ -81,7 +82,7 @@ class Config(configparser.ConfigParser):
     def __init__(self, config_file=None, *args, **kwargs):
         super(Config, self).__init__(*args, **kwargs)
         self._cfg_path = config_file or _find_config_file()
-        self.read(open(self._cfg_path))
+        self.read(self._cfg_path)
 
     def save(self):
         try:
