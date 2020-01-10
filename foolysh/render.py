@@ -74,13 +74,12 @@ class HWRenderer(sdl2.ext.TextureSpriteRenderSystem):
             scale_x = nd_scale_x * self._base_scale * self._zoom
             scale_y = nd_scale_y * self._base_scale * self._zoom
             if nd.node_id not in self._sprites or \
-               self._sprites[nd.node_id].scale != scale:
+                 self._sprites[nd.node_id].scale != (scale_x, scale_y):
                 self._load_sprite(nd, (scale_x, scale_y))
             sprites.append(self._sprites[nd.node_id].sprite)
             x, y = nd.relative_pos.x, nd.relative_pos.y
             sprites[-1].x = int(w * x * self._zoom)
             sprites[-1].y = int(w * y * self._zoom)
-            print(sprites[-1].position)
             sprites[-1].angle = nd.relative_angle
             rot_center = nd.rotation_center
             sprites[-1].center = int(rot_center.x * w), int(rot_center.y * w)
