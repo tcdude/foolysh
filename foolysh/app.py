@@ -16,7 +16,7 @@ from .tools import config
 from . import eventhandler
 from . import interval
 from . import render
-from .scene import nodepath
+from .scene import node
 from . import taskmanager
 from . import tools
 from .tools import vector
@@ -44,7 +44,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE."""
 
-SEQUENCE_TYPE = Iterable[Tuple[float, vector.Point, vector.Point]]
+SEQUENCE_TYPE = Iterable[Tuple[float, vector2.Point2, vector2.Point2]]
 FRAME_TIME = 1 / 60
 
 ISANDROID = False
@@ -83,8 +83,7 @@ class App(object):
         self._event_handler = eventhandler.EventHandler()
         self._taskmgr.add_task('___EVENT_HANDLER___', self._event_handler)
         self._font_manager = None  # type: Union[sdl2.ext.FontManager, None]
-        self._world = sdl2.ext.World()
-        self._root = nodepath.NodePath('RootNodePath')
+        self._root = node.Node()
         self._renderer = None
         self._factory = None
         self._window = None
@@ -106,12 +105,6 @@ class App(object):
         # type: () -> bool
         """``bool`` -> ``True`` if platform is android, otherwise ``False``."""
         return ISANDROID
-
-    @property
-    def world(self):
-        # type: () -> sdl2.ext.World
-        """``sdl2.ext.World``"""
-        return self._world
 
     @property
     def renderer(self):
@@ -164,10 +157,11 @@ class App(object):
         """
         Returns ``True`` when ``entity`` is currently in a sequence.
 
-        :param entity: ``sdl2.ext.Entity``
-        :return: ``bool``
-        """
-        return True if str(entity) in self._sequences else False
+    @property
+    def root(self):
+        # type: () -> node.Node
+        """Root:class:`foolysh.scene.node.Node`."""
+        return self._root
 
     def toast(self, message):
         # type: (str) -> None
@@ -384,7 +378,7 @@ class App(object):
             being executed by an event callback.
 
         .. warning::
-            Do not override this method, override ``App.on_quit()`` instead!!!
+            Do not override this method, override :meth:`App.on_quit` instead!!!
 
         """
         if not self._running:
@@ -392,12 +386,13 @@ class App(object):
         self.on_quit()
         self._running = False
         if blocking:
-            while not self._clean_exit:
+            while not self.__clean_exit:
                 time.sleep(0.01)
 
     def on_quit(self):
         """
-        Method to override to perform cleanup when ``App.quit()`` gets called.
+        Method to override to perform cleanup when :meth:`App.quit()` gets
+        called.
         """
         pass
 
@@ -422,7 +417,6 @@ class App(object):
             sdl2.ext.TEXTURE,
             renderer=self._renderer
         )
-        self.world.add_system(self._renderer)
 
     def __del__(self):
         """Make sure, ``sdl2.ext.quit()`` gets called latest on destruction."""
