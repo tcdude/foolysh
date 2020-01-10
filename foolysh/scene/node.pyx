@@ -550,10 +550,7 @@ cdef class Node:
         """
         Scale, relative to the root node.
         """
-        s = self._get_relative_scale()
-        if s[0] == s[1]:
-            return s[0]
-        return s
+        return self._get_relative_scale()
 
     cdef tuple _get_relative_scale(self):
         cdef Scale s = deref(self.thisptr).get_relative_scale()
@@ -607,7 +604,7 @@ cdef class Node:
         coordinate system.
 
         :setter:
-            ``bool`` -> True if scaled distances should be used or False, if
+            ``bool`` -> Tr<double> args[0][0]ue if scaled distances should be used or False, if
             world space distances should be used for this Node.
         """
         return deref(self.thisptr).get_distance_relative()
@@ -654,6 +651,9 @@ cdef class ImageNode(Node):
     Node type, that additionally holds a :attr:`image` property to the
     :class:`Node`.
     """
+    cdef list _images
+    cdef int _current_index
+
     def __init__(self, name=None, image=None):
         super(ImageNode, self).__init__(name=name)
         self._images = []            # type: List[str]
