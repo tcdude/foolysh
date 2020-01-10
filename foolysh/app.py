@@ -296,15 +296,14 @@ class App(object):
         self._clock.tick()
         try:
             self._running = True
-            dt = 0.0
             while self._running:
                 self.task_manager()
                 self.renderer.render()
                 self._clock.tick()
-                nt = self._clock.get_dt()
+                st = max(0.0, FRAME_TIME - self._clock.get_dt())
                 self._frames += 1
-                time.sleep(max(0.0, FRAME_TIME - (nt - dt)))
-                dt = nt
+                if st:
+                    time.sleep(st)
         except (KeyboardInterrupt, SystemExit):
             self.quit(blocking=False)
         finally:
