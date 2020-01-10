@@ -47,6 +47,12 @@ cdef class Vector2:
             if len(args) == 1:
                 if isinstance(args[0], (int, float)):
                     self.thisptr.reset(new _Vector2(<double> args[0]))
+                elif isinstance(args[0], tuple) and len(args[0]) == 2 \
+                     and isinstance(args[0][0], (int, float)) \
+                     and isinstance(args[0][1], (int, float)):
+                    self.thisptr.reset(
+                        new _Vector2(<double> args[0][0], <double> args[0][1])
+                    ) 
                 else:
                     raise TypeError
             elif len(args) == 2 and isinstance(args[0], (int, float)) \
