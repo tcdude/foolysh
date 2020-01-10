@@ -1,7 +1,7 @@
 """
 Provides the SpriteLoader class, that handles loading and caching of assets.
 """
-import glob
+import pathlib
 import hashlib
 import os
 from typing import Optional
@@ -12,7 +12,7 @@ from PIL import Image
 from sdl2.ext import SpriteFactory
 from sdl2.ext import TextureSprite
 
-from . import vector
+from . import vector2
 
 __author__ = 'Tiziano Bettio'
 __license__ = 'MIT'
@@ -74,7 +74,8 @@ class SpriteLoader(object):
         self.refresh_assets()
 
     def refresh_assets(self):
-        paths = glob.glob(self.asset_dir + '/**/*.*')
+        paths = pathlib.Path(self.asset_dir).glob('**/*.*')
+        paths = [str(f) for f in paths]
         paths = [
             s[s.find(self.asset_dir) + len(self.asset_dir):] for s in paths
         ]
@@ -82,6 +83,12 @@ class SpriteLoader(object):
             paths = [s[1:] for s in paths]
         self._assets = {}
         for k in paths:
+            try:
+                _ = Image.open(os.path.join(self.asset_dir, k))
+            except UnidentifiedImageError:
+                continue
+            except IsADirectoryError:
+                continue
             self._assets[k] = Asset(k, self)
 
     def load_image(self, asset_path, scale=1.0):
@@ -89,7 +96,11 @@ class SpriteLoader(object):
         if asset_path in self._assets:
             return self.factory.from_image(self._assets[asset_path][scale])
         raise ValueError(f'asset_path must be a valid path relative to '
-                         f'"{self.asset_dir}" without leading "/"')
+                         f'"{self.asset_dir}" without leading "/". Got '
+                         f'"{asset_path}".')
+
+    def valid_asset(self, asset_path):
+        return asset_path in self._assets
 
     def load_composed_image(self, images):
         pass
@@ -108,14 +119,15 @@ class Asset(object):
         self.cache_prefix = cache_name[2:]
         self.cache_suffix = '.' + relative_path.split('.')[-1]
         self.abs_path = os.path.join(parent.asset_dir, relative_path)
-        self._img_size = vector.Point(Image.open(self.abs_path).size)
+        self._img_size = vector2.Point2(Image.open(self.abs_path).size)
         self._cached_items = {}
         self.parent = parent
         self.refresh_cached()
 
     def refresh_cached(self):
         self._cached_items = {}
-        files = glob.glob(self.cache_sub_dir + f'/{self.cache_prefix}*')
+        files = pathlib.Path(self.cache_sub_dir).glob(f'{self.cache_prefix}*')
+        files = [str(f) for f in files]
         for file in files:
             res = file.split('.')[-2][-10:]
             res = int(res[:5]), int(res[5:])
