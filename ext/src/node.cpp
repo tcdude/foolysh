@@ -685,6 +685,7 @@ void scenegraph::Node::
 set_pos(Node& other, const double v) {
     _check_dirty(*this, other);
     Vector2 offset = other.get_relative_pos() - get_relative_pos() + v;
+    offset += get_pos();
     set_pos(offset);
 }
 
@@ -711,6 +712,7 @@ set_pos(Node& other, const double x, const double y) {
     _check_dirty(*this, other);
     Vector2 offset = other.get_relative_pos() - get_relative_pos();
     offset += Vector2(x, y);
+    offset += get_pos();
     set_pos(offset);
 }
 
@@ -735,6 +737,7 @@ void scenegraph::Node::
 set_pos(Node& other, Vector2& p) {
     _check_dirty(*this, other);
     Vector2 offset = other.get_relative_pos() - get_relative_pos() + p;
+    offset += get_pos();
     set_pos(offset);
 }
 
