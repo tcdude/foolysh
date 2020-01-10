@@ -193,7 +193,10 @@ cdef class AnimationBase:
         else:
             raise NotImplementedError
 
-    cdef char status(self):
+    def status(self):
+        return self._status()
+
+    cdef char _status(self):
         if isinstance(self, Interval):
             try:
                 return deref(__am).get_interval_status(self._id)
@@ -1252,23 +1255,10 @@ cdef class AnimationManager:
     cdef void clean_up(self):
         cdef char c
         cdef list r = []
-        for k in __ivals:
-            c = __ivals[k].status()
-            if c == 0 or c == 4:
-                r.append(k)
-        for k in r:
-            __ivals.pop(k)
-
-        for k in __anims:
-            c = __anims[k].status()
-            if c == 0 or c == 4:
-                r.append(k)
-        for k in r:
-            __anims.pop(k)
-
-        for k in __seqs:
-            c = __seqs[k].status()
-            if c == 0 or c == 4:
-                r.append(k)
-        for k in r:
-            __seqs.pop(k)
+        for d in (__ivals, __anims, __seqs):
+            for k in d:
+                c = d[k].status()
+                if c == 0 or c == 4:
+                    r.append(k)
+            for k in r:
+                d.pop(k)
