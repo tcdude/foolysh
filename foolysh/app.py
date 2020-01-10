@@ -13,13 +13,16 @@ import sdl2
 import sdl2.ext
 
 from .tools import config
+from . import animation
 from . import eventhandler
 from . import interval
 from . import render
 from .scene import node
 from . import taskmanager
 from . import tools
-from .tools import vector
+from .tools import vector2
+from .tools import spriteloader
+from .tools import clock
 
 __author__ = 'Tiziano Bettio'
 __license__ = 'MIT'
@@ -59,6 +62,20 @@ except ImportError:
     android = Android()
 
 
+class AppClock(object):
+    def __init__(self, clock):
+        self._clock = clock
+
+    def get_dt(self):
+        return self._clock.get_dt()
+
+    def get_time(self):
+        return self._clock.get_time()
+
+    def tick(self):
+        raise RuntimeError('Calls to this method are blocked.')
+
+
 class App(object):
     # noinspection PyUnresolvedReferences
     """
@@ -81,7 +98,7 @@ class App(object):
         self._cfg = config.Config(config_file)
         self._taskmgr = taskmanager.TaskManager()
         self._event_handler = eventhandler.EventHandler()
-        self._taskmgr.add_task('___EVENT_HANDLER___', self._event_handler)
+        self._taskmgr.add_task('__EVENT_HANDLER__', self._event_handler)
         self._font_manager = None  # type: Union[sdl2.ext.FontManager, None]
         self._root = node.Node()
         self._renderer = None
@@ -90,15 +107,28 @@ class App(object):
         self._window_title = window_title
         self._screen_size = (0, 0)
         self._running = False
-        self._mouse_pos = vector.Point()
-        self._taskmgr.add_task('___MOUSE_WATCHER___', self.__update_mouse__)
-        self._sequences = {}
-        self._anim_callbacks = {}
-        self._taskmgr.add_task('___ANIMATION___', self.__animation__)
+        self._mouse_pos = vector2.Point2()
+        self._taskmgr.add_task('__MOUSE_WATCHER__', self.__update_mouse)
+        self._animation_manager = animation.AnimationManager()
+        self._taskmgr.add_task('__ANIMATION__', self._animation_manager.animate)
         self._frames = 0
         self._fps = 0.0
+        self._clock = clock.Clock()
+        self._app_clock = AppClock(self._clock)
         self._init_sdl()
-        self._clean_exit = False
+        self.__clean_exit = False
+        self._sprite_loader = spriteloader.SpriteLoader(
+            self._factory,
+            self._cfg['base']['asset_dir']
+                if 'asset_dir' in self._cfg['base'] else '.',
+            self._cfg['base']['cache_dir']
+                if 'cache_dir' in self._cfg['base'] else None
+        )
+        self._renderer.root_node = self._root
+        apr = self._cfg['base']['asset_pixel_ratio']
+        self._renderer.asset_pixel_ratio = int(apr)
+        self._renderer.sprite_loader = self._sprite_loader
+
 
     @property
     def isandroid(self):
@@ -143,19 +173,11 @@ class App(object):
         """``Tuple[int, int]``"""
         return self._screen_size
 
-    def load_sprite(self, fpath):
-        # type: (str) -> sdl2.ext.TextureSprite
-        """
-        Load a sprite from ``fpath``.
-        :param fpath: ``str`` -> path of an image file.
-        :return: ``sdl2.ext.TextureSprite``
-        """
-        return tools.load_sprite(self._factory, fpath)
-
-    def entity_in_sequences(self, entity):
-        # type: (sdl2.ext.Entity) -> bool
-        """
-        Returns ``True`` when ``entity`` is currently in a sequence.
+    @property
+    def clock(self):
+        # type: () -> AppClock
+        """:class:`foolysh.tools.clock.Clock` object of the running app."""
+        return self._app_clock
 
     @property
     def root(self):
@@ -255,7 +277,7 @@ class App(object):
         return sprite
 
     # noinspection PyUnusedLocal
-    def __update_mouse__(self, *args, **kwargs):
+    def __update_mouse(self, *args, **kwargs):
         # type: (...) -> None
         """Updates ``App.mouse_pos``."""
         if not self._running:
@@ -264,107 +286,31 @@ class App(object):
         _ = sdl2.mouse.SDL_GetMouseState(ctypes.byref(x), ctypes.byref(y))
         self._mouse_pos.x, self._mouse_pos.y = x.value, y.value
 
-    # noinspection PyUnusedLocal
-    def __animation__(self, dt, *args, **kwargs):
-        # type: (float, ..., ...) -> None
-        """Animation Task."""
-        if not self._running or not self._sequences:
-            return
-        for k in self._sequences:
-            sequence = self._sequences[k]
-            rt = sequence[0].step(dt)
-            if rt > 0:
-                continue
-            while rt <= 0:
-                sequence.pop(0)
-                if len(sequence):
-                    rt = sequence[0].step(dt)
-                else:
-                    break
-        p = []
-        e = []
-        for k in self._sequences:
-            if not self._sequences[k]:
-                p.append(k)
-                if k in self._anim_callbacks:
-                    e.append(k)
-        for k in p:
-            self._sequences.pop(k)
-        for k in e:
-            f, args, kwargs = self._anim_callbacks.pop(k)
-            f(*args, **kwargs)
-
-    def position_sequence(
-            self,
-            entity,         # type: sdl2.ext.Entity
-            depth,          # type: int
-            sequence,       # type: SEQUENCE_TYPE
-            callback=None,  # type: Optional[callable]
-            *args,
-            **kwargs
-    ):
-        # type: (...) -> None
-        """
-        Add a sequence of PositionInterval for ``entity``.
-
-        :param entity: ``sdl2.ext.Entity``
-        :param depth: ``int`` -> depth during the sequence.
-        :param sequence: ``Iterable[Tuple[float, Point, Point]]`` -> iterable of
-            3-tuple containing (``duration``, ``start_pos``, ``end_pos``).
-        :param callback: Optional ``callable`` -> callable to execute after the
-            sequence is completed.
-        :param args: Optional positional arguments to pass to ``callback``.
-        :param kwargs: Optional keyword arguments to pass to ``callback``.
-        """
-        seq = []
-        for duration, start_pos, end_pos in sequence:
-            seq.append(interval.PositionInterval(
-                entity,
-                depth,
-                duration,
-                start_pos,
-                end_pos
-            ))
-        k = str(entity)
-        if k in self._sequences:
-            if k in self._anim_callbacks:
-                f, args, kwargs = self._anim_callbacks[k]
-                f(*args, **kwargs)
-        self._sequences[k] = seq
-        if callback is not None:
-            self._anim_callbacks[k] = (callback, args, kwargs)
-
-    def stop_all_position_sequences(self):
-        """Stops all position sequences and calls the respective callbacks."""
-        for k in self._anim_callbacks:
-            f, args, kwargs = self._anim_callbacks[k]
-            f(*args, **kwargs)
-        self._sequences = {}
-        self._anim_callbacks = {}
-
     def run(self):
         """
-        Run the main loop until ``App.quit()`` gets called.
+        Run the main loop until :meth:`App.quit` gets called.
 
         .. warning::
-            Make sure to call ``super(YourClassName, self).run()`` if you
-            override this method!!!
+            Make sure to call ``super().run()`` if you override this method
+            at the end of your implementation.
         """
+        self._clock.tick()
         try:
             self._running = True
-            st = time.perf_counter()
+            dt = 0.0
             while self._running:
-                self.task_manager(st)
-                self.world.process()
+                self.task_manager()
+                self.renderer.render()
+                self._clock.tick()
+                nt = self._clock.get_dt()
                 self._frames += 1
-                nt = time.perf_counter()
-                time.sleep(max(0.0, FRAME_TIME - (nt - st)))
-                st = nt
+                time.sleep(max(0.0, FRAME_TIME - (nt - dt)))
+                dt = nt
         except (KeyboardInterrupt, SystemExit):
             self.quit(blocking=False)
         finally:
             sdl2.ext.quit()
-            self._clean_exit = True
+            self.__clean_exit = True
 
     # noinspection PyUnusedLocal
     def quit(self, blocking=True, event=None):
@@ -420,5 +366,5 @@ class App(object):
 
     def __del__(self):
         """Make sure, ``sdl2.ext.quit()`` gets called latest on destruction."""
-        if not self._clean_exit:
+        if not self.__clean_exit:
             sdl2.ext.quit()
