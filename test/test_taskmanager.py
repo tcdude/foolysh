@@ -40,9 +40,9 @@ def test_taskmanager():
     tm = taskmanager.TaskManager()
     tm.add_task(
         'test_task_no_dt',
+        callback_no_dt,
         0,
         False,
-        callback_no_dt,
         ('a', 'b'),
         {'kwarg_a': 'kwa'}
     )
@@ -58,9 +58,9 @@ def test_timing():
     tm = taskmanager.TaskManager()
     tm.add_task(
         'counter_task',
+        callback,
         0.02,
         False,
-        callback,
         (cb_counter, )
     )
     start_time = time.perf_counter()
@@ -77,9 +77,9 @@ def test_pause_resume():
     tm = taskmanager.TaskManager()
     task = tm.add_task(
         'pause_test',
+        callback,
         0,
         False,
-        callback,
         (cb_counter, )
     )
     tm()
