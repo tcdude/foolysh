@@ -30,9 +30,9 @@ SOFTWARE."""
 # Default configuration
 
 DEFAULT_CONFIG = {
-    'foolysh-engine': {
+    'base': {
         'asset_pixel_ratio': 1080,
-        'logical_screen_size_multiplier': 1
+        'logical_screen_size_multiplier': 1,
     }
 }
 
