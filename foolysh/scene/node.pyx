@@ -213,6 +213,11 @@ cdef class Node:
                 coordinates to the specified values.
             * ``tuple`` of ``Node`` and one of the combinations above -> sets
                 the respective coordinates, relative to the specified Node.
+
+        .. warning::
+            The returned :class:`foolysh.tools.vector2.Vector2` is a copy of the
+            current pos. Any changes made to it are independent from the
+            internally stored position!            
         """
         return self._get_pos()
 
@@ -237,6 +242,63 @@ cdef class Node:
                 raise TypeError
         else:
             raise TypeError
+
+    @property
+    def x(self):
+        """
+        X-coordinate of this Node, relative to its parent.
+
+        :setter:
+            * ``float``/``int`` -> sets the x-coordinate to the specified value.
+        """
+        return self._get_pos().x
+
+    @x.setter
+    def x(self, value):
+        if not isinstance(value, (float, int)):
+            raise TypeError
+        p = self._get_pos()
+        self._set_pos(value, p.y)
+
+    @property
+    def y(self):
+        """
+        Y-coordinate of this Node, relative to its parent.
+
+        :setter:
+            * ``float``/``int`` -> sets the y-coordinate to the specified value.
+        """
+        return self._get_pos().y
+
+    @y.setter
+    def y(self, value):
+        if not isinstance(value, (float, int)):
+            raise TypeError
+        p = self._get_pos()
+        self._set_pos(p.x, value)
+
+    @property
+    def xy(self):
+        """
+        XY-coordinates ``tuple`` of this Node, relative to its parent.
+
+        :setter:
+            * ``Tuple[int/float, int/float]`` -> sets the xy-coordinates to the 
+                specified value.
+        """
+        p = self._get_pos()
+        return p.x, p.y
+
+    @xy.setter
+    def xy(self, value):
+        if not isinstance(value, tuple):
+            raise TypeError
+        if len(value) != 2:
+            raise ValueError('Expected tuple of length 2.')
+        x, y = value
+        if not isinstance(x, (float, int)) or not isinstance(y, (float, int)):
+            raise TypeError
+        self._set_pos(x, y)
 
     def get_pos_node(self, other):
         """
