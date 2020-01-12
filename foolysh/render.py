@@ -7,6 +7,8 @@ from typing import Dict
 from typing import Tuple
 
 import sdl2.ext
+from sdl2 import rect
+from sdl2 import render
 
 from .tools import common
 from .scene import node
@@ -65,8 +67,13 @@ class HWRenderer(sdl2.ext.TextureSpriteRenderSystem):
         if self._dirty:
             self._update_view_aabb()
 
-        sprites = []
         w = min(self.window_size)
+        xo = int(self._view_pos.x * w * self._zoom)
+        yo = int(self._view_pos.y * w * self._zoom)
+        r = rect.SDL_Rect(0, 0, 0, 0)
+        rcopy = render.SDL_RenderCopyEx
+        renderer = self.sdlrenderer
+        self._renderer.clear()
         for nd in self.root_node.query(self._view_aabb):
             if not isinstance(nd, node.ImageNode):
                 continue
@@ -76,18 +83,21 @@ class HWRenderer(sdl2.ext.TextureSpriteRenderSystem):
             if nd.node_id not in self._sprites or \
                  self._sprites[nd.node_id].scale != (scale_x, scale_y):
                 self._load_sprite(nd, (scale_x, scale_y))
-            sprites.append(self._sprites[nd.node_id].sprite)
-            x, y = nd.relative_pos.x, nd.relative_pos.y
-            sprites[-1].x = int(w * x * self._zoom)
-            sprites[-1].y = int(w * y * self._zoom)
-            sprites[-1].angle = nd.relative_angle
+            sprite = self._sprites[nd.node_id].sprite
+            rel_pos = nd.relative_pos
+            r.x = xo + int(w * rel_pos.x * self._zoom)
+            r.y = yo + int(w * rel_pos.y * self._zoom)
+            r.w, r.h = sprite.size
             rot_center = nd.rotation_center
-            sprites[-1].center = int(rot_center.x * w), int(rot_center.y * w)
-        x = int(self._view_pos.x * w * self._zoom)
-        y = int(self._view_pos.y * w * self._zoom)
+            center = rect.SDL_Point(
+                int(rot_center.x * w), 
+                int(rot_center.y * w)
+            )
+            if rcopy(renderer, sprite.texture, None, r, nd.relative_angle,
+                     center, sprite.flip) == -1:
+                raise SDLError()
         self._dirty = False
-        self._renderer.clear()
-        super().render(sprites, x=x, y=y)
+        render.SDL_RenderPresent(renderer)
 
     def _load_sprite(self, nd, scale):
         self._sprites[nd.node_id] = Sprite(
