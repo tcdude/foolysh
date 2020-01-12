@@ -155,6 +155,7 @@ class SpriteLoader(object):
             os.makedirs(self.cache_dir)
         self.resize_type = resize_type
         self._assets = {}
+        self._sprite_cache = {}
         self.refresh_assets()
 
     def refresh_assets(self):
@@ -178,10 +179,13 @@ class SpriteLoader(object):
     def load_image(self, asset_path, scale=1.0):
         # type: (str, Optional[SCALE]) -> TextureSprite
         if asset_path in self._assets:
-            return _image2sprite(
-                Image.open(self._assets[asset_path][scale]),
-                self.factory
-            )
+            k = self._assets[asset_path][scale]
+            if not k in self._sprite_cache:
+                self._sprite_cache[k] = _image2sprite(
+                    Image.open(k),
+                    self.factory
+                )
+            return self._sprite_cache[k]
         raise ValueError(f'asset_path must be a valid path relative to '
                          f'"{self.asset_dir}" without leading "/". Got '
                          f'"{asset_path}".')
