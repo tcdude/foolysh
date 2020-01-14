@@ -82,8 +82,8 @@ cdef class Node:
         # Reference the Node instance to keep it alive
         _nodes[deref(self.thisptr).get_id()] = self
 
-    def __init__(self, name='Unnamed Node', *args, **kwargs):
-        self.__name = name
+    def __init__(self, name=None, *args, **kwargs):
+        self.__name = name or 'Unnamed Node'
 
     @property
     def name(self):
@@ -217,7 +217,7 @@ cdef class Node:
         .. warning::
             The returned :class:`foolysh.tools.vector2.Vector2` is a copy of the
             current pos. Any changes made to it are independent from the
-            internally stored position!            
+            internally stored position!
         """
         return self._get_pos()
 
@@ -283,7 +283,7 @@ cdef class Node:
         XY-coordinates ``tuple`` of this Node, relative to its parent.
 
         :setter:
-            * ``Tuple[int/float, int/float]`` -> sets the xy-coordinates to the 
+            * ``Tuple[int/float, int/float]`` -> sets the xy-coordinates to the
                 specified value.
         """
         p = self._get_pos()
@@ -710,8 +710,7 @@ cdef class Node:
 
 cdef class ImageNode(Node):
     """
-    Node type, that additionally holds a :attr:`image` property to the
-    :class:`Node`.
+    Node type, that additionally holds a :attr:`image` property.
     """
     cdef list _images
     cdef int _current_index
