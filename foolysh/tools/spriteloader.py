@@ -9,6 +9,8 @@ from typing import Tuple
 from typing import Union
 
 from PIL import Image
+from PIL import ImageDraw
+from PIL import ImageFont
 from PIL import UnidentifiedImageError
 from sdl2.ext import SpriteFactory
 from sdl2.ext import TextureSprite
@@ -43,7 +45,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE."""
 
-SCALE = Union[float, Tuple[float, float]]
+COLOR = Tuple[int, int, int, int]
 
 
 # This function is adapted directly from the PySDL2 package, to perform the
@@ -156,6 +158,7 @@ class SpriteLoader(object):
         self.resize_type = resize_type
         self._assets = {}
         self._sprite_cache = {}
+        self._font_cache = {}
         self.refresh_assets()
 
     def refresh_assets(self):
@@ -168,6 +171,9 @@ class SpriteLoader(object):
             paths = [s[1:] for s in paths]
         self._assets = {}
         for k in paths:
+            if k[-3:].lower() in ('ttf, otf'):
+                self._assets[k] = os.path.join(self.asset_dir, k)
+                continue
             try:
                 _ = Image.open(os.path.join(self.asset_dir, k))
             except UnidentifiedImageError:
@@ -180,13 +186,47 @@ class SpriteLoader(object):
         # type: (str, Optional[SCALE]) -> TextureSprite
         if asset_path in self._assets:
             k = self._assets[asset_path][scale]
-            if not k in self._sprite_cache:
+            if k not in self._sprite_cache:
                 self._sprite_cache[k] = _image2sprite(
                     Image.open(k),
                     self.factory
                 )
             return self._sprite_cache[k]
         raise ValueError(f'asset_path must be a valid path relative to '
+                         f'"{self.asset_dir}" without leading "/". Got '
+                         f'"{asset_path}".')
+
+    def load_text(self, text, font, size, color, align, spacing, multiline):
+        # type: (str, str, int, COLOR, str, int, bool) -> TextureSprite
+        if font in self._assets:
+            k = f'{text}{font}{size}{color}{align}{spacing}{multiline}'
+            if k not in self._sprite_cache:
+                fk = (font, size)
+                if fk not in self._font_cache:
+                    self._font_cache[fk] = ImageFont.truetype(
+                        os.path.join(self.asset_dir, font),
+                        size
+                    )
+                img = Image.new(
+                    'RGBA',
+                    self._font_cache[fk].getsize_multiline(
+                        text,
+                        spacing=spacing
+                    ) if multiline else self._font_cache[fk].getsize(text)
+                )
+                d = ImageDraw.Draw(img)
+                f = d.multiline_text if multiline else d.text
+                f(
+                    (0, 0),
+                    text,
+                    color,
+                    self._font_cache[fk],
+                    spacing=spacing,
+                    align=align
+                )
+                self._sprite_cache[k] = _image2sprite(img, self.factory)
+            return self._sprite_cache[k]
+        raise ValueError(f'font must be a valid path relative to '
                          f'"{self.asset_dir}" without leading "/". Got '
                          f'"{asset_path}".')
 

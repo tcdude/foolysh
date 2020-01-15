@@ -767,3 +767,163 @@ cdef class ImageNode(Node):
         if idx == 0:
             self.index = idx
         return idx
+
+
+cdef class TextNode(Node):
+    """
+    Node type, that additionally holds a text property.
+    """
+    cdef str _text
+    cdef str _font
+    cdef float _font_size
+    cdef tuple _color
+    cdef str _align
+    cdef int _spacing
+    cdef bint _multiline
+
+    def __init__(
+        self,
+        name=None,
+        text='',
+        font=None,
+        size=0.05,
+        color=(255, 255, 255, 255),
+        align='left',
+        spacing=0,
+        multiline=False
+    ):
+        super(TextNode, self).__init__(name=name)
+        self._text = ''
+        self._font = ''
+        self._font_size = 0
+        self._color = ()
+        self._align = ''
+        self._spacing = 0
+        self._multiline = False
+        self.text = text
+        self.font = font or ''
+        self.font_size = size
+        self.color = color
+        self.align = align
+        self.spacing = spacing
+        self.multiline = multiline
+
+    @property
+    def text(self):
+        # type: () -> str
+        """The current text."""
+        return self._text
+
+    @text.setter
+    def text(self, value):
+        # type: (str) -> None
+        if not isinstance(value, str):
+            raise TypeError
+        self._text = value
+
+    @property
+    def font(self):
+        # type: () -> str
+        """The current asset path to the font."""
+        if self._font == '':
+            raise RuntimeError('No font set yet.')
+        return self._font
+
+    @font.setter
+    def font(self, value):
+        # type: (str) -> None
+        if not isinstance(value, str):
+            raise TypeError
+        self._font = value
+
+    @property
+    def font_size(self):
+        # type: () -> float
+        """The font size."""
+        return self._font_size
+
+    @font_size.setter
+    def font_size(self, value):
+        # type: (float) -> None
+        if not isinstance(value, (float, int)):
+            raise TypeError
+        if value <= 0.0:
+            raise ValueError('Expected positive, non zero float.')
+        self._font_size = float(value)
+
+    @property
+    def color(self):
+        # type: () -> Tuple[int, int, int, int]
+        """
+        The text color.
+
+        :setter:
+            * ``int`` -> sets all components of the color to the specified
+                value.
+            * 3-/4-``tuple`` of ``int`` -> RGB or RGBA color. The alpha value
+                defaults to 255, if RGB only is provided.
+        """
+        return self._color
+
+    @color.setter
+    def color(self, value):
+        # type: (Union[int, Tuple[int, ...]]) -> None
+        if isinstance(value, int):
+            value = (value, ) * 3 + (255, )
+        elif isinstance(value, tuple):
+            components = len(value)
+            if components == 3:
+                value = value + (255, )
+            elif components != 4:
+                raise ValueError('Expected tuple of length 3 or 4.')
+            for c in value:
+                if not isinstance(c, int):
+                    raise TypeError
+                if not 0 <= c <= 255:
+                    raise ValueError('Expected value in range (0..255).')
+        else:
+            raise TypeError
+        self._color = value
+
+    @property
+    def align(self):
+        # type: () -> str
+        """If `multiline`, align the text 'left', 'center', 'right'."""
+        return self._align
+
+    @align.setter
+    def align(self, value):
+        # type: (str) -> None
+        if not isinstance(value, str):
+            raise TypeError
+        if value not in ('left', 'center', 'right'):
+            raise ValueError('Expected one of "left", "center", "right".')
+        self._align = value
+
+    @property
+    def spacing(self):
+        # type: () -> float
+        """If `multiline`, spacing between lines."""
+        return self._spacing
+
+    @spacing.setter
+    def spacing(self, value):
+        # type: (float) -> None
+        if not isinstance(value, (int, float)):
+            raise TypeError
+        if value < 0:
+            raise ValueError('Expected positive float.')
+        self._spacing = value
+
+    @property
+    def multiline(self):
+        # type: () -> bool
+        """Whether the text is multi or single line"""
+        return self._multiline
+
+    @multiline.setter
+    def multiline(self, value):
+        # type: (bool) -> None
+        if not isinstance(value, bool):
+            raise TypeError
+        self._multiline = value

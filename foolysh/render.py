@@ -40,12 +40,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE."""
 
 
-Sprite = namedtuple('Sprite', ['image', 'scale', 'sprite'])
+Sprite = namedtuple('Sprite', ['scale', 'sprite'])
 
 
 class HWRenderer(sdl2.ext.TextureSpriteRenderSystem):
     """
-    Provides rendering of the scenegraph. 
+    Provides rendering of the scenegraph.
     """
     def __init__(self, window):
         super(HWRenderer, self).__init__(window)
@@ -75,7 +75,7 @@ class HWRenderer(sdl2.ext.TextureSpriteRenderSystem):
         renderer = self.sdlrenderer
         self._renderer.clear()
         for nd in self.root_node.query(self._view_aabb):
-            if not isinstance(nd, node.ImageNode):
+            if not isinstance(nd, (node.ImageNode, node.TextNode)):
                 continue
             nd_scale_x, nd_scale_y = nd.relative_scale
             scale_x = nd_scale_x * self._base_scale * self._zoom
@@ -90,7 +90,7 @@ class HWRenderer(sdl2.ext.TextureSpriteRenderSystem):
             r.w, r.h = sprite.size
             rot_center = nd.rotation_center
             center = rect.SDL_Point(
-                int(rot_center.x * w), 
+                int(rot_center.x * w),
                 int(rot_center.y * w)
             )
             if rcopy(renderer, sprite.texture, None, r, nd.relative_angle,
@@ -100,11 +100,25 @@ class HWRenderer(sdl2.ext.TextureSpriteRenderSystem):
         render.SDL_RenderPresent(renderer)
 
     def _load_sprite(self, nd, scale):
-        self._sprites[nd.node_id] = Sprite(
-            nd.image, 
-            scale,
-            self.sprite_loader.load_image(nd.image, scale) 
-        )
+        if isinstance(nd, node.ImageNode):
+            self._sprites[nd.node_id] = Sprite(
+                scale,
+                self.sprite_loader.load_image(nd.image, scale)
+            )
+        else:
+            size = int(nd.font_size * scale[1] * min(self.window_size))
+            self._sprites[nd.node_id] = Sprite(
+                scale,
+                self.sprite_loader.load_text(
+                    nd.text,
+                    nd.font,
+                    size,
+                    nd.color,
+                    nd.align,
+                    nd.spacing,
+                    nd.multiline
+                )
+            )
         x, y = self._sprites[nd.node_id].sprite.size
         nd.size = (
             x / self._base_scale * self._asset_pixel_ratio,
@@ -119,9 +133,9 @@ class HWRenderer(sdl2.ext.TextureSpriteRenderSystem):
         else:
             w, h = 0.5 * (w / h) / self._zoom, 0.5 / self._zoom
         self._view_aabb = aabb.AABB(
-            self._view_pos.x + w, 
+            self._view_pos.x + w,
             self._view_pos.y + h,
-            w, 
+            w,
             h
         )
 
@@ -155,7 +169,7 @@ class HWRenderer(sdl2.ext.TextureSpriteRenderSystem):
         if value <= 0:
             raise ValueError('Expected non zero, positive int.')
         if value != self._asset_pixel_ratio:
-            self._base_scale = min(self._window.size) / value 
+            self._base_scale = min(self._window.size) / value
             self._asset_pixel_ratio = value
             self._dirty = True
 
