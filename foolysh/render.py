@@ -60,6 +60,7 @@ class HWRenderer(sdl2.ext.TextureSpriteRenderSystem):
         self._view_aabb = aabb.AABB(0.0, 0.0, 0.0, 0.0)
         self._dirty = True
         self._sprites = {}  # type: Dict[int, Sprite]
+        self._texts = {}  # type: Dict[int, str]
 
     def render(self):
         if not self.root_node.traverse() and not self._dirty:
@@ -80,10 +81,14 @@ class HWRenderer(sdl2.ext.TextureSpriteRenderSystem):
             nd_scale_x, nd_scale_y = nd.relative_scale
             scale_x = nd_scale_x * self._base_scale * self._zoom
             scale_y = nd_scale_y * self._base_scale * self._zoom
-            if nd.node_id not in self._sprites or \
-                 self._sprites[nd.node_id].scale != (scale_x, scale_y):
+            n_id = nd.node_id
+            if n_id not in self._sprites or \
+                 self._sprites[n_id].scale != (scale_x, scale_y) or \
+                 (hasattr(nd, 'text') and self._texts[n_id] != nd.text):
                 self._load_sprite(nd, (scale_x, scale_y))
-            sprite = self._sprites[nd.node_id].sprite
+                if hasattr(nd, 'text'):
+                    self._texts[n_id] = nd.text
+            sprite = self._sprites[n_id].sprite
             rel_pos = nd.relative_pos
             r.x = xo + int(w * rel_pos.x * self._zoom)
             r.y = yo + int(w * rel_pos.y * self._zoom)
