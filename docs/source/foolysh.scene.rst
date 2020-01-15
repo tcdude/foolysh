@@ -20,14 +20,6 @@ foolysh.scene.node module
    :undoc-members:
    :show-inheritance:
 
-foolysh.scene.viewport module
------------------------------
-
-.. automodule:: foolysh.scene.viewport
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 
 Module contents
 ---------------
