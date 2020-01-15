@@ -9,6 +9,7 @@ venv
 **/foolysh/**/*.cpp
 **/foolysh/**/*.html
 .vscode/
+update_docs.sh
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
