@@ -190,6 +190,7 @@ namespace animation {
 
         // Control
         void reset();
+        void loop(const bool l) {}
         double get_playback_pos();
         int node_id();
 
