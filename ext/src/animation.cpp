@@ -663,14 +663,13 @@ _update(const double prog) {
 
     // depth
     if (ad.depth.active) {
+        const int target_depth = static_cast<int>(
+            (ad.depth.end - ad.depth.start) * prog + ad.depth.start + 0.5);
         if (ad.depth.relative_node) {
-            ad.node->set_depth(
-                *ad.depth.relative_node,
-                (ad.depth.end - ad.depth.start) * prog + ad.depth.start);
+            ad.node->set_depth(*ad.depth.relative_node, target_depth);
         }
         else {
-            ad.node->set_depth(
-                (ad.depth.end - ad.depth.start) * prog + ad.depth.start);
+            ad.node->set_depth(target_depth);
         }
     }
 }
@@ -1047,16 +1046,14 @@ step(const double dt, ActiveAnimationMap& aam) {
             }
             else {
                 double prog = lerp(ad.playback_pos, ad.dur_depth, ad.blend);
+                const int target_depth = static_cast<int>(
+                    (ad.depth.end - ad.depth.start) * prog + ad.depth.start
+                    + 0.5);
                 if (ad.depth.relative_node) {
-                    ad.node->set_depth(
-                        *ad.depth.relative_node,
-                        (ad.depth.end - ad.depth.start) * prog + ad.depth.start
-                    );
+                    ad.node->set_depth(*ad.depth.relative_node, target_depth);
                 }
                 else {
-                    ad.node->set_depth(
-                        (ad.depth.end - ad.depth.start) * prog + ad.depth.start
-                    );
+                    ad.node->set_depth(target_depth);
                 }
             }
         }
