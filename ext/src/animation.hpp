@@ -191,7 +191,6 @@ namespace animation {
         // Control
         void reset();
         double get_playback_pos();
-        std::unique_ptr<AnimationBase> get_copy();
         int node_id();
 
     protected:
@@ -242,7 +241,7 @@ namespace animation {
      */
     class Sequence : public AnimationBase {
     public:
-        void append(AnimationBase& a);
+        void append(std::unique_ptr<AnimationBase>& a);
         void reset();
         double step(const double dt, ActiveAnimationMap& aam);
         void loop(const bool l);
@@ -270,11 +269,8 @@ namespace animation {
      *      3 = playing
      *      4 = conflict
      */
-    typedef std::unique_ptr<AnimationType> AnimationTypePtr;
-    typedef std::unique_ptr<Sequence> SequencePtr;
     typedef ActiveAnimationMap AnimationStatusMap;
-    typedef std::map<int, AnimationTypePtr, std::greater<int>> AnimationMap;
-    typedef std::map<int, SequencePtr, std::greater<int>> SequenceMap;
+    typedef std::map<int, std::unique_ptr<AnimationBase>, std::greater<int>> AnimationMap;
 
     /**
      * Interface to control animation. Provides methods to create Interval,
@@ -288,6 +284,7 @@ namespace animation {
         Interval& get_interval(const int i_id);
         Animation& get_animation(const int a_id);
         Sequence& get_sequence(const int s_id);
+        std::unique_ptr<AnimationBase>& get_animation_base_ptr(const int i_id);
         void remove_interval(const int i_id);
         void remove_animation(const int a_id);
         void remove_sequence(const int s_id);
@@ -306,17 +303,15 @@ namespace animation {
         char get_interval_status(const int i_id);
         char get_animation_status(const int a_id);
         char get_sequence_status(const int s_id);
+        void append(const int s_id, const int a_id);
 
         void animate(const double dt);
 
     private:
         ActiveAnimationMap _aam;
         AnimationMap _anims;
-        SequenceMap _seqs;
         AnimationStatusMap _anim_status;
-        AnimationStatusMap _seq_status;
         int _max_anim = -1;
-        int _max_seq = -1;
     };
 
 }  // namespace animation

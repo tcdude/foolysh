@@ -1017,6 +1017,7 @@ cdef class Sequence(AnimationBase):
         if not isinstance(loop, bool):
             raise TypeError
         self._loop = loop
+        self._set_loop(loop)
 
     cdef void _set_loop(self, bint l):
         try:
@@ -1030,19 +1031,22 @@ cdef class Sequence(AnimationBase):
         Append a :class:`AnimationBase` instance to this sequence.
         """
         if isinstance(item, Interval):
-            deref(__am).get_sequence(self._id).append(
-                deref(__am).get_interval(item._id)
-            )
+            self._append_interval(item)
         elif isinstance(item, Animation):
-            deref(__am).get_sequence(self._id).append(
-                deref(__am).get_animation(item._id)
-            )
+            self._append_animation(item)
         elif isinstance(item, Sequence):
-            deref(__am).get_sequence(self._id).append(
-                deref(__am).get_sequence(item._id)
-            )
+            self._append_sequence(item)
         else:
             raise TypeError
+
+    cdef void _append_interval(self, Interval item):
+        deref(__am).append(self._id, item._id)
+
+    cdef void _append_animation(self, Animation item):
+        deref(__am).append(self._id, item._id)
+
+    cdef void _append_sequence(self, Sequence item):
+        deref(__am).append(self._id, item._id)
 
     def __iadd__(self, other):
         self.append(other)

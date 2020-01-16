@@ -526,70 +526,6 @@ get_playback_pos() {
 /**
  *
  */
-std::unique_ptr<animation::AnimationBase> animation::AnimationType::
-get_copy() {
-    std::unique_ptr<AnimationType> ptr;
-    ptr.reset(new AnimationType());
-    AnimationData& ad = _get_animation_data(_animation_id);
-    AnimationData& ptr_ad = ptr->_get_animation_data(ptr->_animation_id);
-
-    ptr_ad.duration = ad.duration;
-    ptr_ad.playback_pos = ad.playback_pos;
-    ptr_ad.pos_speed = ad.pos_speed;
-    ptr_ad.scale_speed = ad.scale_speed;
-    ptr_ad.rotation_speed = ad.rotation_speed;
-    ptr_ad.rotation_center_speed = ad.rotation_center_speed;
-    ptr_ad.depth_speed = ad.depth_speed;
-    ptr_ad.dur_pos = ad.dur_pos;
-    ptr_ad.dur_scalex = ad.dur_scalex;
-    ptr_ad.dur_scaley = ad.dur_scaley;
-    ptr_ad.dur_angle = ad.dur_angle;
-    ptr_ad.dur_center_pos = ad.dur_center_pos;
-    ptr_ad.dur_depth = ad.dur_depth;
-    ptr_ad.node.reset(new scenegraph::Node(*ad.node));
-    ptr_ad.blend = ad.blend;
-    ptr_ad.pos.start = ad.pos.start;
-    ptr_ad.pos.end = ad.pos.end;
-    if (ad.pos.relative_node) {
-		ptr_ad.pos.relative_node.reset(new scenegraph::Node(
-					*ad.pos.relative_node));
-	}
-    ptr_ad.pos.active = ad.pos.active;
-    ptr_ad.pos.has_start = ad.pos.has_start;
-    ptr_ad.center_pos.start = ad.center_pos.start;
-    ptr_ad.center_pos.end = ad.center_pos.end;
-    ptr_ad.center_pos.active = ad.center_pos.active;
-    ptr_ad.center_pos.has_start = ad.center_pos.has_start;
-    ptr_ad.scale.start = ad.scale.start;
-    ptr_ad.scale.end = ad.scale.end;
-    if (ad.scale.relative_node) {
-		ptr_ad.scale.relative_node.reset(new scenegraph::Node(
-					*ad.scale.relative_node));
-	}
-    ptr_ad.scale.active = ad.scale.active;
-    ptr_ad.scale.has_start = ad.scale.has_start;
-    ptr_ad.angle.start = ad.angle.start;
-    ptr_ad.angle.end = ad.angle.end;
-    if (ad.angle.relative_node) {
-	    ptr_ad.angle.relative_node.reset(new scenegraph::Node(
-	    			*ad.angle.relative_node));
-	}
-    ptr_ad.angle.active = ad.angle.active;
-    ptr_ad.angle.has_start = ad.angle.has_start;
-    ptr_ad.depth.start = ad.depth.start;
-    ptr_ad.depth.end = ad.depth.end;
-    if (ad.depth.relative_node) {
-    	ptr_ad.depth.relative_node.reset(new scenegraph::Node(
-    				*ad.depth.relative_node));
-    }
-    ptr_ad.depth.active = ad.depth.active;
-    ptr_ad.depth.has_start = ad.depth.has_start;
-    return ptr;
-}
-
-/**
- *
- */
 char animation::AnimationType::
 active_animations() {
     return 0;
@@ -744,7 +680,63 @@ _update(const double prog) {
  */
 std::unique_ptr<animation::AnimationBase> animation::Interval::
 get_copy() {
-    return AnimationType::get_copy();
+    std::unique_ptr<Interval> ptr;
+    ptr.reset(new Interval());
+    AnimationData& ad = _get_animation_data(_animation_id);
+    AnimationData& ptr_ad = ptr->_get_animation_data(ptr->_animation_id);
+
+    ptr_ad.duration = ad.duration;
+    ptr_ad.playback_pos = ad.playback_pos;
+    ptr_ad.pos_speed = ad.pos_speed;
+    ptr_ad.scale_speed = ad.scale_speed;
+    ptr_ad.rotation_speed = ad.rotation_speed;
+    ptr_ad.rotation_center_speed = ad.rotation_center_speed;
+    ptr_ad.depth_speed = ad.depth_speed;
+    ptr_ad.dur_pos = ad.dur_pos;
+    ptr_ad.dur_scalex = ad.dur_scalex;
+    ptr_ad.dur_scaley = ad.dur_scaley;
+    ptr_ad.dur_angle = ad.dur_angle;
+    ptr_ad.dur_center_pos = ad.dur_center_pos;
+    ptr_ad.dur_depth = ad.dur_depth;
+    ptr_ad.node.reset(new scenegraph::Node(*ad.node));
+    ptr_ad.blend = ad.blend;
+    ptr_ad.pos.start = ad.pos.start;
+    ptr_ad.pos.end = ad.pos.end;
+    if (ad.pos.relative_node) {
+		ptr_ad.pos.relative_node.reset(new scenegraph::Node(
+					*ad.pos.relative_node));
+	}
+    ptr_ad.pos.active = ad.pos.active;
+    ptr_ad.pos.has_start = ad.pos.has_start;
+    ptr_ad.center_pos.start = ad.center_pos.start;
+    ptr_ad.center_pos.end = ad.center_pos.end;
+    ptr_ad.center_pos.active = ad.center_pos.active;
+    ptr_ad.center_pos.has_start = ad.center_pos.has_start;
+    ptr_ad.scale.start = ad.scale.start;
+    ptr_ad.scale.end = ad.scale.end;
+    if (ad.scale.relative_node) {
+		ptr_ad.scale.relative_node.reset(new scenegraph::Node(
+					*ad.scale.relative_node));
+	}
+    ptr_ad.scale.active = ad.scale.active;
+    ptr_ad.scale.has_start = ad.scale.has_start;
+    ptr_ad.angle.start = ad.angle.start;
+    ptr_ad.angle.end = ad.angle.end;
+    if (ad.angle.relative_node) {
+	    ptr_ad.angle.relative_node.reset(new scenegraph::Node(
+	    			*ad.angle.relative_node));
+	}
+    ptr_ad.angle.active = ad.angle.active;
+    ptr_ad.angle.has_start = ad.angle.has_start;
+    ptr_ad.depth.start = ad.depth.start;
+    ptr_ad.depth.end = ad.depth.end;
+    if (ad.depth.relative_node) {
+    	ptr_ad.depth.relative_node.reset(new scenegraph::Node(
+    				*ad.depth.relative_node));
+    }
+    ptr_ad.depth.active = ad.depth.active;
+    ptr_ad.depth.has_start = ad.depth.has_start;
+    return ptr;
 }
 
 /**
@@ -1080,7 +1072,63 @@ step(const double dt, ActiveAnimationMap& aam) {
  */
 std::unique_ptr<animation::AnimationBase> animation::Animation::
 get_copy() {
-    return AnimationType::get_copy();
+    std::unique_ptr<Animation> ptr;
+    ptr.reset(new Animation());
+    AnimationData& ad = _get_animation_data(_animation_id);
+    AnimationData& ptr_ad = ptr->_get_animation_data(ptr->_animation_id);
+
+    ptr_ad.duration = ad.duration;
+    ptr_ad.playback_pos = ad.playback_pos;
+    ptr_ad.pos_speed = ad.pos_speed;
+    ptr_ad.scale_speed = ad.scale_speed;
+    ptr_ad.rotation_speed = ad.rotation_speed;
+    ptr_ad.rotation_center_speed = ad.rotation_center_speed;
+    ptr_ad.depth_speed = ad.depth_speed;
+    ptr_ad.dur_pos = ad.dur_pos;
+    ptr_ad.dur_scalex = ad.dur_scalex;
+    ptr_ad.dur_scaley = ad.dur_scaley;
+    ptr_ad.dur_angle = ad.dur_angle;
+    ptr_ad.dur_center_pos = ad.dur_center_pos;
+    ptr_ad.dur_depth = ad.dur_depth;
+    ptr_ad.node.reset(new scenegraph::Node(*ad.node));
+    ptr_ad.blend = ad.blend;
+    ptr_ad.pos.start = ad.pos.start;
+    ptr_ad.pos.end = ad.pos.end;
+    if (ad.pos.relative_node) {
+		ptr_ad.pos.relative_node.reset(new scenegraph::Node(
+					*ad.pos.relative_node));
+	}
+    ptr_ad.pos.active = ad.pos.active;
+    ptr_ad.pos.has_start = ad.pos.has_start;
+    ptr_ad.center_pos.start = ad.center_pos.start;
+    ptr_ad.center_pos.end = ad.center_pos.end;
+    ptr_ad.center_pos.active = ad.center_pos.active;
+    ptr_ad.center_pos.has_start = ad.center_pos.has_start;
+    ptr_ad.scale.start = ad.scale.start;
+    ptr_ad.scale.end = ad.scale.end;
+    if (ad.scale.relative_node) {
+		ptr_ad.scale.relative_node.reset(new scenegraph::Node(
+					*ad.scale.relative_node));
+	}
+    ptr_ad.scale.active = ad.scale.active;
+    ptr_ad.scale.has_start = ad.scale.has_start;
+    ptr_ad.angle.start = ad.angle.start;
+    ptr_ad.angle.end = ad.angle.end;
+    if (ad.angle.relative_node) {
+	    ptr_ad.angle.relative_node.reset(new scenegraph::Node(
+	    			*ad.angle.relative_node));
+	}
+    ptr_ad.angle.active = ad.angle.active;
+    ptr_ad.angle.has_start = ad.angle.has_start;
+    ptr_ad.depth.start = ad.depth.start;
+    ptr_ad.depth.end = ad.depth.end;
+    if (ad.depth.relative_node) {
+    	ptr_ad.depth.relative_node.reset(new scenegraph::Node(
+    				*ad.depth.relative_node));
+    }
+    ptr_ad.depth.active = ad.depth.active;
+    ptr_ad.depth.has_start = ad.depth.has_start;
+    return ptr;
 }
 
 /**
@@ -1117,8 +1165,8 @@ active_animations() {
  *
  */
 void animation::Sequence::
-append(animation::AnimationBase& a) {
-    _v.push_back(a.get_copy());
+append(std::unique_ptr<animation::AnimationBase>& a) {
+    _v.push_back(a->get_copy());
 
     // Make sure no sequences with loop = true are appended.
     _v[_v.size() - 1]->loop(false);
@@ -1146,6 +1194,7 @@ step(const double dt, ActiveAnimationMap& aam) {
     }
     double rdt = 1.0;
     while (rdt >= 0.0) {
+        ActiveAnimationMap tmp = aam;
         rdt = _v[_active]->step(dt, aam);
         if (rdt < 0.0) {
             break;
@@ -1162,6 +1211,7 @@ step(const double dt, ActiveAnimationMap& aam) {
         }
 
         _v[_active]->reset();
+        aam = tmp;
     }
     return rdt;
 }
@@ -1183,7 +1233,7 @@ get_copy() {
     ptr.reset(new Sequence());
     Sequence& sq = static_cast<Sequence&>(*ptr);
     for (auto it = _v.begin(); it != _v.end(); ++it) {
-        sq.append((AnimationBase&) *it);
+        sq.append(*it);
     }
     return ptr;
 }
@@ -1196,7 +1246,7 @@ get_copy() {
 int animation::AnimationManager::
 new_interval() {
     ++_max_anim;
-    _anims[_max_anim] = std::unique_ptr<AnimationType>(new Interval());
+    _anims[_max_anim] = std::unique_ptr<AnimationBase>(new Interval());
     _anim_status[_max_anim] = 0;
     return _max_anim;
 }
@@ -1207,7 +1257,7 @@ new_interval() {
 int animation::AnimationManager::
 new_animation() {
     ++_max_anim;
-    _anims[_max_anim] = std::unique_ptr<AnimationType>(new Animation());
+    _anims[_max_anim] = std::unique_ptr<AnimationBase>(new Animation());
     _anim_status[_max_anim] = 0;
     return _max_anim;
 }
@@ -1217,10 +1267,10 @@ new_animation() {
  */
 int animation::AnimationManager::
 new_sequence() {
-    ++_max_seq;
-    _seqs[_max_seq] = std::unique_ptr<Sequence>(new Sequence());
-    _seq_status[_max_seq] = 0;
-    return _max_seq;
+    ++_max_anim;
+    _anims[_max_anim] = std::unique_ptr<AnimationBase>(new Sequence());
+    _anim_status[_max_anim] = 0;
+    return _max_anim;
 }
 
 /**
@@ -1250,10 +1300,21 @@ get_animation(const int a_id) {
  */
 animation::Sequence& animation::AnimationManager::
 get_sequence(const int s_id) {
-    if (_seqs.find(s_id) == _seqs.end()) {
+    if (_anims.find(s_id) == _anims.end()) {
         throw std::range_error("Specified id is not an active Sequence");
     }
-    return *_seqs[s_id];
+    return (Sequence&) *_anims[s_id];
+}
+
+/**
+ * Return a AnimationBase unique_ptr reference for the specified id.
+ */
+std::unique_ptr<animation::AnimationBase>& animation::AnimationManager::
+get_animation_base_ptr(const int i_id) {
+    if (_anims.find(i_id) == _anims.end()) {
+        throw std::range_error("Specified id is not an active Interval");
+    }
+    return _anims[i_id];
 }
 
 /**
@@ -1284,11 +1345,11 @@ remove_animation(const int a_id) {
  */
 void animation::AnimationManager::
 remove_sequence(const int s_id) {
-    if (_seqs.find(s_id) == _seqs.end()) {
+    if (_anims.find(s_id) == _anims.end()) {
         throw std::range_error("Specified id is not an active Sequence");
     }
-    _seq_status.erase(s_id);
-    _seqs.erase(s_id);
+    _anim_status.erase(s_id);
+    _anims.erase(s_id);
 }
 
 /**
@@ -1324,9 +1385,9 @@ play_animation(const int a_id) {
  */
 void animation::AnimationManager::
 play_sequence(const int s_id) {
-    auto search = _seq_status.find(s_id);
-    if (search != _seq_status.end()) {
-        _seq_status[s_id] = 2;
+    auto search = _anim_status.find(s_id);
+    if (search != _anim_status.end()) {
+        _anim_status[s_id] = 2;
     }
     else {
         throw std::range_error("Specified id is not an active Sequence");
@@ -1372,12 +1433,12 @@ pause_animation(const int a_id) {
  */
 void animation::AnimationManager::
 pause_sequence(const int s_id) {
-    auto search = _seq_status.find(s_id);
-    if (search != _seq_status.end()) {
-        if (_seq_status[s_id] != 3) {
+    auto search = _anim_status.find(s_id);
+    if (search != _anim_status.end()) {
+        if (_anim_status[s_id] != 3) {
             throw std::logic_error("Unable to pause Sequence, not playing");
         }
-        _seq_status[s_id] = 1;
+        _anim_status[s_id] = 1;
     }
     else {
         throw std::range_error("Specified id is not an active Sequence");
@@ -1423,12 +1484,12 @@ resume_animation(const int a_id) {
  */
 void animation::AnimationManager::
 resume_sequence(const int s_id) {
-    auto search = _seq_status.find(s_id);
-    if (search != _seq_status.end()) {
-        if (_seq_status[s_id] != 1) {
+    auto search = _anim_status.find(s_id);
+    if (search != _anim_status.end()) {
+        if (_anim_status[s_id] != 1) {
             throw std::logic_error("Unable to resume Sequence, not paused");
         }
-        _seq_status[s_id] = 3;
+        _anim_status[s_id] = 3;
     }
     else {
         throw std::range_error("Specified id is not an active Sequence");
@@ -1468,9 +1529,9 @@ stop_animation(const int a_id) {
  */
 void animation::AnimationManager::
 stop_sequence(const int s_id) {
-    auto search = _seq_status.find(s_id);
-    if (search != _seq_status.end()) {
-        _seq_status[s_id] = 0;
+    auto search = _anim_status.find(s_id);
+    if (search != _anim_status.end()) {
+        _anim_status[s_id] = 0;
     }
     else {
         throw std::range_error("Specified id is not an active Sequence");
@@ -1507,11 +1568,22 @@ get_animation_status(const int a_id) {
  */
 char animation::AnimationManager::
 get_sequence_status(const int s_id) {
-	auto search = _seq_status.find(s_id);
-	if (search == _seq_status.end()) {
+	auto search = _anim_status.find(s_id);
+	if (search == _anim_status.end()) {
 		throw std::range_error("Specified id is not an active Sequence.");
 	}
-	return _seq_status[s_id];
+	return _anim_status[s_id];
+}
+
+/*
+ * Append to Sequence by id.
+ */
+void animation::AnimationManager::
+append(const int s_id, const int a_id) {
+    if (s_id == a_id) {
+        throw std::runtime_error("Cannot append sequence to itself.");
+    }
+    get_sequence(s_id).append(get_animation_base_ptr(a_id));
 }
 
 /**
@@ -1535,24 +1607,5 @@ animate(const double dt) {
 			// TODO: Log conflict
 			continue;
 		}
-	}
-	// Sequences
-	for (auto it = _seqs.begin(); it != _seqs.end(); ++it) {
-		if (_seq_status[it->first] < 2) {
-			continue;
-		}
-		else if (_seq_status[it->first] == 2) {
-			it->second->reset();
-			_seq_status[it->first] = 3;
-		}
-		const double r = it->second->step(dt, _aam);
-		if (r == -2.0) {
-			_seq_status[it->first] = 4;
-			// TODO: Log conflict
-			continue;
-		}
-        else if (r >= 0.0) {
-            _seq_status[it->first] = 0;
-        }
 	}
 }

@@ -4,6 +4,7 @@ Provides Cython header for the Animation System.
 """
 
 from libcpp cimport bool
+from libcpp.memory cimport unique_ptr
 from .scene.cppnode cimport Node
 from .scene.cppnode cimport Scale
 from .tools.cppvector2 cimport Vector2
@@ -108,7 +109,7 @@ cdef extern from "src/animation.hpp" namespace "animation":
         void add_depth(int, int, Node)
 
     cdef cppclass Sequence(AnimationBase):
-        void append(AnimationBase&)
+        pass
 
     cdef cppclass AnimationManager:
         int new_interval()
@@ -135,5 +136,6 @@ cdef extern from "src/animation.hpp" namespace "animation":
         char get_interval_status(const int) except +
         char get_animation_status(const int) except +
         char get_sequence_status(const int) except +
+        void append(const int, const int)
 
         void animate(const double)
