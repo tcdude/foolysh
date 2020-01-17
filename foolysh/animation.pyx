@@ -1053,7 +1053,7 @@ cdef class Sequence(AnimationBase):
         return self
 
 
-def PosInterval(node, duration, v1, v2=None, rel=None):
+def PosInterval(node, duration, v1, v2=None, rel=None, blend=None):
     """
     Factory method to create an :class:`Interval` instance with position
     modifier.
@@ -1065,14 +1065,18 @@ def PosInterval(node, duration, v1, v2=None, rel=None):
             depending on whether `v2` is provided.
         v2: see `v1`
         rel: :class:`~foolysh.scene.node.Node` optional relative node.
+        blend: :class:`~foolysh.animation.BlendType` optional blending.
     """
-    ival = Interval(node)
+    if blend is None:
+        ival = Interval(node)
+    else:
+        ival = Interval(node, blend=blend)
     ival.set_duration(duration)
     ival.add_pos(v1, v2, rel)
     return ival
 
 
-def ScaleInterval(node, duration, s1, s2=None, rel=None):
+def ScaleInterval(node, duration, s1, s2=None, rel=None, blend=None):
     """
     Factory method to create an :class:`Interval` instance with scale modifier.
 
@@ -1083,14 +1087,18 @@ def ScaleInterval(node, duration, s1, s2=None, rel=None):
             `s2` is provided.
         s2: see `s1`
         rel: :class:`~foolysh.scene.node.Node` optional relative node.
+        blend: :class:`~foolysh.animation.BlendType` optional blending.
     """
-    ival = Interval(node)
+    if blend is None:
+        ival = Interval(node)
+    else:
+        ival = Interval(node, blend=blend)
     ival.set_duration(duration)
     ival.add_scale(s1, s2, rel)
     return ival
 
 
-def RotationInterval(node, duration, d1, d2=None, rel=None):
+def RotationInterval(node, duration, d1, d2=None, rel=None, blend=None):
     """
     Factory method to create an :class:`Interval` instance with rotation
     modifier.
@@ -1102,14 +1110,18 @@ def RotationInterval(node, duration, d1, d2=None, rel=None):
             `d2` is provided.
         d2: see `d1`
         rel: :class:`~foolysh.scene.node.Node` optional relative node.
+        blend: :class:`~foolysh.animation.BlendType` optional blending.
     """
-    ival = Interval(node)
+    if blend is None:
+        ival = Interval(node)
+    else:
+        ival = Interval(node, blend=blend)
     ival.set_duration(duration)
     ival.add_rotation(d1, d2, rel)
     return ival
 
 
-def RotationCenterInterval(node, duration, v1, v2=None):
+def RotationCenterInterval(node, duration, v1, v2=None, blend=None):
     """
     Factory method to create an :class:`Interval` instance with rotation center
     modifier.
@@ -1120,14 +1132,18 @@ def RotationCenterInterval(node, duration, v1, v2=None):
         v1: :class:`~foolysh.tools.vector2.Vector2` the end or start position of
             the rotation center, depending on whether `v2` is provided.
         v2: see `v1`
+        blend: :class:`~foolysh.animation.BlendType` optional blending.
     """
-    ival = Interval(node)
+    if blend is None:
+        ival = Interval(node)
+    else:
+        ival = Interval(node, blend=blend)
     ival.set_duration(duration)
     ival.add_rotation_center(v1, v2)
     return ival
 
 
-def DepthInterval(node, duration, d1, d2=None, rel=None):
+def DepthInterval(node, duration, d1, d2=None, rel=None, blend=None):
     """
     Factory method to create an :class:`Interval` instance with depth modifier.
 
@@ -1138,14 +1154,19 @@ def DepthInterval(node, duration, d1, d2=None, rel=None):
             provided.
         d2: see `d1`
         rel: :class:`~foolysh.scene.node.Node` optional relative node.
+        blend: :class:`~foolysh.animation.BlendType` optional blending.
     """
-    ival = Interval(node)
+    if blend is None:
+        ival = Interval(node)
+    else:
+        ival = Interval(node, blend=blend)
+
     ival.set_duration(duration)
     ival.add_depth(d1, d2, rel)
     return ival
 
 
-def PosAnimation(node, speed, v1, v2=None, rel=None):
+def PosAnimation(node, speed, v1, v2=None, rel=None, blend=None):
     """
     Factory method to create an :class:`Animation` instance with position
     modifier.
@@ -1157,14 +1178,18 @@ def PosAnimation(node, speed, v1, v2=None, rel=None):
             depending on whether `v2` is provided.
         v2: see `v1`
         rel: :class:`~foolysh.scene.node.Node` optional relative node.
+        blend: :class:`~foolysh.animation.BlendType` optional blending.
     """
-    anim = Animation(node)
+    if blend is None:
+        anim = Animation(node)
+    else:
+        anim = Animation(node, blend=blend)
     anim.set_pos_speed(speed)
     anim.add_pos(v1, v2, rel)
     return anim
 
 
-def ScaleAnimation(node, speed, s1, s2=None, rel=None):
+def ScaleAnimation(node, speed, s1, s2=None, rel=None, blend=None):
     """
     Factory method to create an :class:`Animation` instance with scale modifier.
 
@@ -1175,14 +1200,18 @@ def ScaleAnimation(node, speed, s1, s2=None, rel=None):
             `s2` is provided.
         s2: see `s1`
         rel: :class:`~foolysh.scene.node.Node` optional relative node.
+        blend: :class:`~foolysh.animation.BlendType` optional blending.
     """
-    anim = Animation(node)
+    if blend is None:
+        anim = Animation(node)
+    else:
+        anim = Animation(node, blend=blend)
     anim.set_scale_speed(speed)
     anim.add_scale(s1, s2, rel)
     return anim
 
 
-def RotationAnimation(node, speed, d1, d2=None, rel=None):
+def RotationAnimation(node, speed, d1, d2=None, rel=None, blend=None):
     """
     Factory method to create an :class:`Animation` instance with rotation
     modifier.
@@ -1194,14 +1223,18 @@ def RotationAnimation(node, speed, d1, d2=None, rel=None):
             `d2` is provided.
         d2: see `d1`
         rel: :class:`~foolysh.scene.node.Node` optional relative node.
+        blend: :class:`~foolysh.animation.BlendType` optional blending.
     """
-    anim = Animation(node)
+    if blend is None:
+        anim = Animation(node)
+    else:
+        anim = Animation(node, blend=blend)
     anim.set_rotation_speed(speed)
     anim.add_rotation(d1, d2, rel)
     return anim
 
 
-def RotationCenterAnimation(node, speed, v1, v2=None):
+def RotationCenterAnimation(node, speed, v1, v2=None, blend=None):
     """
     Factory method to create an :class:`Animation` instance with rotation center
     modifier.
@@ -1212,14 +1245,18 @@ def RotationCenterAnimation(node, speed, v1, v2=None):
         v1: :class:`~foolysh.tools.vector2.Vector2` the end or start position of
             the rotation center, depending on whether `v2` is provided.
         v2: see `v1`
+        blend: :class:`~foolysh.animation.BlendType` optional blending.
     """
-    anim = Animation(node)
+    if blend is None:
+        anim = Animation(node)
+    else:
+        anim = Animation(node, blend=blend)
     anim.set_rotation_center_speed(speed)
     anim.add_rotation_center(v1, v2)
     return anim
 
 
-def DepthAnimation(node, speed, d1, d2=None, rel=None):
+def DepthAnimation(node, speed, d1, d2=None, rel=None, blend=None):
     """
     Factory method to create an :class:`Animation` instance with depth modifier.
 
@@ -1230,8 +1267,12 @@ def DepthAnimation(node, speed, d1, d2=None, rel=None):
             provided.
         d2: see `d1`
         rel: :class:`~foolysh.scene.node.Node` optional relative node.
+        blend: :class:`~foolysh.animation.BlendType` optional blending.
     """
-    anim = Animation(node)
+    if blend is None:
+        anim = Animation(node)
+    else:
+        anim = Animation(node, blend=blend)
     anim.set_depth_speed(speed)
     anim.add_depth(d1, d2, rel)
     return anim
