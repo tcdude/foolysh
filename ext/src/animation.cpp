@@ -898,9 +898,9 @@ step(const double dt, ActiveAnimationMap& aam) {
     if (ad.playback_pos == -1.0) {
         ad.playback_pos = 0.0;
     }
-    else if (ad.playback_pos >= ad.duration) {
-        return ad.playback_pos - ad.duration;
-    }
+    // else if (ad.playback_pos >= ad.duration) {
+    //     return ad.playback_pos - ad.duration;
+    // }
     int node_id = ad.node->get_id();
     char active_anim = active_animations();
     auto search = aam.find(node_id);
@@ -974,7 +974,7 @@ step(const double dt, ActiveAnimationMap& aam) {
             }
             else {
                 double prog = lerp(ad.playback_pos, ad.dur_scalex, ad.blend);
-                new_scale.sx = (ad.scale.end.sx - ad.scale.end.sx) * prog
+                new_scale.sx = (ad.scale.end.sx - ad.scale.start.sx) * prog
                     + ad.scale.start.sx;
             }
         }
@@ -984,7 +984,7 @@ step(const double dt, ActiveAnimationMap& aam) {
             }
             else {
                 double prog = lerp(ad.playback_pos, ad.dur_scaley, ad.blend);
-                new_scale.sx = (ad.scale.end.sy - ad.scale.end.sy) * prog
+                new_scale.sy = (ad.scale.end.sy - ad.scale.start.sy) * prog
                     + ad.scale.start.sy;
             }
         }

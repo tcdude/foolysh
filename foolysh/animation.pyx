@@ -877,6 +877,10 @@ cdef class Interval(AnimationType):
     def __iadd__(self, other):
         if not isinstance(other, type(self)):
             raise TypeError
+        self._iadd(other)
+        return self
+
+    cdef void _iadd(self, Interval other):
         if other._node.node_id != self._node.node_id:
             raise ValueError('Not the same Node')
         if 'pos' in other._modifiers:
@@ -889,7 +893,6 @@ cdef class Interval(AnimationType):
             self.add_rotation_center(*other._modifiers['rotation_center'])
         if 'depth' in other._modifiers:
             self.add_depth(*other._modifiers['depth'])
-        return self
 
 
 cdef class Animation(AnimationType):
@@ -965,6 +968,10 @@ cdef class Animation(AnimationType):
     def __iadd__(self, other):
         if not isinstance(other, type(self)):
             raise TypeError
+        self._iadd(other)
+        return self
+
+    cdef void _iadd(self, Animation other):
         if other._node.node_id != self._node.node_id:
             raise ValueError('Not the same Node')
         if 'pos' in other._modifiers:
@@ -982,7 +989,6 @@ cdef class Animation(AnimationType):
         if 'depth' in other._modifiers:
             self.add_depth(*other._modifiers['depth'])
             self._depth_speed = other._depth_speed
-        return self
 
 
 cdef class Sequence(AnimationBase):
