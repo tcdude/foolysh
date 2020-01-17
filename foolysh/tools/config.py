@@ -91,3 +91,7 @@ class Config(configparser.ConfigParser):
             if e.errno == 13:
                 return False
             raise e
+
+    @property
+    def cfg_path(self):
+        return self._cfg_path

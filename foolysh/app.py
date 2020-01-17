@@ -89,12 +89,14 @@ class App(object):
         ...         super(MyApp, self).__init__('My App Title')
         ...
         >>> MyApp().run()  # Opens the App and runs, until the App is closed.
-
-        Todo:
-            * Replace PySDL2 Component System with SceneGraph
         """
     def __init__(self, window_title='foolysh engine', config_file=None):
         self._cfg = config.Config(config_file)
+        if 'base' not in self._cfg:
+            raise ValueError(
+                f'Section "base" missing in loaded config_file '
+                f'("{self._cfg.cfg_path}")'
+            )
         self._taskmgr = taskmanager.TaskManager()
         self._event_handler = eventhandler.EventHandler()
         self._taskmgr.add_task('__EVENT_HANDLER__', self._event_handler)
@@ -348,12 +350,22 @@ class App(object):
             sdl2.SDL_GetCurrentDisplayMode(0, dm)
             self._screen_size = (dm.w, dm.h)
             sdl2.ext.Window.DEFAULTFLAGS = sdl2.SDL_WINDOW_FULLSCREEN
+            self._window = sdl2.ext.Window(
+                self._window_title,
+                size=self._screen_size
+            )
         else:
-            self._screen_size = (720, 1280)
-        self._window = sdl2.ext.Window(
-            self._window_title,
-            size=self._screen_size
-        )
+            if 'window_size' in self._cfg['base']:
+                sx, sy = self._cfg['base']['window_size'].split('x')
+                size = int(sx), int(sy)
+            else:
+                size = (720, 1280)
+            self._screen_size = size
+            self._window = sdl2.ext.Window(
+                self._window_title,
+                size=self._screen_size,
+                flags=sdl2.SDL_WINDOW_RESIZABLE
+            )
         self._window.show()
         android.remove_presplash()
         self._renderer = render.HWRenderer(self.window)
