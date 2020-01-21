@@ -86,17 +86,23 @@ class HWRenderer(sdl2.ext.TextureSpriteRenderSystem):
             scale_x = nd_scale_x * self._base_scale * self._zoom
             scale_y = nd_scale_y * self._base_scale * self._zoom
             n_id = nd.node_id
-            if n_id not in self._sprites or \
-                 self._sprites[n_id].scale != (scale_x, scale_y) or \
-                 (hasattr(nd, 'text') and self._texts[n_id] != nd.text):
+            if n_id not in self._sprites:
+                self._load_sprite(nd, (1, 1))
+            elif hasattr(nd, 'text') and (self._texts[n_id] != nd.text or \
+                  self._sprites[n_id].scale != (scale_x, scale_y)):
                 self._load_sprite(nd, (scale_x, scale_y))
-                if hasattr(nd, 'text'):
-                    self._texts[n_id] = nd.text
+                self._texts[n_id] = nd.text
             sprite = self._sprites[n_id].sprite
             rel_pos = nd.relative_pos
             r.x = xo + int(w * rel_pos.x * self._zoom)
             r.y = yo + int(w * rel_pos.y * self._zoom)
-            r.w, r.h = sprite.size
+            if hasattr(nd, 'text'):
+                r.w, r.h = sprite.size
+            else:
+                r.w, r.h = (
+                    int(round(sprite.size[0] * scale_x, 0)),
+                    int(round(sprite.size[1] * scale_y, 0))
+                )
             rot_center = nd.rotation_center
             center = rect.SDL_Point(
                 int(rot_center.x * w),

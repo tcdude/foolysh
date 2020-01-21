@@ -345,6 +345,7 @@ class App(object):
     def _init_sdl(self):
         """Initializes SDL2."""
         sdl2.ext.init()
+        sdl2.SDL_SetHint(sdl2.SDL_HINT_RENDER_SCALE_QUALITY, b'1')
         if self.isandroid:
             dm = sdl2.SDL_DisplayMode()
             sdl2.SDL_GetCurrentDisplayMode(0, dm)
