@@ -59,10 +59,14 @@ class HWRenderer(sdl2.ext.TextureSpriteRenderSystem):
         self._view_pos = vector2.Vector2(0.0, 0.0)
         self._view_aabb = aabb.AABB(0.0, 0.0, 0.0, 0.0)
         self._dirty = True
+        self._last_w_size = window.size
         self._sprites = {}  # type: Dict[int, Sprite]
         self._texts = {}  # type: Dict[int, str]
 
     def render(self):
+        if self._last_w_size != self._window.size:
+            self._dirty = True
+            self._update_base_scale()
         if not self.root_node.traverse() and not self._dirty:
             return
         if self._dirty:
@@ -174,8 +178,8 @@ class HWRenderer(sdl2.ext.TextureSpriteRenderSystem):
         if value <= 0:
             raise ValueError('Expected non zero, positive int.')
         if value != self._asset_pixel_ratio:
-            self._base_scale = min(self._window.size) / value
             self._asset_pixel_ratio = value
+            self._update_base_scale()
             self._dirty = True
 
     @property
@@ -226,3 +230,8 @@ class HWRenderer(sdl2.ext.TextureSpriteRenderSystem):
         if not isinstance(value, spriteloader.SpriteLoader):
             raise TypeError
         self._sprite_loader = value
+
+    def _update_base_scale(self):
+        ws = self._window.size
+        self._base_scale = min(ws) / self._asset_pixel_ratio
+        self._last_w_size = ws
