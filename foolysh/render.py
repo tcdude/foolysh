@@ -87,7 +87,7 @@ class HWRenderer(sdl2.ext.TextureSpriteRenderSystem):
             scale_y = nd_scale_y * self._base_scale * self._zoom
             n_id = nd.node_id
             if n_id not in self._sprites:
-                self._load_sprite(nd, (1, 1))
+                self._load_sprite(nd, (1.0, 1.0))
             elif hasattr(nd, 'text') and (self._texts[n_id] != nd.text or \
                   self._sprites[n_id].scale != (scale_x, scale_y)):
                 self._load_sprite(nd, (scale_x, scale_y))
