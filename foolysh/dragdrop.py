@@ -57,6 +57,8 @@ class DragDrop:
 
     Args:
         app_instance: :class:`~foolysh.app.App` -> the App instance running.
+        drag_threshold: ``float`` -> threshold in world units, until it counts
+            as drag and drop action.
         watch_button: ``int`` -> optional which button to watch.
         (default=:const:`sdl2.SDL_BUTTON_LEFT`)
     """
@@ -64,12 +66,15 @@ class DragDrop:
     def __init__(
             self,
             app_instance: app.App,
+            drag_threshold: Optional[float] = 0.025,
             watch_button: Optional[int] = sdl2.SDL_BUTTON_LEFT
     ) -> None:
         self._app = app_instance
+        self._drag_threshold = drag_threshold
         self._drag_nodes = {}
         self._active = -1
         self._last_mouse = None
+        self._start_pos = None
         self._ids = uuid4().hex, uuid4().hex, uuid4().hex
         if self._app.isandroid:
             self._watch_button = None
@@ -164,6 +169,7 @@ class DragDrop:
                         if res is False:
                             break
                     self._active = res_node.node_id
+                    self._start_pos = res_node.pos
                     break
 
     def _mouse_up(self, event: sdl2.SDL_Event) -> None:
@@ -175,8 +181,12 @@ class DragDrop:
             return
         if self._active > -1:
             drag_node = self._drag_nodes[self._active]
-            if drag_node.drop_callback is not None:
-                drag_node.drop_callback(*drag_node.drop_args)
+            drag_len = (self._start_pos - drag_node.node.pos).length
+            if drag_len >= self._drag_threshold:
+                if drag_node.drop_callback is not None:
+                    drag_node.drop_callback(*drag_node.drop_args)
+            else:
+                drag_node.node.pos = self._start_pos
             self._active = -1
 
     def __del__(self):
