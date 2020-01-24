@@ -40,7 +40,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE."""
 
 
-Sprite = namedtuple('Sprite', ['scale', 'sprite'])
+Sprite = namedtuple('Sprite', ['scale', 'sprite', 'index'])
 
 
 class HWRenderer(sdl2.ext.TextureSpriteRenderSystem):
@@ -88,6 +88,8 @@ class HWRenderer(sdl2.ext.TextureSpriteRenderSystem):
             n_id = nd.node_id
             if n_id not in self._sprites:
                 self._load_sprite(nd, (scale_x, scale_y))
+            elif hasattr(nd, 'index') and self._sprites[n_id].index != nd.index:
+                self._load_sprite(nd, (scale_x, scale_y))
             elif hasattr(nd, 'text') and (self._texts[n_id] != nd.text or \
                   self._sprites[n_id].scale != (scale_x, scale_y)):
                 self._load_sprite(nd, (scale_x, scale_y))
@@ -118,7 +120,8 @@ class HWRenderer(sdl2.ext.TextureSpriteRenderSystem):
         if isinstance(nd, node.ImageNode):
             self._sprites[nd.node_id] = Sprite(
                 (1.0, 1.0),
-                self.sprite_loader.load_image(nd.image, 1.0)
+                self.sprite_loader.load_image(nd.image, 1.0),
+                nd.index
             )
         else:
             size = int(nd.font_size * scale[1] * min(self.window_size))
@@ -132,7 +135,8 @@ class HWRenderer(sdl2.ext.TextureSpriteRenderSystem):
                     nd.align,
                     nd.spacing,
                     nd.multiline
-                )
+                ),
+                0
             )
         x, y = self._sprites[nd.node_id].sprite.size
         nd.size = (
