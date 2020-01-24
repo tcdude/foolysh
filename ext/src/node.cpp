@@ -1104,6 +1104,7 @@ set_size(const double w, const double h) {
     if (w >= 0.0 && h >= 0.0) {
         nd._size.w = w;
         nd._size.h = h;
+        nd._propagate_dirty(_sgdh);
     }
     else {
         throw std::domain_error("Size must be positive.");
