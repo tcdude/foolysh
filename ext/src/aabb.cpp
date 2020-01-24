@@ -76,11 +76,13 @@ overlap(const AABB& aabb) {
     const double l = x - hw, r = x + hw;
     const double l_o = aabb.x - aabb.hw;
     const double r_o = aabb.x + aabb.hw;
-    if ((l <= l_o && r >= l_o) || (l <= r_o && r >= r_o)) {
+    if ((l <= l_o && r >= l_o) || (l <= r_o && r >= r_o)
+        || (l_o <= l && r_o >= l) || (l_o <= r && r_o >= r)) {
         const double t = y - hh, b = y + hh;
         const double t_o = aabb.y - aabb.hh;
         const double b_o = aabb.y + aabb.hh;
-        if ((t <= t_o && b >= t_o) || (t <= b_o && b >= b_o)) {
+        if ((t <= t_o && b >= t_o) || (t <= b_o && b >= b_o)
+            || (t_o <= t && b_o >= t) || (t_o <= b && b_o >= b)) {
             return true;
         }
     }
