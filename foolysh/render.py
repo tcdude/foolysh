@@ -87,7 +87,7 @@ class HWRenderer(sdl2.ext.TextureSpriteRenderSystem):
             scale_y = nd_scale_y * self._base_scale * self._zoom
             n_id = nd.node_id
             if n_id not in self._sprites:
-                self._load_sprite(nd, (1.0, 1.0))
+                self._load_sprite(nd, (scale_x, scale_y))
             elif hasattr(nd, 'text') and (self._texts[n_id] != nd.text or \
                   self._sprites[n_id].scale != (scale_x, scale_y)):
                 self._load_sprite(nd, (scale_x, scale_y))
@@ -117,8 +117,8 @@ class HWRenderer(sdl2.ext.TextureSpriteRenderSystem):
     def _load_sprite(self, nd, scale):
         if isinstance(nd, node.ImageNode):
             self._sprites[nd.node_id] = Sprite(
-                scale,
-                self.sprite_loader.load_image(nd.image, scale)
+                (1.0, 1.0),
+                self.sprite_loader.load_image(nd.image, 1.0)
             )
         else:
             size = int(nd.font_size * scale[1] * min(self.window_size))
@@ -136,8 +136,8 @@ class HWRenderer(sdl2.ext.TextureSpriteRenderSystem):
             )
         x, y = self._sprites[nd.node_id].sprite.size
         nd.size = (
-            x / self._base_scale * self._asset_pixel_ratio,
-            y / self._base_scale * self._asset_pixel_ratio
+            x * scale[0] / min(self._window.size),
+            y * scale[1] / min(self._window.size)
         )
 
     def _update_view_aabb(self):
