@@ -64,11 +64,14 @@ class EventHandler(object):
         Args:
             name: ``str`` unique name of the event to be removed.
         """
+        pop_list = []
         for e in self._events:
             if name in self._events[e]:
                 self._events[e].pop(name)
             if not self._events[e]:
-                self._events.pop(e)
+                pop_list.append(e)
+        for e in pop_list:
+            self._events.pop(e)
         if name in self._unique:
             self._unique.pop(name)
 
