@@ -109,7 +109,11 @@ class App(object):
         self._screen_size = (0, 0)
         self._running = False
         self._mouse_pos = vector2.Point2()
-        self._taskmgr.add_task('__MOUSE_WATCHER__', self.__update_mouse)
+        self._taskmgr.add_task(
+            '__MOUSE_WATCHER__',
+            self.__update_mouse,
+            with_dt=False
+        )
         self._animation_manager = animation.AnimationManager()
         self._taskmgr.add_task('__ANIMATION__', self._animation_manager.animate)
         self._frames = 0
@@ -166,7 +170,7 @@ class App(object):
     def mouse_pos(self):
         # type: () -> vector.Point
         """``Point`` -> current mouse position (=last touch location)"""
-        return self._mouse_pos.asint()
+        return self._mouse_pos
 
     @property
     def screen_size(self):
@@ -277,15 +281,15 @@ class App(object):
         sdl2.SDL_FreeSurface(surface)
         return sprite
 
-    # noinspection PyUnusedLocal
-    def __update_mouse(self, *args, **kwargs):
+    def __update_mouse(self):
         # type: (...) -> None
         """Updates ``App.mouse_pos``."""
         if not self._running:
             return
         x, y = ctypes.c_int(0), ctypes.c_int(0)
         _ = sdl2.mouse.SDL_GetMouseState(ctypes.byref(x), ctypes.byref(y))
-        self._mouse_pos.x, self._mouse_pos.y = x.value, y.value
+        f = 1 / min(self._window.size)
+        self._mouse_pos.x, self._mouse_pos.y = x.value * f, y.value * f
 
     def run(self):
         """
