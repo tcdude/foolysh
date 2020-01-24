@@ -96,7 +96,7 @@ query(AABB& aabb) {
             while (element_node_id != -1) {
                 QuadElementNode& qen = _element_nodes[element_node_id];
                 QuadElement& qe = _elements[qen.element];
-                if (search_aabb.inside(qe.aabb.x, qe.aabb.y)) {
+                if (search_aabb.overlap(qe.aabb)) {
                     result.push_back(qe.id);
                 }
                 element_node_id = qen.next;
