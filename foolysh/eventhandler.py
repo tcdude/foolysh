@@ -53,7 +53,8 @@ class EventHandler(object):
         if name in self._unique:
             raise ValueError('An event with this name already exists.')
         if sdl_event not in self._events:
-            self._events[sdl_event] = {name: priority}
+            self._events[sdl_event] = {}
+        self._events[sdl_event][name] = priority
         self._unique[name] = (callback, args, kwargs)
 
     def forget(self, name):
