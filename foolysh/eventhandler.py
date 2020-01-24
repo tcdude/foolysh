@@ -40,15 +40,15 @@ class EventHandler(object):
         """
         Adds a callback to be executed at every call of the EventHandler.
 
-        :param name: Unique name of the event
-        :param sdl_event: SDL event type tested against
-            ``sdl2.ext.get_events()``
-        :param callback: Method to execute. Must provide ``event`` as named
-            argument.
-        :param priority: Call priority, higher numbers get executed first
-            (default=0).
-        :param args: optional positional arguments to pass to ``callback``.
-        :param kwargs: optional keyword arguments to pass to ``callback``.
+        Args:
+            name: Unique name of the event
+            sdl_event: SDL event type tested against ``sdl2.ext.get_events()``
+            callback: Method to execute. Must provide ``event`` as named
+                argument.
+            priority: Call priority, higher numbers get executed first
+                (default=0).
+            args: optional positional arguments to pass to ``callback``.
+            kwargs: optional keyword arguments to pass to ``callback``.
         """
         if name in self._unique:
             raise ValueError('An event with this name already exists.')
@@ -57,14 +57,24 @@ class EventHandler(object):
         self._unique[name] = (callback, args, kwargs)
 
     def forget(self, name):
-        """Removes event ``name`` from the EventHandler"""
+        """
+        Removes event from the EventHandler.
+
+        Args:
+            name: ``str`` unique name of the event to be removed.
+        """
         for e in self._events:
             if name in self._events[e]:
                 self._events[e].pop(name)
+            if not self._events[e]:
+                self._events.pop(e)
         if name in self._unique:
             self._unique.pop(name)
 
-    def __call__(self, *args, **kwargs):
+    def __call__(self, *unused_args, **unused_kwargs):
+        """
+        Check and execute events.
+        """
         for event in sdl2.ext.get_events():
             if event.type in self._events:
                 k = reversed(sorted(
