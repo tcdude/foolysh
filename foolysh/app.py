@@ -109,11 +109,6 @@ class App(object):
         self._screen_size = (0, 0)
         self._running = False
         self._mouse_pos = vector2.Point2()
-        self._taskmgr.add_task(
-            '__MOUSE_WATCHER__',
-            self.__update_mouse,
-            with_dt=False
-        )
         self._animation_manager = animation.AnimationManager()
         self._taskmgr.add_task('__ANIMATION__', self._animation_manager.animate)
         self._frames = 0
@@ -170,7 +165,7 @@ class App(object):
     def mouse_pos(self):
         # type: () -> vector.Point
         """``Point`` -> current mouse position (=last touch location)"""
-        return self._mouse_pos
+        return self._mouse_pos + vector2.Vector2()
 
     @property
     def screen_size(self):
@@ -303,6 +298,7 @@ class App(object):
         try:
             self._running = True
             while self._running:
+                self.__update_mouse()
                 self.task_manager()
                 self.renderer.render()
                 self._clock.tick()
