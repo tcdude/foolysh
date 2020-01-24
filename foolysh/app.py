@@ -128,7 +128,14 @@ class App(object):
         apr = self._cfg['base']['asset_pixel_ratio']
         self._renderer.asset_pixel_ratio = int(apr)
         self._renderer.sprite_loader = self._sprite_loader
-
+        from . import dragdrop
+        if 'drag_drop_button' in self._cfg['base']:
+            self._drag_drop = dragdrop.DragDrop(
+                self,
+                int(self._cfg['base']['drag_drop_button'])
+            )
+        else:
+            self._drag_drop = dragdrop.DragDrop(self)
 
     @property
     def isandroid(self):
@@ -182,8 +189,14 @@ class App(object):
     @property
     def root(self):
         # type: () -> node.Node
-        """Root:class:`foolysh.scene.node.Node`."""
+        """Root :class:`foolysh.scene.node.Node`."""
         return self._root
+
+    @property
+    def drag_drop(self):
+        # type: () -> dragdrop.DragDrop
+        """:class:`~foolysh.dragdrop.DragDrop` instance."""
+        return self._drag_drop
 
     def toast(self, message):
         # type: (str) -> None
