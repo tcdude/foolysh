@@ -130,6 +130,53 @@ cdef class Node:
         self._attach_node(np)
         return np
 
+    def attach_image_node(self, name='Unnamed Node', image=None):
+        """
+        Attach a new child image node to this Node.
+
+        Args:
+            name: ``str`` -> optional custom identifier of the node instance.
+            image: ``str`` -> optional image path.
+
+        Returns:
+            ``ImageNode``
+        """
+        np = ImageNode(name, image)
+        self._attach_node(np)
+        return np
+
+    def attach_text_node(
+        self,
+        name='Unnamed Node',
+        text='',
+        font=None,
+        size=0.05,
+        color=(255, 255, 255, 255),
+        align='left',
+        spacing=0,
+        multiline=False
+    ):
+        """
+        Attach a new child text node to this Node.
+
+        Args:
+            name: ``str`` -> optional custom identifier of the node instance.
+            text: ``str`` -> optional text to display.
+            font: ``str`` -> optional font.
+            size: ``float`` -> optional font size.
+            color: ``4 value Tuple[int]`` -> optional font color.
+            align: ``str`` -> optional text alignment on multiline text.
+            spacing: ``int`` -> optional spacing between lines.
+            multiline: ``bool`` -> optional whether the text spans across
+                multiple lines.
+
+        Returns:
+            ``TextNode``
+        """
+        np = TextNode(name, text, font, size, color, align, spacing, multiline)
+        self._attach_node(np)
+        return np
+
     cdef void _attach_node(self, Node np):
         cdef unique_ptr[_Node] _np
         _nodes.pop(deref(np.thisptr).get_id())
