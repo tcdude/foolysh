@@ -1307,6 +1307,7 @@ cdef class AnimationManager:
         cdef char c
         cdef list r = []
         for d in (__ivals, __anims, __seqs):
+            r = []
             for k in d:
                 c = d[k].status()
                 if c == 0 or c == 4:
