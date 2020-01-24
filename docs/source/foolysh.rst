@@ -29,6 +29,14 @@ foolysh.app module
    :undoc-members:
    :show-inheritance:
 
+foolysh.dragdrop module
+-----------------------
+
+.. automodule:: foolysh.dragdrop
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 foolysh.eventhandler module
 ---------------------------
 
