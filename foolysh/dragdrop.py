@@ -170,12 +170,12 @@ class DragDrop:
                         click_node = d_node
                         d_max = d_depth
             if click_node is not None:
-                if d_node.drag_callback is not None:
-                    res = d_node.drag_callback(*d_node.drag_args)
+                if click_node.drag_callback is not None:
+                    res = click_node.drag_callback(*click_node.drag_args)
                     if res is False:
                         return
-                self._active = d_node.node.node_id
-                self._start_pos = d_node.node.pos
+                self._active = click_node.node.node_id
+                self._start_pos = click_node.node.pos
                 return
 
     def _mouse_up(self, event: sdl2.SDL_Event) -> None:
