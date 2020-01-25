@@ -874,7 +874,10 @@ cdef class TextNode(Node):
         # type: (str) -> None
         if not isinstance(value, str):
             raise TypeError
-        self._text = value
+        if self._text != value:
+            self._text = value
+            global _dirty
+            _dirty = True
 
     @property
     def font(self):
