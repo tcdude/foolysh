@@ -43,6 +43,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE."""
 
 cdef dict _nodes = {}
+cdef bint _dirty = False
 
 
 cdef class SceneGraphDataHandler:
@@ -209,6 +210,11 @@ cdef class Node:
         Returns:
             ``True`` if the Scenegraph had to be updated, otherwise ``False``.
         """
+        global _dirty
+        if _dirty:
+            _dirty = False
+            deref(self.thisptr).traverse()
+            return True
         return deref(self.thisptr).traverse()
 
     def query(self, aabb, depth_sorted=True):
@@ -797,6 +803,8 @@ cdef class ImageNode(Node):
             raise IndexError('Invalid index')
         if value != self._current_index:
             self._current_index = value
+            global _dirty
+            _dirty = True
 
     def add_image(self, image):
         # type: (str) -> int
