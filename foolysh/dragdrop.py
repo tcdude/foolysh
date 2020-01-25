@@ -4,6 +4,7 @@ Provides drag and drop logic to :class:`~foolysh.scene.node.Node` instances.
 
 from dataclasses import dataclass
 from typing import Callable
+from typing import Dict
 from typing import Optional
 from typing import Tuple
 from uuid import uuid4
@@ -71,7 +72,7 @@ class DragDrop:
     ) -> None:
         self._app = app_instance
         self._drag_threshold = drag_threshold
-        self._drag_nodes = {}
+        self._drag_nodes: Dict[int, DragEntry] = {}
         self._active = -1
         self._last_mouse = None
         self._start_pos = None
@@ -159,18 +160,23 @@ class DragDrop:
              event.button.button == self._watch_button):
             mouse_pos = self._app.mouse_pos + self._app.renderer.view_pos
             mouse_aabb = aabb.AABB(mouse_pos.x, mouse_pos.y, 0, 0)
-            for res_node in reversed(self._app.root.query(mouse_aabb)):
-                if not res_node.aabb.overlap(mouse_aabb):
-                    continue
-                if res_node.node_id in self._drag_nodes:
-                    drag_node = self._drag_nodes[res_node.node_id]
-                    if drag_node.drag_callback is not None:
-                        res = drag_node.drag_callback(*drag_node.drag_args)
-                        if res is False:
-                            break
-                    self._active = res_node.node_id
-                    self._start_pos = res_node.pos
-                    break
+            click_node = None
+            d_max = None
+            for k in self._drag_nodes:
+                d_node = self._drag_nodes[k]
+                if d_node.node.aabb.overlap(mouse_aabb):
+                    d_depth = d_node.node.relative_depth
+                    if click_node is None or d_depth > d_max:
+                        click_node = d_node
+                        d_max = d_depth
+            if click_node is not None:
+                if d_node.drag_callback is not None:
+                    res = d_node.drag_callback(*d_node.drag_args)
+                    if res is False:
+                        return
+                self._active = d_node.node.node_id
+                self._start_pos = d_node.node.pos
+                return
 
     def _mouse_up(self, event: sdl2.SDL_Event) -> None:
         """
