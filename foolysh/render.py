@@ -85,8 +85,6 @@ class HWRenderer(sdl2.ext.TextureSpriteRenderSystem):
             if not isinstance(nd, (node.ImageNode, node.TextNode)):
                 continue
             scale_x, scale_y = nd.relative_scale
-            t_scale_x = scale_x * self._zoom
-            t_scale_y = scale_y * self._zoom
             n_id = nd.node_id
             if n_id not in self._sprites:
                 self._load_sprite(nd, image_scale)
@@ -96,8 +94,8 @@ class HWRenderer(sdl2.ext.TextureSpriteRenderSystem):
                 self._load_sprite(nd, image_scale)
             elif hasattr(nd, 'text') and (n_id not in self._texts or \
                   self._texts[n_id] != nd.text or \
-                  self._sprites[n_id].scale != (t_scale_x, t_scale_y)):
-                self._load_sprite(nd, (t_scale_x, t_scale_y))
+                  self._sprites[n_id].scale != image_scale):
+                self._load_sprite(nd, image_scale)
                 self._texts[n_id] = nd.text
             sprite = self._sprites[n_id].sprite
             rel_pos = nd.relative_pos
@@ -129,7 +127,9 @@ class HWRenderer(sdl2.ext.TextureSpriteRenderSystem):
                 nd.index
             )
         else:
-            size = int(nd.font_size * scale[1] * min(self.window_size))
+            size = int(
+                nd.font_size * nd.relative_scale[1] * min(self.window_size)
+            )
             self._sprites[nd.node_id] = Sprite(
                 scale,
                 self.sprite_loader.load_text(
