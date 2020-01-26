@@ -33,7 +33,8 @@ DEFAULT_CONFIG = {
     'base': {
         'asset_pixel_ratio': 1080,
         'logical_screen_size_multiplier': 1,
-        'window_size': '720x1280'
+        'window_size': '720x1280',
+        'cache_dir': 'cache'
     }
 }
 
