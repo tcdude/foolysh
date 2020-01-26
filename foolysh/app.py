@@ -105,6 +105,8 @@ class App(object):
         self._renderer = None
         self._factory = None
         self._window = None
+        if 'window_title' in self._cfg['base']:
+            window_title = self._cfg['base']['window_title']
         self._window_title = window_title
         self._screen_size = (0, 0)
         self._running = False
@@ -129,13 +131,13 @@ class App(object):
         self._renderer.asset_pixel_ratio = int(apr)
         self._renderer.sprite_loader = self._sprite_loader
         from . import dragdrop
+        drag_threshold = 0.025
+        if 'drag_threshold' in self._cfg['base']:
+            drag_threshold = float(self._cfg['base']['drag_threshold'])
+        drag_button = sdl2.SDL_BUTTON_LEFT
         if 'drag_drop_button' in self._cfg['base']:
-            self._drag_drop = dragdrop.DragDrop(
-                self,
-                int(self._cfg['base']['drag_drop_button'])
-            )
-        else:
-            self._drag_drop = dragdrop.DragDrop(self)
+            drag_button = int(self._cfg['base']['drag_drop_button'])
+        self._drag_drop = dragdrop.DragDrop(self, drag_threshold, drag_button)
 
     @property
     def isandroid(self):
@@ -197,6 +199,12 @@ class App(object):
         # type: () -> dragdrop.DragDrop
         """:class:`~foolysh.dragdrop.DragDrop` instance."""
         return self._drag_drop
+
+    @property
+    def config(self):
+        # type: () -> config.Config
+        """:class:`~foolysh.tools.config.Config` instance."""
+        return self._cfg
 
     def toast(self, message):
         # type: (str) -> None
