@@ -179,11 +179,7 @@ cdef class Node:
         return np
 
     cdef void _attach_node(self, Node np):
-        cdef unique_ptr[_Node] _np
-        _nodes.pop(deref(np.thisptr).get_id())
-        _np.reset(new _Node(deref(self.thisptr).attach_node()))
-        _nodes[deref(_np).get_id()] = np
-        np.thisptr.reset(_np.release())
+        deref(np.thisptr).reparent_to(deref(self.thisptr))
 
     def reparent_to(self, parent):
         """
