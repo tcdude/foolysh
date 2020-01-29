@@ -368,6 +368,7 @@ insert(const T& element) {
         first_free = data[first_free].next;
         data[index].element = element;
         data[index].free = false;
+        --free_count;
         return index;
     }
     else {
