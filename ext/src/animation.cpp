@@ -1604,5 +1604,8 @@ animate(const double dt) {
 			// TODO: Log conflict
 			continue;
 		}
+        else if (r >= 0.0) {
+			_anim_status[it->first] = 0;
+        }
 	}
 }
