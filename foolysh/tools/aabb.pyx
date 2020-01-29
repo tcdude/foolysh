@@ -77,6 +77,14 @@ cdef class AABB:
     cdef _AABB aabb(self):
         return deref(self.thisptr)
 
+    @property
+    def pos(self):
+        return deref(self.thisptr).x, deref(self.thisptr).y
+
+    @property
+    def size(self):
+        return deref(self.thisptr).hw, deref(self.thisptr).hh
+
     def __repr__(self):
         return f'{type(self).__name__}{str(self)}'
 
