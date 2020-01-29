@@ -210,23 +210,21 @@ _remove_child(SceneGraphDataHandler& sgdh, const int node_id) {
     if (!cnps.active(_first_child)) {
         throw std::range_error("Child is not present");
     }
-    ChildNode& cnp = cnps[_first_child];
     int cnp_id = _first_child;
-    if (cnp.node_id == node_id) {
-        _first_child = cnp.next;
+    if (cnps[cnp_id].node_id == node_id) {
+        _first_child = cnps[cnp_id].next;
     }
     else {
-        if (cnp.next == -1 || !cnps.active(cnp.next)) {
-            throw std::range_error("Child is not present");
-        }
-        while (cnps[cnp.next].node_id != node_id) {
-            if (cnp.next == -1 || !cnps.active(cnp.next)) {
-                throw std::range_error("Child not found");
+        int before = cnp_id;
+        cnp_id = cnps[cnp_id].next;
+        while (cnps[cnp_id].node_id != node_id) {
+            if (cnps[cnp_id].next == -1 || !cnps.active(cnps[cnp_id].next)) {
+                throw std::range_error("Child not found ");
             }
-            cnp = cnps[cnp.next];
-            cnp_id = cnp.next;
+            before = cnp_id;
+            cnp_id = cnps[cnp_id].next;
         }
-        cnp.next = cnps[cnp.next].next;
+        cnps[before].next = cnps[cnp_id].next;
     }
     cnps.erase(cnp_id);
 }
