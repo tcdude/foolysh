@@ -317,16 +317,19 @@ class App(object):
         """
         self._clock.tick()
         try:
+            frame_clock = clock.Clock()
             self._running = True
             while self._running:
+                frame_clock.tick()
                 self.__update_mouse()
                 self.task_manager()
                 self.renderer.render()
-                self._clock.tick()
-                st = max(0.0, FRAME_TIME - self._clock.get_dt())
-                self._frames += 1
+                frame_clock.tick()
+                st = max(0.0, FRAME_TIME - frame_clock.get_dt())
                 if st:
                     time.sleep(st)
+                self._frames += 1
+                self._clock.tick()
         except (KeyboardInterrupt, SystemExit):
             self.quit(blocking=False)
         finally:
