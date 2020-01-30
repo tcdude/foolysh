@@ -105,6 +105,7 @@ cdef extern from "src/node.hpp" namespace "scenegraph":
         void show()
 
         int get_id()
+        int get_parent_id()
         void set_pos(const double)
         void set_pos(Node&, const double)
         void set_pos(const double, const double)

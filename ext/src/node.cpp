@@ -662,6 +662,15 @@ get_id() {
 }
 
 /**
+ * Return the Node index of the parent.
+ */
+int scenegraph::Node::
+get_parent_id() {
+    NodeData& nd = _get_node_data(_node_id);
+    return nd._parent;
+}
+
+/**
  * Set both parts of position to ``v``.
  */
 void scenegraph::Node::

@@ -176,6 +176,7 @@ namespace scenegraph {
         void show();
 
         int get_id();
+        int get_parent_id();
         void set_pos(const double v);
         void set_pos(Node& other, const double v);
         void set_pos(const double x, const double y);

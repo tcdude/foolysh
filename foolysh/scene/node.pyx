@@ -109,6 +109,13 @@ cdef class Node:
         """
         return deref(self.thisptr).get_id()
 
+    @property
+    def parent_id(self):
+        """
+        ID of the parent Node. `-1` if called on a root Node.
+        """
+        return deref(self.thisptr).get_parent_id()
+
     cpdef void remove(self):
         """
         Removes the cyclic reference to the wrapped Node so it can get garbage
