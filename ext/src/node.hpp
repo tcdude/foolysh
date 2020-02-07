@@ -174,6 +174,7 @@ namespace scenegraph {
         SmallList<int> query(AABB& aabb, const bool depth_sorted = true);
         void hide();
         void show();
+        void propagate_dirty();
 
         int get_id();
         int get_parent_id();

@@ -43,7 +43,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE."""
 
 cdef dict _nodes = {}
-cdef bint _dirty = False
 
 
 cdef class SceneGraphDataHandler:
@@ -213,11 +212,6 @@ cdef class Node:
         Returns:
             ``True`` if the Scenegraph had to be updated, otherwise ``False``.
         """
-        global _dirty
-        if _dirty:
-            _dirty = False
-            deref(self.thisptr).traverse()
-            return True
         return deref(self.thisptr).traverse()
 
     def query(self, aabb, depth_sorted=True):
@@ -757,6 +751,9 @@ cdef class Node:
         cdef Size s = deref(self.thisptr).get_relative_size()
         return s.w, s.h
 
+    def propagate_dirty(self):
+        deref(self.thisptr).propagate_dirty()
+
     def __repr__(self):
         return f'{type(self).__name__}{str(self)}'
 
@@ -806,8 +803,7 @@ cdef class ImageNode(Node):
             raise IndexError('Invalid index')
         if value != self._current_index:
             self._current_index = value
-            global _dirty
-            _dirty = True
+            self.propagate_dirty()
 
     def add_image(self, image):
         # type: (str) -> int
@@ -879,8 +875,7 @@ cdef class TextNode(Node):
             raise TypeError
         if self._text != value:
             self._text = value
-            global _dirty
-            _dirty = True
+            self.propagate_dirty()
 
     @property
     def font(self):

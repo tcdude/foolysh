@@ -103,6 +103,7 @@ cdef extern from "src/node.hpp" namespace "scenegraph":
         SmallList[int] query(AABB&, const bint) except +
         void hide()
         void show()
+        void propagate_dirty()
 
         int get_id()
         int get_parent_id()

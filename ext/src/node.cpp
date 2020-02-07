@@ -616,6 +616,14 @@ show() {
 }
 
 /**
+ * Makes the Node visible.
+ */
+void scenegraph::Node::
+propagate_dirty() {
+    _get_node_data(_node_id)._propagate_dirty(_sgdh);
+}
+
+/**
  * Return the root NodeData reference.
  */
 inline scenegraph::NodeData& scenegraph::Node::
