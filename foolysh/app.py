@@ -15,7 +15,6 @@ import sdl2.ext
 from .tools import config
 from . import animation
 from . import eventhandler
-from . import interval
 from . import render
 from .scene import node
 from . import taskmanager
