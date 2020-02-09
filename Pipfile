@@ -12,6 +12,7 @@ rope = "*"
 
 [packages]
 cython = "*"
+numpy = "*"
 plyer = "*"
 pysdl2 = "*"
 pillow = "*"
