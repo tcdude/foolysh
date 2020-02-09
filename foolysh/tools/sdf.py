@@ -60,7 +60,7 @@ def box(
     df = frame - size
     mx = np.minimum(0, np.max(df, 0))
     length = (np.sqrt(np.sum(np.maximum(0, df) ** 2, 0)) + mx) - corner_radius
-    if thickness is not None:
+    if thickness is not None and thickness != 0:
         length = np.abs(length) - thickness / 2
     length = np.minimum(1.5, length) / 1.5
     return 1 - (length > 0) * length
@@ -103,6 +103,13 @@ def framed_box_im(
     target_res = width, height
     sdf_res = width * multi_sampling, height * multi_sampling
     corner_radius *= multi_sampling
+    if border_thickness == 0:
+        frame = box(*sdf_res, corner_radius)
+        im = sdf2image(frame, frame_color, alpha)
+        if multi_sampling > 1:
+            return im.resize(target_res, Image.BICUBIC)
+        return im
+
     border_thickness = (border_thickness or (max(sdf_res) // 100))
     border_thickness *= multi_sampling
     half_thickness = max(border_thickness - 1, 1) * 2
@@ -114,16 +121,8 @@ def framed_box_im(
         corner_radius - half_thickness
     )
 
-    border_im = sdf2image(
-        border,
-        border_color,
-        alpha
-    )
-    frame_im = sdf2image(
-        frame,
-        frame_color,
-        alpha
-    )
+    border_im = sdf2image(border, border_color, alpha)
+    frame_im = sdf2image(frame, frame_color, alpha)
 
     im = Image.new('RGBA', sdf_res)
     im.paste(frame_im, (half_thickness // 2, half_thickness // 2), frame_im)
@@ -149,7 +148,7 @@ def circle(radius: int, thickness: Optional[int] = None):
     frame = np.abs(frame)
     half_t = (thickness or 0) / 2
     length = np.sqrt(np.sum(frame ** 2, 0)) - (radius - half_t - 0.5)
-    if thickness is not None:
+    if thickness is not None and thickness != 0:
         length = np.abs(length) - half_t
     length = np.minimum(1.5, length) / 1.5
     return 1 - (length > 0) * length
@@ -186,6 +185,13 @@ def framed_circle_im(
                          'multi_sampling.')
     target_res = (radius * 2, ) * 2
     sdf_res = (radius * 2 * multi_sampling, ) * 2
+    if border_thickness == 0:
+        frame = circle(radius * multi_sampling)
+        im = sdf2image(frame, frame_color, alpha)
+        if multi_sampling > 1:
+            return im.resize(target_res, Image.BICUBIC)
+        return im
+
     border_thickness = (border_thickness or (radius // 50)) * multi_sampling
     half_t = max(border_thickness - 1, 1)
     radius = radius * multi_sampling
