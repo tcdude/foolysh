@@ -59,6 +59,6 @@ setup(
     install_requires=['plyer', 'Pillow', 'PySDL2>=0.9.6'],
     setup_requires=['Cython'],
     ext_modules=cythonize(extensions,
-                          compiler_directives={'language_level': 3},
-                          annotate=False),
+        compiler_directives={'language_level': 3, 'embedsignature': True},
+        annotate=False),
 )
