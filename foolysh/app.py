@@ -300,7 +300,8 @@ class App:
                 size=self._screen_size
             )
         else:
-            size_x, size_y = self._cfg.get('base', 'window_size', fallback='720x1280')
+            size_x, size_y = self._cfg.get('base', 'window_size',
+                                           fallback='720x1280').split('x')
             self._screen_size = int(size_x), int(size_y)
             self._window = sdl2.ext.Window(
                 self._window_title,
