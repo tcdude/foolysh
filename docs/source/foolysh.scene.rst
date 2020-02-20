@@ -1,6 +1,11 @@
 foolysh.scene package
 =====================
 
+.. automodule:: foolysh.scene
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Submodules
 ----------
 
@@ -20,11 +25,3 @@ foolysh.scene.node module
    :undoc-members:
    :show-inheritance:
 
-
-Module contents
----------------
-
-.. automodule:: foolysh.scene
-   :members:
-   :undoc-members:
-   :show-inheritance:

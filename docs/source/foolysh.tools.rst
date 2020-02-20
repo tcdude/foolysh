@@ -1,6 +1,11 @@
 foolysh.tools package
 =====================
 
+.. automodule:: foolysh.tools
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Submodules
 ----------
 
@@ -52,6 +57,14 @@ foolysh.tools.quadtree module
    :undoc-members:
    :show-inheritance:
 
+foolysh.tools.sdf module
+------------------------
+
+.. automodule:: foolysh.tools.sdf
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 foolysh.tools.spriteloader module
 ---------------------------------
 
@@ -68,11 +81,3 @@ foolysh.tools.vector2 module
    :undoc-members:
    :show-inheritance:
 
-
-Module contents
----------------
-
-.. automodule:: foolysh.tools
-   :members:
-   :undoc-members:
-   :show-inheritance:

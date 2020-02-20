@@ -1,6 +1,11 @@
 foolysh package
 ===============
 
+.. automodule:: foolysh
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Subpackages
 -----------
 
@@ -53,14 +58,6 @@ foolysh.fsm module
    :undoc-members:
    :show-inheritance:
 
-foolysh.interval module
------------------------
-
-.. automodule:: foolysh.interval
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 foolysh.render module
 ---------------------
 
@@ -77,11 +74,3 @@ foolysh.taskmanager module
    :undoc-members:
    :show-inheritance:
 
-
-Module contents
----------------
-
-.. automodule:: foolysh
-   :members:
-   :undoc-members:
-   :show-inheritance:
