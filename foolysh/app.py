@@ -4,10 +4,8 @@ Provides the App class to handle everything related to execution of an App.
 
 import ctypes
 import time
-from typing import Iterable
 from typing import Optional
 from typing import Tuple
-from typing import Union
 
 import sdl2
 import sdl2.ext
@@ -50,32 +48,40 @@ FRAME_TIME = 1 / 60
 
 ISANDROID = False
 try:
-    # noinspection PyPackageRequirements
     import android
     ISANDROID = True
 except ImportError:
-    class Android(object):
+    class Android:
+        """Android dummy class."""
+        # pylint: disable=too-few-public-methods
         def remove_presplash(self):
-            pass
+            """Dummy method."""
     android = Android()
 
 
-class AppClock(object):
-    def __init__(self, clock):
-        self._clock = clock
+class AppClock:
+    """
+    Dummy class that simulates a Clock object with the
+    :meth:`~foolysh.tools.clock.Clock.tick` method disabled.
+    """
+    def __init__(self, clock_obj):
+        self._clock = clock_obj
 
     def get_dt(self):
+        """See: :meth:`~foolysh.tools.clock.Clock.get_dt`."""
         return self._clock.get_dt()
 
     def get_time(self):
+        """See: :meth:`~foolysh.tools.clock.Clock.get_time`."""
         return self._clock.get_time()
 
-    def tick(self):
+    @staticmethod
+    def tick():
+        """Raises a RuntimeError if called."""
         raise RuntimeError('Calls to this method are blocked.')
 
 
-class App(object):
-    # noinspection PyUnresolvedReferences
+class App:
     """
         Base class that handles everything necessary to run an App.
 
@@ -89,6 +95,8 @@ class App(object):
         ...
         >>> MyApp().run()  # Opens the App and runs, until the App is closed.
         """
+    # pylint: disable=too-many-instance-attributes
+
     def __init__(self, window_title='foolysh engine', config_file=None):
         self._cfg = config.Config(config_file)
         if 'base' not in self._cfg:
@@ -99,13 +107,12 @@ class App(object):
         self._taskmgr = taskmanager.TaskManager()
         self._event_handler = eventhandler.EventHandler()
         self._taskmgr.add_task('__EVENT_HANDLER__', self._event_handler)
-        self._font_manager = None  # type: Union[sdl2.ext.FontManager, None]
         self._root = node.Node()
         self._renderer = None
         self._factory = None
         self._window = None
-        if 'window_title' in self._cfg['base']:
-            window_title = self._cfg['base']['window_title']
+        window_title = self._cfg.get('base', 'window_title',
+                                     fallback=window_title)
         self._window_title = window_title
         self._screen_size = (0, 0)
         self._running = False
@@ -120,22 +127,18 @@ class App(object):
         self.__clean_exit = False
         self._sprite_loader = spriteloader.SpriteLoader(
             self._factory,
-            self._cfg['base']['asset_dir']
-                if 'asset_dir' in self._cfg['base'] else '.',
-            self._cfg['base']['cache_dir']
-                if 'cache_dir' in self._cfg['base'] else None
+            self._cfg.get('base', 'asset_dir', fallback='assets/'),
+            self._cfg.get('base', 'cache_dir', fallback=None)
         )
         self._renderer.root_node = self._root
-        apr = self._cfg['base']['asset_pixel_ratio']
-        self._renderer.asset_pixel_ratio = int(apr)
+        self._renderer.asset_pixel_ratio = self._cfg.getint('base',
+                                                            'asset_pixel_ratio')
         self._renderer.sprite_loader = self._sprite_loader
-        from . import dragdrop
-        drag_threshold = 0.025
-        if 'drag_threshold' in self._cfg['base']:
-            drag_threshold = float(self._cfg['base']['drag_threshold'])
-        drag_button = sdl2.SDL_BUTTON_LEFT
-        if 'drag_drop_button' in self._cfg['base']:
-            drag_button = int(self._cfg['base']['drag_drop_button'])
+        from . import dragdrop  # pylint: disable=import-outside-toplevel
+        drag_threshold = self._cfg.getfloat('base', 'drag_threshold',
+                                            fallback=0.025)
+        drag_button = self._cfg.getint('base', 'drag_drop_button',
+                                       fallback=sdl2.SDL_BUTTON_LEFT)
         self._drag_drop = dragdrop.DragDrop(self, drag_threshold, drag_button)
 
     @property
@@ -150,9 +153,8 @@ class App(object):
         """``sdl2.ext.TextureSpriteRenderSystem``"""
         return self._renderer
 
-    # noinspection PyUnusedLocal
     @property
-    def event_handler(self, *args, **kwargs):
+    def event_handler(self, *unused_args, **unused_kwargs):
         # type: (...) -> eventhandler.EventHandler
         """``EventHandler``"""
         return self._event_handler
@@ -215,87 +217,6 @@ class App(object):
         if self.isandroid:
             tools.toast(message)
 
-    def init_font_manager(
-            self,
-            font_path,                          # type: str
-            alias=None,                         # type: Optional[str]
-            size=16,                            # type: Optional[int]
-            color=sdl2.ext.Color(),             # type: Optional[sdl2.ext.Color]
-            bgcolor=sdl2.ext.Color(0, 0, 0, 0)  # type: Optional[sdl2.ext.Color]
-    ):
-        # type: (...) -> None
-        """
-        Initializes the ``sdl2.ext.FontManager``.
-
-        :param font_path: ``str`` -> Path to the default font.
-        :param alias: Optional ``str`` -> alias of the font.
-        :param size: Optional ``int`` -> font size
-        :param color: Optional ``sdl2.ext.Color`` -> foreground color
-        :param bgcolor: Optional ``sdl2.ext.Color`` -> background color
-        """
-        if self._font_manager is not None:
-            self._font_manager.close()
-        self._font_manager = sdl2.ext.FontManager(
-            font_path,
-            alias,
-            size,
-            color,
-            bgcolor
-        )
-
-    def add_font(self, font_path, alias=None, size=16):
-        """
-        Add a font to the ``sdl2.ext.FontManager``.
-
-        :param font_path: ``str`` -> Path to the default font.
-        :param alias: Optional ``str`` -> alias of the font.
-        :param size: Optional ``int`` -> font size
-        """
-        if self._font_manager is None:
-            raise ValueError('FontManager not initialized. Call '
-                             'init_font_manager() method first')
-        self._font_manager.add(font_path, alias, size)
-
-    def text_sprite(
-            self,
-            text,               # type: str
-            alias=None,         # type: Optional[str]
-            size=None,          # type: Optional[int]
-            width=None,         # type: Optional[int]
-            color=None,         # type: Optional[sdl2.ext.Color]
-            bg_color=None,      # type: Optional[sdl2.ext.Color]
-            **kwargs
-    ):
-        # type: (...) -> sdl2.ext.TextureSprite
-        """
-        Load text as a Sprite.
-
-        :param text: ``str`` -> the text to load.
-        :param alias: Optional ``str`` -> the alias of the font to use.
-        :param size: Optional ``int`` -> the font size.
-        :param width: Optional ``int`` -> the width used for word wrap.
-        :param color: Optional ``sdl2.ext.Color`` -> the foreground color
-        :param bg_color: Optional ``sdl2.ext.Color`` -> the background color
-        :param kwargs: additional keyword arguments, passed into
-            ``sdl2.ext.FontManager.render()``
-        :return: ``sdl2.ext.TextureSprite``
-        """
-        if self._font_manager is None:
-            raise ValueError('FontManager not initialized. Call '
-                             'init_font_manager() method first')
-        surface = self._font_manager.render(
-            text,
-            alias,
-            size,
-            width,
-            color,
-            bg_color,
-            **kwargs
-        )
-        sprite = self._factory.from_surface(surface)
-        sdl2.SDL_FreeSurface(surface)
-        return sprite
-
     def __update_mouse(self):
         # type: (...) -> None
         """Updates ``App.mouse_pos``."""
@@ -303,8 +224,9 @@ class App(object):
             return
         x, y = ctypes.c_int(0), ctypes.c_int(0)
         _ = sdl2.mouse.SDL_GetMouseState(ctypes.byref(x), ctypes.byref(y))
-        f = 1 / min(self._window.size)
-        self._mouse_pos.x, self._mouse_pos.y = x.value * f, y.value * f
+        world_unit = 1 / min(self._window.size)
+        self._mouse_pos.x = x.value * world_unit
+        self._mouse_pos.y = y.value * world_unit
 
     def run(self):
         """
@@ -324,9 +246,9 @@ class App(object):
                 self.task_manager()
                 self.renderer.render()
                 frame_clock.tick()
-                st = max(0.0, FRAME_TIME - frame_clock.get_dt())
-                if st:
-                    time.sleep(st)
+                sleep_time = max(0.0, FRAME_TIME - frame_clock.get_dt())
+                if sleep_time:
+                    time.sleep(sleep_time)
                 self._frames += 1
                 self._clock.tick()
         except (KeyboardInterrupt, SystemExit):
@@ -335,7 +257,6 @@ class App(object):
             sdl2.ext.quit()
             self.__clean_exit = True
 
-    # noinspection PyUnusedLocal
     def quit(self, blocking=True, event=None):
         # type: (Optional[bool], Optional[sdl2.SDL_Event]) -> None
         """
@@ -350,6 +271,7 @@ class App(object):
             Do not override this method, override :meth:`App.on_quit` instead!!!
 
         """
+        # pylint: disable=unused-argument
         if not self._running:
             return
         self.on_quit()
@@ -363,28 +285,23 @@ class App(object):
         Method to override to perform cleanup when :meth:`App.quit()` gets
         called.
         """
-        pass
 
     def _init_sdl(self):
         """Initializes SDL2."""
         sdl2.ext.init()
         sdl2.SDL_SetHint(sdl2.SDL_HINT_RENDER_SCALE_QUALITY, b'1')
         if self.isandroid:
-            dm = sdl2.SDL_DisplayMode()
-            sdl2.SDL_GetCurrentDisplayMode(0, dm)
-            self._screen_size = (dm.w, dm.h)
+            display_mode = sdl2.SDL_DisplayMode()
+            sdl2.SDL_GetCurrentDisplayMode(0, display_mode)
+            self._screen_size = (display_mode.w, display_mode.h)
             sdl2.ext.Window.DEFAULTFLAGS = sdl2.SDL_WINDOW_FULLSCREEN
             self._window = sdl2.ext.Window(
                 self._window_title,
                 size=self._screen_size
             )
         else:
-            if 'window_size' in self._cfg['base']:
-                sx, sy = self._cfg['base']['window_size'].split('x')
-                size = int(sx), int(sy)
-            else:
-                size = (720, 1280)
-            self._screen_size = size
+            size_x, size_y = self._cfg.get('base', 'window_size', fallback='720x1280')
+            self._screen_size = int(size_x), int(size_y)
             self._window = sdl2.ext.Window(
                 self._window_title,
                 size=self._screen_size,
