@@ -822,6 +822,11 @@ cdef class ImageNode(Node):
             self.index = idx
         return idx
 
+    def clear_images(self):
+        """Removes all images stored in this node."""
+        self._images = []
+        self._current_index = -1
+
 
 cdef class TextNode(Node):
     """
@@ -861,6 +866,11 @@ cdef class TextNode(Node):
         self.align = align
         self.spacing = spacing
         self.multiline = multiline
+
+    @property
+    def hashkey(self):
+        return hash(f'{self._text}{self._font}{self._font_size}{self._color}'
+                    f'{self._align}{self._spacing}{self._multiline}')
 
     @property
     def text(self):
