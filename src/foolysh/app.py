@@ -3,6 +3,7 @@ Provides the App class to handle everything related to execution of an App.
 """
 
 import ctypes
+from dataclasses import dataclass
 import time
 from typing import Optional
 from typing import Tuple
@@ -81,6 +82,80 @@ class AppClock:
         raise RuntimeError('Calls to this method are blocked.')
 
 
+@dataclass
+class Systems:
+    """Class for keeping track of the various handler/manager objects."""
+    task_manager: taskmanager.TaskManager
+    event_handler: eventhandler.EventHandler
+    animation_manager: animation.AnimationManager
+    sprite_loader: spriteloader.SpriteLoader = None
+    window: sdl2.ext.Window = None
+    renderer: render.HWRenderer = None
+    factory: sdl2.ext.SpriteFactory = None
+
+
+@dataclass
+class AppStats:
+    """Class for keeping runtime stats of the App."""
+    clock: clock.Clock
+    window_title: str
+    mouse_pos: vector2.Point2 = vector2.Point2()
+    frames: int = 0
+    fps: float = 0.0
+    running: bool = False
+    clean_exit: bool = True
+
+
+@dataclass
+class UIAnchors:
+    """Class representing all UI anchor Node instances."""
+    # pylint: disable=too-many-instance-attributes
+    root: node.Node
+    top_center: node.Node
+    top_right: node.Node
+    center_left: node.Node
+    center: node.Node
+    center_right: node.Node
+    bottom_left: node.Node
+    bottom_center: node.Node
+    bottom_right: node.Node
+
+    @property
+    def top_left(self):
+        """Alias for root."""
+        return self.root
+
+
+@dataclass
+class AppNodes:
+    """Class for keeping special Node instances."""
+    # pylint: disable=invalid-name
+    root: node.Node
+    ui: UIAnchors
+
+
+def _node_setup() -> AppNodes:
+    root = node.Node('Root Node')
+    uiroot = node.Node('UI Root Node / Top Left')
+    node_list = [
+        ('UI Top Center', node.Origin.TOP_CENTER),
+        ('UI Top Right', node.Origin.TOP_RIGHT),
+        ('UI Center Left', node.Origin.CENTER_LEFT),
+        ('UI Center', node.Origin.CENTER),
+        ('UI Center Right', node.Origin.CENTER_RIGHT),
+        ('UI Bottom Left', node.Origin.BOTTOM_LEFT),
+        ('UI Bottom Center', node.Origin.BOTTOM_CENTER),
+        ('UI Bottom Right', node.Origin.BOTTOM_RIGHT),
+    ]
+    uinodes = []
+    for name, origin in node_list:
+        uinode = uiroot.attach_node(name)
+        uinode.origin = origin
+        uinode.depth = 0
+        uinodes.append(uinode)
+    return AppNodes(root, UIAnchors(uiroot, *uinodes))
+
+
 class App:
     """
         Base class that handles everything necessary to run an App.
@@ -95,51 +170,31 @@ class App:
         ...
         >>> MyApp().run()  # Opens the App and runs, until the App is closed.
         """
-    # pylint: disable=too-many-instance-attributes
 
-    def __init__(self, window_title='foolysh engine', config_file=None):
-        self._cfg = config.Config(config_file)
-        if 'base' not in self._cfg:
+    def __init__(self, window_title=None, config_file=None):
+        self.__cfg = config.Config(config_file)
+        if 'base' not in self.__cfg:
             raise ValueError(
                 f'Section "base" missing in loaded config_file '
-                f'("{self._cfg.cfg_path}")'
+                f'("{self.__cfg.cfg_path}")'
             )
-        self._taskmgr = taskmanager.TaskManager()
-        self._event_handler = eventhandler.EventHandler()
-        self._taskmgr.add_task('__EVENT_HANDLER__', self._event_handler)
-        self._root = node.Node()
-        self._renderer = None
-        self._factory = None
-        self._window = None
-        window_title = self._cfg.get('base', 'window_title',
-                                     fallback=window_title)
-        self._window_title = window_title
-        self._screen_size = (0, 0)
-        self._running = False
-        self._mouse_pos = vector2.Point2()
-        self._animation_manager = animation.AnimationManager()
-        self._taskmgr.add_task('__ANIMATION__', self._animation_manager.animate)
-        self._frames = 0
-        self._fps = 0.0
-        self._clock = clock.Clock()
-        self._app_clock = AppClock(self._clock)
-        self._init_sdl()
-        self.__clean_exit = False
-        self._sprite_loader = spriteloader.SpriteLoader(
-            self._factory,
-            self._cfg.get('base', 'asset_dir', fallback='assets/'),
-            self._cfg.get('base', 'cache_dir', fallback=None)
+        self.__systems = Systems(
+            task_manager=taskmanager.TaskManager(),
+            event_handler=eventhandler.EventHandler(),
+            animation_manager=animation.AnimationManager()
         )
-        self._renderer.root_node = self._root
-        self._renderer.asset_pixel_ratio = self._cfg.getint('base',
-                                                            'asset_pixel_ratio')
-        self._renderer.sprite_loader = self._sprite_loader
+        self.__nodes = _node_setup()
+        window_title = window_title or self.__cfg.get('base', 'window_title',
+                                                      fallback='foolysh engine')
+        self.__stats = AppStats(clock.Clock(), window_title)
+        self.__app_clock = AppClock(self.__stats.clock)
+
         from . import dragdrop  # pylint: disable=import-outside-toplevel
-        drag_threshold = self._cfg.getfloat('base', 'drag_threshold',
-                                            fallback=0.025)
-        drag_button = self._cfg.getint('base', 'drag_drop_button',
-                                       fallback=sdl2.SDL_BUTTON_LEFT)
-        self._drag_drop = dragdrop.DragDrop(self, drag_threshold, drag_button)
+        drag_threshold = self.__cfg.getfloat('base', 'drag_threshold',
+                                             fallback=0.025)
+        drag_button = self.__cfg.getint('base', 'drag_drop_button',
+                                        fallback=sdl2.SDL_BUTTON_LEFT)
+        self.__drag_drop = dragdrop.DragDrop(self, drag_threshold, drag_button)
 
     @property
     def isandroid(self):
@@ -148,64 +203,72 @@ class App:
         return ISANDROID
 
     @property
-    def renderer(self):
-        # type: () -> sdl2.ext.TextureSpriteRenderSystem
-        """``sdl2.ext.TextureSpriteRenderSystem``"""
-        return self._renderer
-
-    @property
     def event_handler(self, *unused_args, **unused_kwargs):
         # type: (...) -> eventhandler.EventHandler
         """``EventHandler``"""
-        return self._event_handler
+        return self.__systems.event_handler
 
     @property
     def task_manager(self):
         # type: () -> taskmanager.TaskManager
         """``TaskManager``"""
-        return self._taskmgr
+        return self.__systems.task_manager
 
     @property
     def window(self):
         # type: () -> sdl2.ext.Window
         """``sdl2.ext.Window``"""
-        return self._window
+        return self.__systems.window
 
     @property
     def mouse_pos(self):
-        # type: () -> vector.Point
+        # type: () -> vector2.Vector2
         """``Point`` -> current mouse position (=last touch location)"""
-        return self._mouse_pos + vector2.Vector2()
+        return self.__stats.mouse_pos + vector2.Vector2()
 
     @property
     def screen_size(self):
         # type: () -> Tuple[int, int]
         """``Tuple[int, int]``"""
-        return self._screen_size
+        if self.__systems.window is not None:
+            return self.__systems.window.size
+        if self.isandroid:
+            display_mode = sdl2.SDL_DisplayMode()
+            sdl2.SDL_GetCurrentDisplayMode(0, display_mode)
+            return display_mode.w, display_mode.h
+        size_x, size_y = self.__cfg.get('base', 'window_size',
+                                        fallback='720x1280').split('x')
+        return int(size_x), int(size_y)
 
     @property
     def clock(self):
         # type: () -> AppClock
         """:class:`foolysh.tools.clock.Clock` object of the running app."""
-        return self._app_clock
+        return self.__app_clock
 
     @property
     def root(self):
         # type: () -> node.Node
         """Root :class:`foolysh.scene.node.Node`."""
-        return self._root
+        return self.__nodes.root
+
+    @property
+    def ui(self):  # pylint: disable=invalid-name
+        # type: () -> node.Node
+        """:class:`UIAnchors`."""
+        return self.__nodes.ui
 
     @property
     def drag_drop(self):
         # type: () -> dragdrop.DragDrop
         """:class:`~foolysh.dragdrop.DragDrop` instance."""
-        return self._drag_drop
+        return self.__drag_drop
 
     @property
     def config(self):
         # type: () -> config.Config
         """:class:`~foolysh.tools.config.Config` instance."""
-        return self._cfg
+        return self.__cfg
 
     def toast(self, message):
         # type: (str) -> None
@@ -220,13 +283,13 @@ class App:
     def __update_mouse(self):
         # type: (...) -> None
         """Updates ``App.mouse_pos``."""
-        if not self._running:
+        if not self.__stats.running:
             return
         x, y = ctypes.c_int(0), ctypes.c_int(0)
         _ = sdl2.mouse.SDL_GetMouseState(ctypes.byref(x), ctypes.byref(y))
-        world_unit = 1 / min(self._window.size)
-        self._mouse_pos.x = x.value * world_unit
-        self._mouse_pos.y = y.value * world_unit
+        world_unit = 1 / min(self.__systems.window.size)
+        self.__stats.mouse_pos.x = x.value * world_unit
+        self.__stats.mouse_pos.y = y.value * world_unit
 
     def run(self):
         """
@@ -236,26 +299,30 @@ class App:
             Make sure to call ``super().run()`` if you override this method
             at the end of your implementation.
         """
-        self._clock.tick()
+        self.__init_sdl()
+        self.__stats.clock.tick()
         try:
             frame_clock = clock.Clock()
-            self._running = True
-            while self._running:
+            self.__stats.running = True
+            while self.__stats.running:
                 frame_clock.tick()
                 self.__update_mouse()
-                self.task_manager()
-                self.renderer.render()
+                self.__systems.event_handler()
+                self.__systems.animation_manager.animate(
+                    self.__stats.clock.get_dt())
+                self.__systems.task_manager()
+                self.__systems.renderer.render()
                 frame_clock.tick()
                 sleep_time = max(0.0, FRAME_TIME - frame_clock.get_dt())
                 if sleep_time:
                     time.sleep(sleep_time)
-                self._frames += 1
-                self._clock.tick()
+                self.__stats.frames += 1
+                self.__stats.clock.tick()
         except (KeyboardInterrupt, SystemExit):
             self.quit(blocking=False)
         finally:
             sdl2.ext.quit()
-            self.__clean_exit = True
+            self.__stats.clean_exit = True
 
     def quit(self, blocking=True, event=None):
         # type: (Optional[bool], Optional[sdl2.SDL_Event]) -> None
@@ -272,12 +339,12 @@ class App:
 
         """
         # pylint: disable=unused-argument
-        if not self._running:
+        if not self.__stats.running:
             return
         self.on_quit()
-        self._running = False
+        self.__stats.running = False
         if blocking:
-            while not self.__clean_exit:
+            while not self.__stats.clean_exit:
                 time.sleep(0.01)
 
     def on_quit(self):
@@ -286,37 +353,46 @@ class App:
         called.
         """
 
-    def _init_sdl(self):
+    def __init_sdl(self):
         """Initializes SDL2."""
         sdl2.ext.init()
         sdl2.SDL_SetHint(sdl2.SDL_HINT_RENDER_SCALE_QUALITY, b'1')
         if self.isandroid:
             display_mode = sdl2.SDL_DisplayMode()
             sdl2.SDL_GetCurrentDisplayMode(0, display_mode)
-            self._screen_size = (display_mode.w, display_mode.h)
+            screen_size = (display_mode.w, display_mode.h)
             sdl2.ext.Window.DEFAULTFLAGS = sdl2.SDL_WINDOW_FULLSCREEN
-            self._window = sdl2.ext.Window(
-                self._window_title,
-                size=self._screen_size
+            self.__systems.window = sdl2.ext.Window(
+                self.__stats.window_title,
+                size=screen_size
             )
         else:
-            size_x, size_y = self._cfg.get('base', 'window_size',
-                                           fallback='720x1280').split('x')
-            self._screen_size = int(size_x), int(size_y)
-            self._window = sdl2.ext.Window(
-                self._window_title,
-                size=self._screen_size,
+            size_x, size_y = self.__cfg.get('base', 'window_size',
+                                            fallback='720x1280').split('x')
+            self.__systems.window = sdl2.ext.Window(
+                self.__stats.window_title,
+                size=(int(size_x), int(size_y)),
                 flags=sdl2.SDL_WINDOW_RESIZABLE
             )
-        self._window.show()
+        self.__systems.window.show()
         android.remove_presplash()
-        self._renderer = render.HWRenderer(self.window)
-        self._factory = sdl2.ext.SpriteFactory(
+        self.__systems.renderer = render.HWRenderer(self.window)
+        self.__systems.factory = sdl2.ext.SpriteFactory(
             sdl2.ext.TEXTURE,
-            renderer=self._renderer
+            renderer=self.__systems.renderer
         )
+        self.__stats.clean_exit = False
+        self.__systems.sprite_loader = spriteloader.SpriteLoader(
+            self.__systems.factory,
+            self.__cfg.get('base', 'asset_dir', fallback='assets/'),
+            self.__cfg.get('base', 'cache_dir', fallback=None)
+        )
+        self.__systems.renderer.root_node = self.__nodes.root
+        self.__systems.renderer.asset_pixel_ratio = \
+            self.__cfg.getint('base', 'asset_pixel_ratio')
+        self.__systems.renderer.sprite_loader = self.__systems.sprite_loader
 
     def __del__(self):
         """Make sure, ``sdl2.ext.quit()`` gets called latest on destruction."""
-        if not self.__clean_exit:
+        if not self.__stats.clean_exit:
             sdl2.ext.quit()
