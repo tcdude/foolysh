@@ -813,7 +813,7 @@ void animation::Animation::
 reset() {
     AnimationType::reset();
     AnimationData& ad = _get_animation_data(_animation_id);
-    double duration = -1.0;
+    ad.duration = -1.0;
 
     if (ad.pos.active) {
         if (ad.pos_speed < 0.0) {
@@ -822,8 +822,8 @@ reset() {
         }
         double tmp_d = (ad.pos.end - ad.pos.start).length() / ad.pos_speed;
         ad.dur_pos = tmp_d;
-        if (tmp_d > duration) {
-            duration = tmp_d;
+        if (tmp_d > ad.duration) {
+            ad.duration = tmp_d;
         }
     }
 
@@ -835,8 +835,8 @@ reset() {
         double tmp_d = (ad.center_pos.end - ad.center_pos.start).length()
                        / ad.rotation_center_speed;
         ad.dur_center_pos = tmp_d;
-        if (tmp_d > duration) {
-            duration = tmp_d;
+        if (tmp_d > ad.duration) {
+            ad.duration = tmp_d;
         }
     }
 
@@ -851,8 +851,8 @@ reset() {
         ad.dur_scaley = std::abs(
             ad.scale.end.sy - ad.scale.start.sy) / ad.scale_speed;
         double tmp_d = std::max(ad.dur_scalex, ad.dur_scaley);
-        if (tmp_d > duration) {
-            duration = tmp_d;
+        if (tmp_d > ad.duration) {
+            ad.duration = tmp_d;
         }
     }
 
@@ -863,8 +863,8 @@ reset() {
         }
         ad.dur_angle = std::abs(
             ad.angle.end - ad.angle.start) / ad.rotation_speed;
-        if (ad.dur_angle > duration) {
-            duration = ad.dur_angle;
+        if (ad.dur_angle > ad.duration) {
+            ad.duration = ad.dur_angle;
         }
     }
 
@@ -875,8 +875,8 @@ reset() {
         }
         ad.dur_depth = std::abs(
             ad.depth.end - ad.depth.start) / ad.depth_speed;
-        if (ad.dur_depth > duration) {
-            duration = ad.dur_depth;
+        if (ad.dur_depth > ad.duration) {
+            ad.duration = ad.dur_depth;
         }
     }
 
@@ -1557,7 +1557,7 @@ get_animation_status(const int a_id) {
 	if (search == _anim_status.end()) {
 		throw std::range_error("Specified id is not an active Animation.");
 	}
-	return get_interval_status(a_id);
+	return _anim_status[a_id];
 }
 
 /**
