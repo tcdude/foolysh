@@ -40,7 +40,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE."""
 
 
-Sprite = namedtuple('Sprite', ['scale', 'sprite', 'index'])
+Sprite = namedtuple('Sprite', ['scale', 'sprite', 'index', 'name'])
 
 
 class HWRenderer(sdl2.ext.TextureSpriteRenderSystem):
@@ -62,6 +62,8 @@ class HWRenderer(sdl2.ext.TextureSpriteRenderSystem):
         self._last_w_size = window.size
         self._sprites = {}  # type: Dict[int, Sprite]
         self._texts = {}  # type: Dict[int, str]
+        self._rcopy = render.SDL_RenderCopyEx
+        self._rect = rect.SDL_Rect(0, 0, 0, 0)
 
     def render(self):
         if self._last_w_size != self._window.size:
@@ -73,60 +75,78 @@ class HWRenderer(sdl2.ext.TextureSpriteRenderSystem):
             self._update_view_aabb()
 
         w = min(self.window_size)
-        xo = int(self._view_pos.x * w * self._zoom)
-        yo = int(self._view_pos.y * w * self._zoom)
-        r = rect.SDL_Rect(0, 0, 0, 0)
-        rcopy = render.SDL_RenderCopyEx
-        renderer = self.sdlrenderer
+        x = int(self._view_pos.x * w * self._zoom)
+        y = int(self._view_pos.y * w * self._zoom)
         self._renderer.clear()
         image_scale = self._base_scale * self._zoom
         image_scale = image_scale, image_scale
         for nd in self.root_node.query(self._view_aabb):
-            if not isinstance(nd, (node.ImageNode, node.TextNode)):
-                continue
-            scale_x, scale_y = nd.relative_scale
-            n_id = nd.node_id
-            if n_id not in self._sprites:
-                self._load_sprite(nd, image_scale)
-            elif hasattr(nd, 'index') and \
-                  (self._sprites[n_id].index != nd.index or \
-                  self._sprites[n_id].scale != image_scale):
-                self._load_sprite(nd, image_scale)
-            elif hasattr(nd, 'text') and (n_id not in self._texts or \
-                  self._texts[n_id] != nd.text or \
-                  self._sprites[n_id].scale != image_scale):
-                self._load_sprite(nd, image_scale)
-                self._texts[n_id] = nd.text
-            sprite = self._sprites[n_id].sprite
-            rel_pos = nd.relative_pos
-            r.x = xo + int(w * rel_pos.x * self._zoom)
-            r.y = yo + int(w * rel_pos.y * self._zoom)
-            if hasattr(nd, 'text'):
-                r.w, r.h = sprite.size
-            else:
-                r.w, r.h = (
-                    int(round(sprite.size[0] * scale_x, 0)),
-                    int(round(sprite.size[1] * scale_y, 0))
-                )
-            rot_center = nd.rotation_center
-            center = rect.SDL_Point(
-                int(rot_center.x * w),
-                int(rot_center.y * w)
-            )
-            if rcopy(renderer, sprite.texture, None, r, nd.relative_angle,
-                     center, sprite.flip) == -1:
-                raise SDLError()
+            if isinstance(nd, node.ImageNode):
+                self._render_image(nd, w, image_scale, x, y)
+            elif isinstance(nd, node.TextNode):
+                self._render_text(nd, w, image_scale, x, y)
         self._dirty = False
-        render.SDL_RenderPresent(renderer)
+        render.SDL_RenderPresent(self.renderer)
 
-    def _load_sprite(self, nd, scale):
+    def _render_text(self, nd, w, image_scale, x, y):
+        scale_x, scale_y = nd.relative_scale
+        n_id = nd.node_id
+        if n_id not in self._sprites or n_id not in self._texts \
+              or nd.hashkey != self._texts[n_id] \
+              or self._sprites[n_id].scale != image_scale:
+            self._load_sprite(nd, image_scale)
+            self._texts[n_id] = nd.hashkey
+        sprite = self._sprites[n_id].sprite
+        rel_pos = nd.relative_pos
+        self._rect.x = x + int(w * rel_pos.x * self._zoom)
+        self._rect.y = y + int(w * rel_pos.y * self._zoom)
+        self._rect.w, self._rect.h = sprite.size
+        rot_center = nd.rotation_center
+        center = rect.SDL_Point(
+            int(rot_center.x * w),
+            int(rot_center.y * w)
+        )
+        if self._rcopy(self.renderer, sprite.texture, None, self._rect,
+                       nd.relative_angle, center, sprite.flip) == -1:
+            raise sdl2.ext.common.SDLError()
+
+    def _render_image(self, nd, w, image_scale, x, y):
+        scale_x, scale_y = nd.relative_scale
+        n_id = nd.node_id
+        if n_id not in self._sprites or n_id not in self._texts \
+              or self._sprites[n_id].index != nd.index \
+              or self._sprites[n_id].scale != image_scale \
+              or self._sprites[n_id].name != nd.image:
+            self._load_sprite(nd, image_scale, w)
+        sprite = self._sprites[n_id].sprite
+        rel_pos = nd.relative_pos
+        self._rect.x = x + int(w * rel_pos.x * self._zoom)
+        self._rect.y = y + int(w * rel_pos.y * self._zoom)
+        self._rect.w, self._rect.h = (
+            int(sprite.size[0] * scale_x + 0.5),
+            int(sprite.size[1] * scale_y + 0.5)
+        )
+        rot_center = nd.rotation_center
+        center = rect.SDL_Point(
+            int(rot_center.x * w),
+            int(rot_center.y * w)
+        )
+        if self._rcopy(self.renderer, sprite.texture, None, self._rect,
+                       nd.relative_angle, center, sprite.flip) == -1:
+            raise sdl2.ext.common.SDLError()
+
+    def _load_sprite(self, nd, scale, w=None):
         if isinstance(nd, node.ImageNode):
+            image_str = nd.image
+            if image_str.find(':F:') > -1:  # Pass world unit to float SDF
+                image_str += f':w={w}'
             self._sprites[nd.node_id] = Sprite(
                 scale,
-                self.sprite_loader.load_image(nd.image, scale),
-                nd.index
+                self.sprite_loader.load_image(image_str, scale),
+                nd.index,
+                nd.image
             )
-        else:
+        elif isinstance(nd, node.TextNode):
             size = int(
                 nd.font_size * nd.relative_scale[1] * min(self.window_size)
             )
@@ -141,7 +161,8 @@ class HWRenderer(sdl2.ext.TextureSpriteRenderSystem):
                     nd.spacing,
                     nd.multiline
                 ),
-                0
+                0,
+                ''
             )
         x, y = self._sprites[nd.node_id].sprite.size
         sx, sy = nd.relative_scale

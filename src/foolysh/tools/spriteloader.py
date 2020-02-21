@@ -18,6 +18,7 @@ from sdl2 import surface
 from sdl2 import pixels
 from sdl2.ext import SDLError
 
+from . import sdf
 from . import vector2
 
 __author__ = 'Tiziano Bettio'
@@ -127,6 +128,74 @@ def _image2sprite(image, factory):
     return factory.from_surface(imgsurface, free=True)
 
 
+def parse_sdf_str(sdf_str):
+    """
+    Parses SDF strings to get SDF type and keyword arguments for the function
+    call.
+
+
+    Args:
+        sdf_str: ``str`` -> SDF strings are formatted as follows:
+            "SDF:[sdf_type]:[I/F]:[parameter]=[value]:..." where value will be
+            converted to either I=int or F=float, where appropriate. Colors are
+            the exception, where always int is presumed in form of a tuple.
+            .. note::
+                SDF string Example:
+
+                ``SDF:circle:I:radius=100:frame_color=(80,120,10):alpha=180``
+                This would produce a circle with a radius of 100 pixel filled
+                with the specified frame_color and alpha values.
+
+    Returns:
+        ``Tuple[Dict, str]`` -> kwargs as dictionary and the SDF type as string.
+    """
+    elements = sdf_str.split(':')
+    try:
+        isfloat = {'I': False, 'F': True}[elements[2]]
+    except KeyError:
+        raise ValueError(f'Expected either "I" or "F" for data type, got '
+                         f'"{elements[2]}" instead.')
+    converter = {
+        'width': (float, int),
+        'height': (float, int),
+        'radius': (float, int),
+        'corner_radius': (float, int),
+        'border_thickness': (float, int),
+        'frame_color': (
+            lambda x: tuple([int(i) for i in x.strip()[1:-1].split(',')]),
+        ),
+        'border_color': (
+            lambda x: tuple([int(i) for i in x.strip()[1:-1].split(',')]),
+        ),
+        'multi_sampling': (int, ),
+        'alpha': (int, )
+    }  # Insures that
+
+    kwargs = {}
+    w_unit = 0
+    for i in elements[3:]:
+        try:
+            k, value = i.split('=')
+        except ValueError:
+            raise ValueError(f'Expected "parameter=value", got "{i}" instead.')
+        if k in converter:
+            try:
+                kwargs[k] = converter[k][0 if isfloat else -1](value)
+            except (TypeError, ValueError):
+                raise ValueError(f'Unable to unpack parameter: "{i}"')
+        elif isfloat and k == 'w':
+            w_unit = int(value)
+        else:
+            raise ValueError(f'Unknown parameter: "{k}".')
+
+    if isfloat:
+        for k in kwargs:
+            if converter[k][0] is float:
+                kwargs[k] = int(kwargs[k] * w_unit + 0.5)
+
+    return kwargs, elements[1]
+
+
 class SpriteLoader:
     """
     Provides ``load_*`` methods that return Sprite objects of (cached) images
@@ -185,6 +254,12 @@ class SpriteLoader:
 
     def load_image(self, asset_path, scale=1.0):
         # type: (str, Optional[SCALE]) -> TextureSprite
+        """
+        Loads asset_path at specified scale or generates (if necessary) a SDF
+        if `asset_path` starts with "SDF:" (SDF strings are case sensitive!).
+        """
+        if asset_path.startswith('SDF:'):
+            return self._load_sdf(asset_path)
         if asset_path in self._assets:
             k = self._assets[asset_path][scale]
             if k not in self._sprite_cache:
@@ -241,6 +316,39 @@ class SpriteLoader:
         """Delete all cached files."""
         for asset in self._assets.values():
             asset.empty_cache()
+
+    def _load_sdf(self, sdf_str):
+        """
+        Adds the appropriate SDF to the sprite cache.
+
+        """
+        kwargs, sdf_t = parse_sdf_str(sdf_str)
+        arg_str = ''.join([f'{k}={kwargs[k]}' for k in sorted(kwargs)])
+        cache_name = hashlib.sha3_224(arg_str.encode()).hexdigest()
+        path = os.path.join(
+            self.cache_dir,
+            f'SDF/{sdf_t}/{cache_name[:2]}/{cache_name[2:]}.png'
+        )
+        if path not in self._sprite_cache:
+            if not os.path.isfile(path):
+                cache_dir = os.path.split(path)[0]
+                if not os.path.isdir(cache_dir):
+                    os.makedirs(cache_dir)
+                if sdf_t == 'box':
+                    image = sdf.framed_box_im(**kwargs)
+                elif sdf_t == 'circle':
+                    image = sdf.framed_circle_im(**kwargs)
+                else:
+                    raise ValueError(f'Unknown SDF type: "{sdf_t}"')
+                image.save(path)
+                self._sprite_cache[path] = _image2sprite(image, self.factory)
+            else:
+                self._sprite_cache[path] = _image2sprite(
+                    Image.open(path),
+                    self.factory
+                )
+        return self._sprite_cache[path]
+
 
 class Asset:
     """
