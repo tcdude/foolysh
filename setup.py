@@ -1,7 +1,10 @@
+"""Setup for foolysh."""
+
 import os
+import platform
 from setuptools import setup
 from setuptools import find_namespace_packages
-from distutils.extension import Extension
+from distutils.extension import Extension  # pylint: disable=wrong-import-order
 from Cython.Build import cythonize
 
 __author__ = 'Tiziano Bettio'
@@ -31,34 +34,42 @@ SOFTWARE.
 
 
 with open(os.path.join(os.path.dirname(__file__), 'VERSION'), 'r') as f:
-    version = f.read().strip()
+    VERSION = f.read().strip()
 
 
-extensions = [
+EXTRA_COMPILE_ARGS = []
+EXTRA_LINK_ARGS = []
+if platform.system() == 'Linux':
+    EXTRA_COMPILE_ARGS.append('-std=c++11')
+    EXTRA_LINK_ARGS.append('-std=c++11')
+
+
+EXTENSION = [
     Extension(
         '*',
-        ['foolysh/**/*.pyx'],
+        ['src/foolysh/**/*.pyx'],
         include_dirs=['ext'],
-        libraries=['stdc++'],
-        extra_compile_args=["-std=c++11"],
-        extra_link_args=["-std=c++11"]
+        extra_compile_args=EXTRA_COMPILE_ARGS,
+        extra_link_args=EXTRA_LINK_ARGS
     )
 ]
 
 
 setup(
     name='foolysh',
-    version=version,
+    version=VERSION,
     description='A 2D Rendering Engine, nobody asked for or needed.',
     author='Tiziano Bettio',
     author_email='tizilogic@gmail.com',
-    packages=find_namespace_packages(include=['foolysh.*', 'foolysh']),
+    packages=find_namespace_packages(where='src'),
+    package_dir={'': 'src'},
     package_data={'foolysh': [
         'LICENSE.md',
     ]},
-    install_requires=['plyer', 'Pillow', 'PySDL2>=0.9.6'],
+    install_requires=['plyer', 'Pillow', 'PySDL2>=0.9.6', 'numpy>=1.18'],
     setup_requires=['Cython'],
-    ext_modules=cythonize(extensions,
+    ext_modules=cythonize(
+        EXTENSION,
         compiler_directives={'language_level': 3, 'embedsignature': True},
         annotate=False),
 )
