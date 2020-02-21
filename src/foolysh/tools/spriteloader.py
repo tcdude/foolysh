@@ -6,7 +6,6 @@ import hashlib
 import os
 from typing import Optional
 from typing import Tuple
-from typing import Union
 
 from PIL import Image
 from PIL import ImageDraw
@@ -14,7 +13,6 @@ from PIL import ImageFont
 from PIL import UnidentifiedImageError
 from sdl2.ext import SpriteFactory
 from sdl2.ext import TextureSprite
-import sdl2
 from sdl2 import endian
 from sdl2 import surface
 from sdl2 import pixels
@@ -51,6 +49,8 @@ COLOR = Tuple[int, int, int, int]
 # This function is adapted directly from the PySDL2 package, to perform the
 # conversion of a PIL/Pillow image into a SDL2 Sprite.
 def _image2sprite(image, factory):
+    # pylint: disable=missing-docstring,bad-continuation,protected-access
+    # pylint: disable=too-many-locals,too-many-branches,too-many-statements
     mode = image.mode
     width, height = image.size
     rmask = gmask = bmask = amask = 0
@@ -114,6 +114,7 @@ def _image2sprite(image, factory):
         if not sdlpalette:
             raise SDLError()
         SDL_Color = pixels.SDL_Color
+        # pylint: disable=invalid-name
         for idx, (r, g, b) in enumerate(_chunk(rgbcolors, 3)):
             sdlpalette.contents.colors[idx] = SDL_Color(r, g, b)
         ret = surface.SDL_SetSurfacePalette(imgsurface, sdlpalette)
@@ -126,7 +127,7 @@ def _image2sprite(image, factory):
     return factory.from_surface(imgsurface, free=True)
 
 
-class SpriteLoader(object):
+class SpriteLoader:
     """
     Provides ``load_*`` methods that return Sprite objects of (cached) images
     and a method to compose/flatten multiple images into a single one.
@@ -159,9 +160,9 @@ class SpriteLoader(object):
         self._assets = {}
         self._sprite_cache = {}
         self._font_cache = {}
-        self.refresh_assets()
+        self._refresh_assets()
 
-    def refresh_assets(self):
+    def _refresh_assets(self):
         paths = pathlib.Path(self.asset_dir).glob('**/*.*')
         paths = [str(f) for f in paths]
         paths = [
@@ -171,7 +172,7 @@ class SpriteLoader(object):
             paths = [s[1:] for s in paths]
         self._assets = {}
         for k in paths:
-            if k[-3:].lower() in ('ttf, otf'):
+            if k[-3:].lower() in ('ttf', 'otf'):
                 self._assets[k] = os.path.join(self.asset_dir, k)
                 continue
             try:
@@ -198,29 +199,31 @@ class SpriteLoader(object):
 
     def load_text(self, text, font, size, color, align, spacing, multiline):
         # type: (str, str, int, COLOR, str, int, bool) -> TextureSprite
+        """Load """
+        # pylint: disable=too-many-arguments
         if font in self._assets:
             k = f'{text}{font}{size}{color}{align}{spacing}{multiline}'
             if k not in self._sprite_cache:
-                fk = (font, size)
-                if fk not in self._font_cache:
-                    self._font_cache[fk] = ImageFont.truetype(
+                font_k = (font, size)
+                if font_k not in self._font_cache:
+                    self._font_cache[font_k] = ImageFont.truetype(
                         os.path.join(self.asset_dir, font),
                         size
                     )
                 img = Image.new(
                     'RGBA',
-                    self._font_cache[fk].getsize_multiline(
+                    self._font_cache[font_k].getsize_multiline(
                         text,
                         spacing=spacing
-                    ) if multiline else self._font_cache[fk].getsize(text)
+                    ) if multiline else self._font_cache[font_k].getsize(text)
                 )
-                d = ImageDraw.Draw(img)
-                f = d.multiline_text if multiline else d.text
-                f(
+                draw = ImageDraw.Draw(img)
+                func = draw.multiline_text if multiline else draw.text
+                func(
                     (0, 0),
                     text,
                     color,
-                    self._font_cache[fk],
+                    self._font_cache[font_k],
                     spacing=spacing,
                     align=align
                 )
@@ -228,20 +231,24 @@ class SpriteLoader(object):
             return self._sprite_cache[k]
         raise ValueError(f'font must be a valid path relative to '
                          f'"{self.asset_dir}" without leading "/". Got '
-                         f'"{asset_path}".')
+                         f'"{font}".')
 
     def valid_asset(self, asset_path):
+        """Verify that a given asset path is valid."""
         return asset_path in self._assets
 
-    def load_composed_image(self, images):
-        pass
-
     def empty_cache(self):
+        """Delete all cached files."""
         for asset in self._assets.values():
             asset.empty_cache()
 
+class Asset:
+    """
+    Represents a single Image asset path. Provides caching of scaled images.
+    Used by SpriteLoader.
+    """
+    # pylint: disable=too-many-instance-attributes
 
-class Asset(object):
     def __init__(self, relative_path, parent):
         # type: (str, SpriteLoader) -> None
         self.relative_path = relative_path
@@ -253,9 +260,9 @@ class Asset(object):
         self._img_size = vector2.Point2(Image.open(self.abs_path).size)
         self._cached_items = {}
         self.parent = parent
-        self.refresh_cached()
+        self._refresh_cached()
 
-    def refresh_cached(self):
+    def _refresh_cached(self):
         self._cached_items = {}
         files = pathlib.Path(self.cache_sub_dir).glob(f'{self.cache_prefix}*')
         files = [str(f) for f in files]
@@ -266,6 +273,7 @@ class Asset(object):
 
     @property
     def size(self):
+        """Original image size."""
         return self._img_size
 
     def __getitem__(self, item):
@@ -278,20 +286,21 @@ class Asset(object):
         else:
             raise TypeError('expected type Union[float, Tuple[float, float]]')
         if k not in self._cached_items:
-            self.cache(k)
+            self._cache(k)
         return self._cached_items[k]
 
-    def cache(self, k):
+    def _cache(self, k):
         if not os.path.isdir(self.cache_sub_dir):
             os.makedirs(self.cache_sub_dir)
         fname = f'{self.cache_prefix}{k[0]:05d}{k[1]:05d}{self.cache_suffix}'
-        p = os.path.join(self.cache_sub_dir, fname)
-        Image.open(self.abs_path).resize(k, self.parent.resize_type).save(p)
-        self._cached_items[k] = p
+        pth = os.path.join(self.cache_sub_dir, fname)
+        Image.open(self.abs_path).resize(k, self.parent.resize_type).save(pth)
+        self._cached_items[k] = pth
 
     def empty_cache(self):
-        for f in self._cached_items.values():
-            os.remove(f)
+        """Delete all cached files from disk."""
+        for pth in self._cached_items.values():
+            os.remove(pth)
         try:
             os.rmdir(self.cache_sub_dir)
         except OSError as err:
