@@ -247,6 +247,11 @@ class App:
         return self.__app_clock
 
     @property
+    def renderer(self):
+        """:class:`foolysh.render.HWRenderer` object of the running app."""
+        return self.__systems.renderer
+
+    @property
     def root(self):
         # type: () -> node.Node
         """Root :class:`foolysh.scene.node.Node`."""
