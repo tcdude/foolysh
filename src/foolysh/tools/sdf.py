@@ -33,12 +33,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE."""
 
 
-def box(
-        width: int,
-        height: int,
-        corner_radius: Optional[int] = 0,
-        thickness: Optional[int] = None
-    ) -> np.ndarray:
+def box(width: int, height: int, corner_radius: Optional[int] = 0,
+        thickness: Optional[int] = None) -> np.ndarray:
     """
     Generate a SDF of a box.
 
@@ -57,25 +53,22 @@ def box(
     frame -= size
     frame = np.abs(frame)
     size -= corner_radius + (thickness or 0) / 2 + 0.5
-    df = frame - size
-    mx = np.minimum(0, np.max(df, 0))
-    length = (np.sqrt(np.sum(np.maximum(0, df) ** 2, 0)) + mx) - corner_radius
+    distance_field = frame - size
+    max_x = np.minimum(0, np.max(distance_field, 0))
+    length = (np.sqrt(np.sum(np.maximum(0, distance_field) ** 2, 0)) + max_x)
+    length -= corner_radius
     if thickness is not None and thickness != 0:
         length = np.abs(length) - thickness / 2
     length = np.minimum(1.5, length) / 1.5
     return 1 - (length > 0) * length
 
 
-def framed_box_im(
-        width: int,
-        height: int,
-        corner_radius: Optional[int] = 0,
-        border_thickness: Optional[int] = None,
-        frame_color: Optional[Tuple[int, int, int]] = (160, 160, 160),
-        border_color: Optional[Tuple[int, int, int]] = (255, 255, 255),
-        multi_sampling: Optional[int] = 1,
-        alpha: Optional[int] = 255
-    ) -> Image:
+def framed_box_im(width: int, height: int, corner_radius: Optional[int] = 0,
+                  border_thickness: Optional[int] = None,
+                  frame_color: Optional[Tuple[int, int, int]] = (160, 160, 160),
+                  border_color: Optional[Tuple[int, int, int]]
+                  = (255, 255, 255), multi_sampling: Optional[int] = 1,
+                  alpha: Optional[int] = 255) -> Image:
     """
     Generate a framed box image.
 
@@ -97,6 +90,7 @@ def framed_box_im(
     Returns:
         ``PIL.Image.Image`` of size (`width` x `height`) in mode ``RGBA``.
     """
+    # pylint: disable=too-many-arguments,too-many-locals
     if multi_sampling < 1:
         raise ValueError('Expected positive, non zero value for '
                          'multi_sampling.')
@@ -105,16 +99,16 @@ def framed_box_im(
     corner_radius *= multi_sampling
     if border_thickness == 0:
         frame = box(*sdf_res, corner_radius)
-        im = sdf2image(frame, frame_color, alpha)
+        img = sdf2image(frame, frame_color, alpha)
         if multi_sampling > 1:
-            return im.resize(target_res, Image.BICUBIC)
-        return im
+            return img.resize(target_res, Image.BICUBIC)
+        return img
 
     border_thickness = (border_thickness or (max(sdf_res) // 100))
     border_thickness *= multi_sampling
     half_thickness = max(border_thickness - 1, 1) * 2
 
-    border = box(*sdf_res, corner_radius, border_thickness )
+    border = box(*sdf_res, corner_radius, border_thickness)
     frame = box(
         sdf_res[0] - half_thickness,
         sdf_res[1] - half_thickness,
@@ -124,12 +118,12 @@ def framed_box_im(
     border_im = sdf2image(border, border_color, alpha)
     frame_im = sdf2image(frame, frame_color, alpha)
 
-    im = Image.new('RGBA', sdf_res)
-    im.paste(frame_im, (half_thickness // 2, half_thickness // 2), frame_im)
-    im.alpha_composite(border_im)
+    img = Image.new('RGBA', sdf_res)
+    img.paste(frame_im, (half_thickness // 2, half_thickness // 2), frame_im)
+    img.alpha_composite(border_im)
     if multi_sampling > 1:
-        return im.resize(target_res, Image.BICUBIC)
-    return im
+        return img.resize(target_res, Image.BICUBIC)
+    return img
 
 
 def circle(radius: int, thickness: Optional[int] = None):
@@ -154,14 +148,12 @@ def circle(radius: int, thickness: Optional[int] = None):
     return 1 - (length > 0) * length
 
 
-def framed_circle_im(
-        radius: int,
-        border_thickness: Optional[int] = None,
-        frame_color: Optional[Tuple[int, int, int]] = (160, 160, 160),
-        border_color: Optional[Tuple[int, int, int]] = (255, 255, 255),
-        multi_sampling: Optional[int] = 1,
-        alpha: Optional[int] = 255
-    ) -> Image:
+def framed_circle_im(radius: int, border_thickness: Optional[int] = None,
+                     frame_color: Optional[Tuple[int, int, int]]
+                     = (160, 160, 160), border_color:
+                     Optional[Tuple[int, int, int]] = (255, 255, 255),
+                     multi_sampling: Optional[int] = 1,
+                     alpha: Optional[int] = 255) -> Image:
     """
     Generate a framed circle image.
 
@@ -187,10 +179,10 @@ def framed_circle_im(
     sdf_res = (radius * 2 * multi_sampling, ) * 2
     if border_thickness == 0:
         frame = circle(radius * multi_sampling)
-        im = sdf2image(frame, frame_color, alpha)
+        img = sdf2image(frame, frame_color, alpha)
         if multi_sampling > 1:
-            return im.resize(target_res, Image.BICUBIC)
-        return im
+            return img.resize(target_res, Image.BICUBIC)
+        return img
 
     border_thickness = (border_thickness or (radius // 50)) * multi_sampling
     half_t = max(border_thickness - 1, 1)
@@ -201,19 +193,16 @@ def framed_circle_im(
     frame_im = sdf2image(frame, frame_color, alpha)
     border_im = sdf2image(border, border_color, alpha)
 
-    im = Image.new('RGBA', sdf_res)
-    im.paste(frame_im, (half_t, half_t), frame_im)
-    im.alpha_composite(border_im)
+    img = Image.new('RGBA', sdf_res)
+    img.paste(frame_im, (half_t, half_t), frame_im)
+    img.alpha_composite(border_im)
     if multi_sampling > 1:
-        return im.resize(target_res, Image.BICUBIC)
-    return im
+        return img.resize(target_res, Image.BICUBIC)
+    return img
 
 
-def sdf2image(
-        df: np.ndarray,
-        color: Optional[Tuple[int, int, int]] = (255, 255, 255),
-        alpha: Optional[int]=255
-    ) -> Image.Image:
+def sdf2image(distance_field: np.ndarray, color: Optional[Tuple[int, int, int]]
+              = (255, 255, 255), alpha: Optional[int] = 255) -> Image.Image:
     """
     Generate an image from a SDF.
 
@@ -225,8 +214,8 @@ def sdf2image(
     Returns:
         ``PIL.Image.Image`` of the SDF.
     """
-    arr = np.zeros(df.shape + (4, ), dtype=np.float32)
-    for i, c in enumerate(color):
-        arr[:, :, i] = df * c
-    arr[:, :, 3] = df * alpha
+    arr = np.zeros(distance_field.shape + (4, ), dtype=np.float32)
+    for i, comp in enumerate(color):
+        arr[:, :, i] = distance_field * comp
+    arr[:, :, 3] = distance_field * alpha
     return Image.fromarray(arr.astype(np.uint8), 'RGBA')

@@ -352,9 +352,14 @@ good-names=i,
            k,
            x,
            y,
+           sx,
+           sy,
+           w,
+           h,
            ex,
            Run,
-           _
+           _,
+           nd
 
 # Include a hint for the correct naming format with invalid-name.
 include-naming-hint=no
@@ -487,7 +492,7 @@ notes=FIXME,
 [DESIGN]
 
 # Maximum number of arguments for function / method.
-max-args=5
+max-args=6
 
 # Maximum number of attributes for a class (see R0902).
 max-attributes=7
