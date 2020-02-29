@@ -27,1137 +27,1100 @@
 #include "node.hpp"
 #include "common.hpp"
 
-#include <algorithm>
+#include <cmath>
 #include <stdexcept>
-#include <limits>
-#include <iostream>
 
+namespace foolysh {
+namespace scene {
 
-/**
- * NodeData Struct
- * Holds all relevant data for a Node to avoid complicated memory handling.
- */
+using foolysh::tools::SmallList;
+using foolysh::tools::Vec2;
 
-
-scenegraph::NodeData::
-NodeData() {
-    _dirty = true;
-    _isnew = true;
-    _distance_relative = false;
-    _hidden = false;
-    _parent = -1;
-    _first_child = -1;
-    _angle = _r_angle = 0.0;
-    _depth = _r_depth = 1;
-    _origin = TOP_LEFT;
-    _ref_count = 1;
-}
-
-/* NodeData */
-scenegraph::NodeData::
-~NodeData() {
-
-}
+/* SceneGraphDataHandler */
 
 /**
- *
- */
-bool scenegraph::NodeData::
-_traverse(SceneGraphDataHandler& sgdh) {
-    int root_node_id = _node_data_id;
-    while (sgdh._nd[root_node_id]->_parent > -1) {
-        root_node_id = sgdh._nd[root_node_id]->_parent;
+ * Get an empty index for a new Node.
+ **/
+size_t SceneGraphDataHandler::
+get_empty() {
+    if (free_vec.size()) {
+        const size_t node_id = free_vec.back();
+        free_vec.pop_back();
+        flag_vec[node_id] = 0;
+        return node_id;
     }
-    NodeData& root = *sgdh._nd[root_node_id];
-    if (!root._dirty) {
-        return false;
-    }
-
-    root._tmp_quadtree_entry.clear();
-    double x_max, x_min, y_max, y_min;
-    x_max = y_max = -std::numeric_limits<double>::max();
-    x_min = y_min = std::numeric_limits<double>::max();
-    SmallList<int> to_process;
-    to_process.push_back(root._node_data_id);
-    while(to_process.size() > 0) {
-        const int node_id = to_process.pop_back();
-        NodeData& nd = *sgdh._nd[node_id];
-        if (nd._dirty) {
-            int child_id = nd._first_child;
-            while (child_id != -1) {
-                ChildNode& cn = sgdh._child_nodes[child_id];
-                to_process.push_back(cn.node_id);
-                child_id = cn.next;
-            }
-
-            QuadtreeEntry qe;
-            qe.node_id = (nd._isnew) ? -1 : nd._node_data_id;
-            qe.aabb = nd._aabb;
-            root._tmp_quadtree_entry.push_back(qe);
-            nd._update_relative(sgdh);
-            x_max = std::max(x_max, nd._aabb.x + nd._aabb.hw);
-            y_max = std::max(y_max, nd._aabb.y + nd._aabb.hh);
-            x_min = std::min(x_min, nd._aabb.x - nd._aabb.hw);
-            y_min = std::min(y_min, nd._aabb.y - nd._aabb.hh);
-            qe.node_id = nd._node_data_id;
-            qe.aabb = nd._aabb;
-            root._tmp_quadtree_entry.push_back(qe);
-        }
-    }
-
-    double hw = (x_max - x_min) / 2.0, hh = (y_max - y_min) / 2.0;
-    AABB qt = AABB(x_min + hw, y_min + hh, hw, hh);
-    if (!root._quadtree) {
-        root._quadtree.reset(new Quadtree(qt, NodeData::_max_qt_leaf_elements,
-                             NodeData::_max_qt_depth));
-    }
-    else if (!root._quadtree->inside(x_min, y_min)
-            || !root._quadtree->inside(x_max, y_max)) {
-        root._quadtree->resize(qt);
-    }
-
-    if (root._tmp_quadtree_entry.size() % 2) {
-        throw std::logic_error("Collected quadtree entries are not a multiple "
-                               "of 2.");
-    }
-    while (root._tmp_quadtree_entry.size() > 0) {
-        QuadtreeEntry& qe_to = *(root._tmp_quadtree_entry.end() - 1);
-        QuadtreeEntry& qe_from = *(root._tmp_quadtree_entry.end() - 2);
-        if (qe_from.node_id == -1) {
-            root._quadtree->insert(qe_to.node_id, qe_to.aabb);
-        }
-        else if (qe_from.aabb != qe_to.aabb) {
-            root._quadtree->move(qe_from.node_id, qe_from.aabb, qe_to.aabb);
-        }
-        root._tmp_quadtree_entry.pop_back();
-        root._tmp_quadtree_entry.pop_back();
-    }
-    root._quadtree->cleanup();
-    return true;
+    pos_x.push_back(0.0);
+    pos_y.push_back(0.0);
+    r_pos_x.push_back(0.0);
+    r_pos_y.push_back(0.0);
+    scale_x.push_back(0.0);
+    scale_y.push_back(0.0);
+    r_scale_x.push_back(0.0);
+    r_scale_y.push_back(0.0);
+    size_x.push_back(0.0);
+    size_y.push_back(0.0);
+    rotation_center_x.push_back(0.0);
+    rotation_center_y.push_back(0.0);
+    angle_vec.push_back(0.0);
+    r_angle_vec.push_back(0.0);
+    depth_vec.push_back(0);
+    r_depth_vec.push_back(0);
+    flag_vec.push_back(0);
+    origin_vec.push_back(TOP_LEFT);
+    parent_vec.push_back(0);
+    ref_vec.push_back(1);
+    return pos_x.size() - 1;
 }
 
 /**
- *
- */
-SmallList<int> scenegraph::NodeData::
-_query(SceneGraphDataHandler& sgdh, AABB& aabb, const bool depth_sorted) {
-    int root_node_id = _node_data_id;
-    while (sgdh._nd[root_node_id]->_parent > -1) {
-        root_node_id = sgdh._nd[root_node_id]->_parent;
+ * Erase a Node reference.
+ **/
+void SceneGraphDataHandler::
+erase(const size_t node_id) {
+    --ref_vec[node_id];
+    if (ref_vec[node_id]) {
+        return;
     }
-    NodeData& root = *sgdh._nd[root_node_id];
-    if (!root._quadtree) {
-        throw std::logic_error("Quadtree not built yet");
-    }
-    SmallList<int> result, qt_result = root._quadtree->query(aabb);
-    while (qt_result.size() > 0) {
-        const int node_id = qt_result.pop_back();
-        NodeData& nd = *sgdh._nd[node_id];
-        if (!nd._hidden) {
-            result.push_back(node_id);
-        }
-    }
-    if (!depth_sorted) {
-        return result;
-    }
-
-    // TODO: learn how to implement Random Access Iterator!!!
-    std::vector<DepthData> v;
-    v.reserve(result.size());
-    for (auto i=0; i < result.size(); ++i) {
-        v.push_back(DepthData(result[i], sgdh._nd[result[i]]->_r_depth));
-    }
-    result.clear();
-    std::sort(v.begin(), v.end(), comp_depth_data);
-    for (auto& it : v) {
-        result.push_back(it.node_id);
-    }
-    return result;
+    flag_vec[node_id] = flag_vec[node_id] | FREE;
+    free_vec.push_back(node_id);
 }
 
 /**
- * Insert Node with ``node_id`` as child.
- */
-void scenegraph::NodeData::
-_insert_child(SceneGraphDataHandler& sgdh, const int node_id) {
-    ChildNode cnp;
-    cnp.node_id = node_id;
-    const int cnp_id = sgdh._child_nodes.insert(cnp);
-    if (_first_child == -1) {
-        _first_child = cnp_id;
-    }
-    else {
-        int current = _first_child;
-        int next = sgdh._child_nodes[current].next;
-        while (next != -1) {
-            current = next;
-            next = sgdh._child_nodes[next].next;
-        }
-        sgdh._child_nodes[current].next = cnp_id;
-    }
-    _propagate_dirty(sgdh);
+ * Reserve memory. Useful when the number of Nodes needed is known.
+ **/
+void SceneGraphDataHandler::
+reserve(const size_t size) {
+    pos_x.reserve(size);
+    pos_y.reserve(size);
+    r_pos_x.reserve(size);
+    r_pos_y.reserve(size);
+    scale_x.reserve(size);
+    scale_y.reserve(size);
+    r_scale_x.reserve(size);
+    r_scale_y.reserve(size);
+    size_x.reserve(size);
+    size_y.reserve(size);
+    rotation_center_x.reserve(size);
+    rotation_center_y.reserve(size);
+    angle_vec.reserve(size);
+    r_angle_vec.reserve(size);
+    depth_vec.reserve(size);
+    r_depth_vec.reserve(size);
+    flag_vec.reserve(size);
+    origin_vec.reserve(size);
+    parent_vec.reserve(size);
+    ref_vec.reserve(size);
+}
+
+/* Node */
+
+/**
+ * Construct new Node.
+ **/
+Node::
+Node(SceneGraphDataHandler& sgdh) : sgdh(sgdh) {
+    node_id = sgdh.get_empty();
+    sgdh.pos_x[node_id] = 0.0;
+    sgdh.pos_y[node_id] = 0.0;
+    sgdh.r_pos_x[node_id] = 0.0;
+    sgdh.r_pos_y[node_id] = 0.0;
+    sgdh.scale_x[node_id] = 1.0;
+    sgdh.scale_y[node_id] = 1.0;
+    sgdh.size_x[node_id] = 0.0;
+    sgdh.size_y[node_id] = 0.0;
+    sgdh.rotation_center_x[node_id] = 0.0;
+    sgdh.rotation_center_y[node_id] = 0.0;
+    sgdh.angle_vec[node_id] = 0.0;
+    sgdh.r_angle_vec[node_id] = 0.0;
+    sgdh.depth_vec[node_id] = 1;
+    sgdh.r_depth_vec[node_id] = 1;
+    sgdh.flag_vec[node_id] = DIRTY;
+    sgdh.origin_vec[node_id] = TOP_LEFT;
+    sgdh.parent_vec[node_id] = node_id;
 }
 
 /**
- * Remove Node with ``node_id`` from children.
- */
-void scenegraph::NodeData::
-_remove_child(SceneGraphDataHandler& sgdh, const int node_id) {
-    if (_first_child == -1) {
-        throw std::range_error("No children");
-    }
-    ExtFreeList<ChildNode>& cnps = sgdh._child_nodes;
-    if (!cnps.active(_first_child)) {
-        throw std::range_error("Child is not present");
-    }
-    int cnp_id = _first_child;
-    if (cnps[cnp_id].node_id == node_id) {
-        _first_child = cnps[cnp_id].next;
-    }
-    else {
-        int before = cnp_id;
-        cnp_id = cnps[cnp_id].next;
-        while (cnps[cnp_id].node_id != node_id) {
-            if (cnps[cnp_id].next == -1 || !cnps.active(cnps[cnp_id].next)) {
-                throw std::range_error("Child not found ");
-            }
-            before = cnp_id;
-            cnp_id = cnps[cnp_id].next;
-        }
-        cnps[before].next = cnps[cnp_id].next;
-    }
-    cnps.erase(cnp_id);
+ * Create a copy of the Node with the specified node_id.
+ **/
+Node::
+Node(SceneGraphDataHandler& sgdh, const size_t node_id)
+ : sgdh(sgdh), node_id(node_id) {
+     ++sgdh.ref_vec[node_id];
 }
 
 /**
- * If necessary, propagates the _dirty flag to all descendants and along the
- * direct path to the root Node.
- */
-void scenegraph::NodeData::
-_propagate_dirty(SceneGraphDataHandler& sgdh) {
-    if (_parent > -1) {
-        int parent = _parent;
-        while (parent > -1) {
-            NodeData& nd = *sgdh._nd[parent];
-            nd._dirty = true;
-            parent = nd._parent;
-        }
-    }
-    if (_first_child > -1) {
-        SmallList<int> to_process;
-        to_process.push_back(_first_child);
-        while (to_process.size() > 0) {
-            const int cnp_id = to_process.pop_back();
-            ChildNode& cnp = sgdh._child_nodes[cnp_id];
-            NodeData& nd = *sgdh._nd[cnp.node_id];
-            if (cnp.next > -1) {
-                to_process.push_back(cnp.next);
-            }
-            if (nd._first_child > -1) {
-                to_process.push_back(nd._first_child);
-            }
-            nd._dirty = true;
-        }
-    }
-    _dirty = true;
-}
-
-/**
- * Updates all relative values according to its parent.
- */
-void scenegraph::NodeData::
-_update_relative(SceneGraphDataHandler& sgdh) {
-    Vector2 local_origin;  // origin of local coordinate system
-    Scale base_scale;
-    double base_angle;
-    bool base_dist_rel;
-    if (_parent > -1) {
-        NodeData& parent = *sgdh._nd[_parent];
-        local_origin = parent._r_position;
-        base_scale = parent._r_scale;
-        base_angle = parent._r_angle;
-        _r_depth = parent._r_depth + _depth;
-        base_dist_rel = parent._distance_relative || _distance_relative;
-    }
-    else {
-        local_origin = _get_offset();
-        base_scale = Scale();
-        base_angle = 0.0;
-        _r_depth = _depth;
-        base_dist_rel = _distance_relative;
-    }
-
-    Vector2 position = _position;
-    Vector2 tl = _get_offset();
-    Vector2 tr = tl + Vector2(_size.w, 0.0);
-    Vector2 bl = tl + Vector2(0.0, _size.h);
-    Vector2 br = tl + Vector2(_size.w, _size.h);
-    Vector2 rotation_center = tl + Vector2(_size.w / 2.0, _size.h / 2.0)
-                              + _rot_center;
-
-    if (base_scale != 1.0 || _scale != 1.0) {
-        double sx = base_scale.sx, sy = base_scale.sy;
-        if (_scale != 1.0) {
-            sx *= _scale.sx;
-            sy *= _scale.sy;
-        }
-        if (base_dist_rel) {
-            position[0] *= sx;
-            position[1] *= sy;
-        }
-        tl[0] *= sx;
-        tl[1] *= sy;
-        tr[0] *= sx;
-        tr[1] *= sy;
-        bl[0] *= sx;
-        bl[1] *= sy;
-        br[0] *= sx;
-        br[1] *= sy;
-        rotation_center[0] *= sx;
-        rotation_center[1] *= sy;
-    }
-
-    if (base_angle != 0.0) {
-        position.rotate(base_angle);
-        rotation_center.rotate(base_angle);
-        tl.rotate(base_angle);
-        tr.rotate(base_angle);
-        bl.rotate(base_angle);
-        br.rotate(base_angle);
-    }
-
-    _r_position = local_origin + position;
-    _tl_position = _r_position + tl;
-    _r_scale = base_scale * _scale;
-    _r_angle = base_angle + _angle;
-    _r_size = _size * _r_scale;
-
-    rotation_center += position;
-    tl += position;
-    tr += position;
-    bl += position;
-    br += position;
-
-    if (_angle != 0.0) {
-        tl -= rotation_center;
-        tr -= rotation_center;
-        bl -= rotation_center;
-        br -= rotation_center;
-
-        tl.rotate(_angle);
-        tr.rotate(_angle);
-        bl.rotate(_angle);
-        br.rotate(_angle);
-
-        tl += rotation_center;
-        tr += rotation_center;
-        bl += rotation_center;
-        br += rotation_center;
-    }
-
-    tl += local_origin;
-    tr += local_origin;
-    bl += local_origin;
-    br += local_origin;
-
-    double x[4], y[4];
-    x[0] = tl[0];
-    x[1] = tr[0];
-    x[2] = bl[0];
-    x[3] = br[0];
-    y[0] = tl[1];
-    y[1] = tr[1];
-    y[2] = bl[1];
-    y[3] = br[1];
-    double x_max, x_min, y_max, y_min;
-    x_max = *std::max_element(x, x + 4);
-    y_max = *std::max_element(y, y + 4);
-    x_min = *std::min_element(x, x + 4);
-    y_min = *std::min_element(y, y + 4);
-    _aabb.x = x_min + (x_max - x_min) / 2.0;
-    _aabb.y = y_min + (y_max - y_min) / 2.0;
-    _aabb.hw = _aabb.x - x_min;
-    _aabb.hh = _aabb.y - y_min;
-    _dirty = _isnew = false;
-}
-
-/**
- * Return Vector2 with origin offset relative to original size.
- */
-Vector2 scenegraph::NodeData::
-_get_offset() {
-    Vector2 offset;
-    switch (_origin) {
-        case TOP_LEFT: {
-            break;
-        }
-        case TOP_CENTER: {
-            offset[0] = -_size.w / 2.0;
-            offset[1] = 0.0;
-            break;
-        }
-        case TOP_RIGHT: {
-            offset[0] = -_size.w;
-            offset[1] = 0.0;
-            break;
-        }
-        case CENTER_LEFT: {
-            offset[0] = 0.0;
-            offset[1] = -_size.h / 2.0;
-            break;
-        }
-        case CENTER: {
-            offset[0] = -_size.w / 2.0;
-            offset[1] = -_size.h / 2.0;
-            break;
-        }
-        case CENTER_RIGHT: {
-            offset[0] = -_size.w;
-            offset[1] = -_size.h / 2.0;
-            break;
-        }
-        case BOTTOM_LEFT: {
-            offset[0] = 0.0;
-            offset[1] = -_size.h;
-            break;
-        }
-        case BOTTOM_CENTER: {
-            offset[0] = -_size.w / 2.0;
-            offset[1] = -_size.h;
-            break;
-        }
-        case BOTTOM_RIGHT: {
-            offset[0] = -_size.w;
-            offset[1] = -_size.h;
-            break;
-        }
-    }
-    return offset;
-}
-
-/**
- * Node Class
- * Serves as a wrapper around NodeData. Multiple copies of NodePath can access
- * a single instance of NodeData without protection against race conditions if
- * being accessed in parallel.
- */
-
-/**
- * Default Constructor.
- */
-scenegraph::Node::
-Node(SceneGraphDataHandler& sgdh) : _sgdh(sgdh) {
-    _node_id = _sgdh._nd.insert(new NodeData());
-    _sgdh._nd[_node_id]->_node_data_id = _node_id;
-}
-
-/**
- * Destructor, clean up relations.
- */
-scenegraph::Node::
+ * Call erase to reduce ref count.
+ **/
+Node::
 ~Node() {
-    if (_node_id > -1) {
-        NodeData& nd = _get_node_data(_node_id);
-        if (nd._ref_count == 1) {
-            /* If ours is the last reference, delete the NodeData */
-            _sgdh._nd.erase(_node_id);
-        }
-        else {
-            --nd._ref_count;
-        }
-    }
+    sgdh.erase(node_id);
 }
 
 /**
- * Copy Constructor. Creates a copy of Node ``other`` with access to the same
- * NodeData instance.
- */
-scenegraph::Node::
-Node(const Node& other) : _sgdh(other._sgdh) {
-    _node_id = other._node_id;
-    NodeData& nd = _get_node_data(_node_id);
-    ++nd._ref_count;
+ *
+ **/
+Node::
+Node(const Node& other) : sgdh(other.sgdh), node_id(other.node_id) {
+    ++sgdh.ref_vec[node_id];
 }
 
 /**
- * Move Constructor. Invalidates ``other``.
- */
-scenegraph::Node::
-Node(Node&& other) noexcept  : _sgdh(other._sgdh) {
-    _node_id = other._node_id;
-    other._node_id = -1;
-}
+ *
+ **/
+Node::
+Node(Node&& other) noexcept : sgdh(other.sgdh), node_id(other.node_id) {}
 
 /**
- * Copy Assignment Operator. Creates a copy of Node ``other`` with access to the
- * same NodeData instance.
- */
-scenegraph::Node& scenegraph::Node::
+ *
+ **/
+Node& Node::
 operator=(const Node& other) {
-    if (other._sgdh._nd.active(_node_id)) {
-        NodeData& nd = _get_node_data(_node_id);
-        --nd._ref_count;
+    if (other.node_id == node_id && &sgdh == &other.sgdh) {
+        return *this;
     }
-    _node_id = other._node_id;
-    _sgdh = other._sgdh;
-    NodeData& nd = _get_node_data(_node_id);
-    ++nd._ref_count;
+    sgdh = other.sgdh;
+    node_id = other.node_id;
+    ++sgdh.ref_vec[node_id];
     return *this;
 }
 
 /**
- * Move Assignment Operator. Invalidates ``other``. TODO: This doesn't seem right!
- */
-scenegraph::Node& scenegraph::Node::
+ *
+ **/
+Node& Node::
 operator=(Node&& other) noexcept {
-    if (other._sgdh._nd.active(_node_id)) {
-        NodeData& nd = _get_node_data(_node_id);
-        --nd._ref_count;
+    if (other.node_id == node_id && &sgdh == &other.sgdh) {
+        return *this;
     }
-    _node_id = other._node_id;
-    _sgdh = other._sgdh;
-    NodeData& nd = _get_node_data(_node_id);
-    ++nd._ref_count;
+    sgdh = other.sgdh;
+    node_id = other.node_id;
     return *this;
 }
 
 /**
- * Attach new child Node to this.
- */
-scenegraph::Node scenegraph::Node::
+ * Attach a new child node.
+ **/
+Node Node::
 attach_node() {
-    Node n = {_sgdh};
-    NodeData& cnd = _get_node_data(n._node_id);
-    NodeData& tnd = _get_node_data(_node_id);
-    cnd._parent = _node_id;
-    cnd._distance_relative = tnd._distance_relative;
-    cnd._origin = tnd._origin;
-    tnd._insert_child(_sgdh, n._node_id);
-    tnd._propagate_dirty(_sgdh);
+    Node n(sgdh);
+    n.set_origin(get_origin());
+    n.set_distance_relative(get_distance_relative());
+    n.reparent_to(node_id);
     return n;
 }
 
 /**
- * Reparents this Node to ``parent``.
- */
-void scenegraph::Node::
+ * Reparent this node to a new parent.
+ **/
+void Node::
 reparent_to(Node& parent) {
-    reparent_to(parent._node_id);
-}
-
-/**
- * Reparents this Node to ``parent``.
- */
-void scenegraph::Node::
-reparent_to(const int parent) {
-    int _p_id = _sgdh._nd[parent]->_parent;
-    while (_p_id > -1) {
-        if (_p_id == _node_id) {
-            throw std::logic_error("Unable to reparent: new parent is a child "
-                                   "of this Node.");
-        }
-        NodeData& lnd = _get_node_data(_p_id);
-        _p_id = lnd._parent;
+    if (sgdh.parent_vec[node_id] != parent.node_id) {
+        sgdh.parent_vec[node_id] = parent.node_id;
+        propagate_dirty();
     }
+}
 
-    NodeData& nd = _get_node_data(_node_id);
-    if (nd._parent > -1) {
-        NodeData& pnd = *_sgdh._nd[nd._parent];
-        pnd._remove_child(_sgdh, _node_id);
+/**
+ * Reparent this node to a new parent.
+ **/
+void Node::
+reparent_to(const size_t parent) {
+    if (sgdh.parent_vec[node_id] != parent) {
+        sgdh.parent_vec[node_id] = parent;
+        propagate_dirty();
     }
-    nd._tmp_quadtree_entry.clear();
-
-    nd._parent = parent;
-    NodeData& pnd = *_sgdh._nd[nd._parent];
-    pnd._insert_child(_sgdh, _node_id);
-    nd._propagate_dirty(_sgdh);
 }
 
 /**
- * Return true if the Scene Graph has changed. Finds root Node and traverses
- * the Scene Graph where marked dirty.
- */
-bool scenegraph::Node::
-traverse() {
-    return _get_node_data(_node_id)._traverse(_sgdh);
+ * Traverse the scene starting at the root of this Node or optionally only at
+ * this Node, if local is true.
+ **/
+bool Node::
+traverse(const bool local) {
+    if (local) {
+        return scene_traverse(sgdh, node_id);
+    }
+    size_t root = node_id;
+    while (sgdh.parent_vec[root] != root) {
+        root = sgdh.parent_vec[root];
+    }
+    return scene_traverse(sgdh, root);
 }
 
 /**
- * Return all Node indices that are visible and overlap with ``aabb`` since
- * the last call to traverse().
- */
-SmallList<int> scenegraph::Node::
+ * Query the scene starting at this node, optionally depth sorted.
+ **/
+SmallList<size_t> Node::
 query(AABB& aabb, const bool depth_sorted) {
-    return _get_node_data(_node_id)._query(_sgdh, aabb, depth_sorted);
+    SmallList<size_t> to_process;
+    std::vector<DepthSort> v;
+
+    to_process.push_back(node_id);
+    while(to_process.size()) {
+        const size_t pid = to_process.pop_back();
+        Node n(sgdh, pid);
+        if (aabb.overlap(n.get_aabb())) {
+            v.emplace_back(DepthSort(n.node_id, n.get_relative_depth()));
+        }
+        for (size_t i = 0; i < sgdh.parent_vec.size(); ++i) {
+            if (i == pid) {
+                continue;
+            }
+            if (sgdh.parent_vec[i] == pid) {
+                to_process.push_back(i);
+            }
+        }
+    }
+    if (depth_sorted) {
+        std::sort(v.begin(), v.end());
+    }
+    for (auto& i : v) {
+        to_process.push_back(i.node_id);
+    }
+    return to_process;
 }
 
 /**
- * Hides the Node and all it's children.
- */
-void scenegraph::Node::
+ * Hide the Node.
+ **/
+void Node::
 hide() {
-    NodeData& nd = _get_node_data(_node_id);
-    if (!nd._hidden) {
-        nd._hidden = true;
-        nd._propagate_dirty(_sgdh);
+    if (sgdh.flag_vec[node_id] & HIDDEN) {
+        return;
     }
+    sgdh.flag_vec[node_id] = sgdh.flag_vec[node_id] | HIDDEN;
 }
 
 /**
- * Makes the Node visible.
- */
-void scenegraph::Node::
+ * Show the Node.
+ **/
+void Node::
 show() {
-    NodeData& nd = _get_node_data(_node_id);
-    if (nd._hidden) {
-        nd._hidden = false;
-        nd._propagate_dirty(_sgdh);
+    if (!(sgdh.flag_vec[node_id] & HIDDEN)) {
+        return;
+    }
+    sgdh.flag_vec[node_id] = sgdh.flag_vec[node_id] ^ HIDDEN;
+    propagate_dirty();
+}
+
+/**
+ * Propagate the dirty flag to all attached nodes.
+ **/
+void Node::propagate_dirty() {
+    SmallList<size_t> to_process;
+    to_process.push_back(node_id);
+    while (to_process.size()) {
+        const size_t child_node_id = to_process.pop_back();
+        sgdh.flag_vec[child_node_id] = sgdh.flag_vec[child_node_id] | DIRTY;
+        for (size_t i = 0; i < sgdh.parent_vec.size(); ++i) {
+            if (i == node_id || i == child_node_id) {
+                continue;
+            }
+            if (sgdh.parent_vec[i] == child_node_id) {
+                to_process.push_back(i);
+            }
+        }
     }
 }
 
 /**
- * Makes the Node visible.
- */
-void scenegraph::Node::
-propagate_dirty() {
-    _get_node_data(_node_id)._propagate_dirty(_sgdh);
-}
-
-/**
- * Return the root NodeData reference.
- */
-inline scenegraph::NodeData& scenegraph::Node::
-_get_root() {
-    if (!_sgdh._nd.active(_node_id)) {
-        throw std::logic_error("Tried to access invalid NodeData");
-    }
-    int search_id = _node_id;
-    while (_sgdh._nd[search_id]->_parent > -1) {
-        search_id = _sgdh._nd[search_id]->_parent;
-    }
-    return *_sgdh._nd[search_id];
-}
-
-/**
- * Return the NodeData reference of this.
- */
-inline scenegraph::NodeData& scenegraph::Node::
-_get_node_data(const int node_id) {
-    if (!_sgdh._nd.active(node_id)) {
-        throw std::logic_error("Tried to access invalid NodeData");
-    }
-    return *_sgdh._nd[node_id];
-}
-
-/**
- * Traverses the scene_graph if either ``node_a`` or ``node_b`` is marked dirty.
- */
-inline void scenegraph::Node::
-_check_dirty(Node& node_a, Node& node_b) {
-    NodeData& a = _get_node_data(node_a._node_id);
-    NodeData& b = _get_node_data(node_b._node_id);
-    if (a._dirty || b._dirty) {
-        traverse();
-    }
-}
-
-/**
- * Return the Node index, useful to later retrieve a reference by id.
- */
-int scenegraph::Node::
+ * Get the Node ID.
+ **/
+size_t Node::
 get_id() {
-    return _node_id;
+    return node_id;
 }
 
 /**
- * Return the Node index of the parent.
- */
-int scenegraph::Node::
+ * Get the Node ID of the parent.
+ **/
+size_t Node::
 get_parent_id() {
-    NodeData& nd = _get_node_data(_node_id);
-    return nd._parent;
+    return sgdh.parent_vec[node_id];
 }
 
 /**
- * Set both parts of position to ``v``.
- */
-void scenegraph::Node::
+ * Set x and y pos to a value.
+ **/
+void Node::
 set_pos(const double v) {
-    NodeData& nd = _get_node_data(_node_id);
-    if (nd._position[0] != v || nd._position[1] != v) {
-        nd._position[0] = v;
-        nd._position[1] = v;
-        nd._propagate_dirty(_sgdh);
-    }
+    set_pos(v, v);
 }
 
 /**
- * Set both parts of position to ``v``, relative to ``other``. If either this
- * or ``other`` is marked dirty, triggers scenegraph traversal to update the
- * relative positions.
- */
-void scenegraph::Node::
-set_pos(Node& other, const double v) {
-    _check_dirty(*this, other);
-    Vector2 offset = other.get_relative_pos() - get_relative_pos() + v;
-    offset += get_pos();
-    set_pos(offset);
-}
-
-/**
- * Set position to ``x``, ``y``.
- */
-void scenegraph::Node::
+ * Set the position as x, y.
+ **/
+void Node::
 set_pos(const double x, const double y) {
-    NodeData& nd = _get_node_data(_node_id);
-    if (nd._position[0] != x || nd._position[1] != y) {
-        nd._position[0] = x;
-        nd._position[1] = y;
-        nd._propagate_dirty(_sgdh);
+    if (sgdh.pos_x[node_id] != x || sgdh.pos_y[node_id] != y) {
+        sgdh.pos_x[node_id] = x;
+        sgdh.pos_y[node_id] = y;
+        propagate_dirty();
     }
 }
 
 /**
- * Set position to ``x``, ``y``, relative to ``other``. If either this
- * or ``other`` is marked dirty, triggers scenegraph traversal to update the
- * relative positions.
- */
-void scenegraph::Node::
+ * Set the position as Vec2.
+ **/
+void Node::
+set_pos(Vec2& p) {
+    set_pos(p[0], p[1]);
+}
+
+/**
+ * Set the position as x, y, relative to another Node.
+ **/
+void Node::
 set_pos(Node& other, const double x, const double y) {
-    _check_dirty(*this, other);
-    Vector2 offset = other.get_relative_pos() - get_relative_pos();
-    offset += Vector2(x, y);
-    offset += get_pos();
-    set_pos(offset);
+    const double t_x = other.get_relative_x() + x;
+    const double t_y = other.get_relative_y() + y;
+    if (get_relative_x() == t_x && get_relative_y() == t_y) {
+        return;
+    }
+
+    const bool dist_rel = (sgdh.flag_vec[node_id] & DISTANCE_RELATIVE) > 0;
+    const double p_x = sgdh.pos_x[node_id];
+    const double p_y = sgdh.pos_y[node_id];
+    const Scale r_s = get_relative_scale();
+    const double o_x = get_relative_x() - (dist_rel ? p_x * r_s.sx : p_x);
+    const double o_y = get_relative_y() - (dist_rel ? p_y * r_s.sy : p_y);
+
+    sgdh.pos_x[node_id] = t_x - o_x;
+    sgdh.pos_y[node_id] = t_y - o_y;
+    if (dist_rel) {
+        sgdh.pos_x[node_id] /= r_s.sx;
+        sgdh.pos_y[node_id] /= r_s.sy;
+    }
+    propagate_dirty();
 }
 
 /**
- * Set position to ``p``.
- */
-void scenegraph::Node::
-set_pos(Vector2& p) {
-    NodeData& nd = _get_node_data(_node_id);
-    if (nd._position != p) {
-        nd._position = p;
-        nd._propagate_dirty(_sgdh);
+ * Set x and y pos to a value, relative to another Node.
+ **/
+void Node::
+set_pos(Node& other, const double v) {
+    set_pos(other, v, v);
+}
+
+/**
+ * Set the position as Vec2, relative to another Node.
+ **/
+void Node::
+set_pos(Node& other, Vec2& p) {
+    set_pos(other, p[0], p[1]);
+}
+
+/**
+ * Set the X component.
+ **/
+void Node::
+set_x(const double v) {
+    if (sgdh.pos_x[node_id] != v) {
+        sgdh.pos_x[node_id] = v;
+        propagate_dirty();
     }
 }
 
 /**
- * Set position to ``x``, ``y``, relative to ``other``. If either this or
- * ``other`` is marked dirty, triggers scenegraph traversal to update the
- * relative positions.
- */
-void scenegraph::Node::
-set_pos(Node& other, Vector2& p) {
-    _check_dirty(*this, other);
-    Vector2 offset = other.get_relative_pos() - get_relative_pos() + p;
-    offset += get_pos();
-    set_pos(offset);
+ * Set the X component, relative to another Node.
+ **/
+void Node::
+set_x(Node& other, const double v) {
+    const double t_x = other.get_relative_x() + v;
+    const double r_x = get_relative_x();
+    if (r_x == t_x) {
+        return;
+    }
+
+    const bool dist_rel = (sgdh.flag_vec[node_id] & DISTANCE_RELATIVE) > 0;
+    const double p_x = sgdh.pos_x[node_id];
+    const double s_x = get_relative_scale().sx;
+    const double o_x = r_x - (dist_rel ? p_x * s_x : p_x);
+
+    sgdh.pos_x[node_id] = t_x - o_x;
+    if (dist_rel) {
+        sgdh.pos_x[node_id] /= s_x;
+    }
+    propagate_dirty();
 }
 
 /**
- * Return a ``Vector2`` of the current position.
- */
-Vector2 scenegraph::Node::
+ * Set the Y component.
+ **/
+void Node::
+set_y(const double v) {
+    if (sgdh.pos_y[node_id] != v) {
+        sgdh.pos_y[node_id] = v;
+        propagate_dirty();
+    }
+}
+
+/**
+ * Set the Y component, relative to another Node.
+ **/
+void Node::
+set_y(Node& other, const double v) {
+    const double t_y = other.get_relative_y() + v;
+    const double r_y = get_relative_y();
+    if (r_y == t_y) {
+        return;
+    }
+
+    const bool dist_rel = (sgdh.flag_vec[node_id] & DISTANCE_RELATIVE) > 0;
+    const double p_y = sgdh.pos_y[node_id];
+    const double s_y = get_relative_scale().sy;
+    const double o_y = r_y - (dist_rel ? p_y * s_y : p_y);
+
+    sgdh.pos_y[node_id] = t_y - o_y;
+    if (dist_rel) {
+        sgdh.pos_y[node_id] /= s_y;
+    }
+    propagate_dirty();
+}
+
+/**
+ * Get the position as Vec2.
+ **/
+Vec2 Node::
 get_pos() {
-    return _get_node_data(_node_id)._position;
+    return Vec2(sgdh.pos_x[node_id], sgdh.pos_y[node_id]);
 }
 
 /**
- * Return a ``Vector2`` of the current position, relative to ``other``.
- */
-Vector2 scenegraph::Node::
+ * Get the position as Vec2, relative to another Node.
+ **/
+Vec2 Node::
 get_pos(Node& other) {
-    _check_dirty(*this, other);
     return get_relative_pos() - other.get_relative_pos();
 }
 
 /**
- * Set scale to ``s``.
- */
-void scenegraph::Node::
-set_scale(const double s) {
-    if (s <= 0.0) {
-        throw std::domain_error("Scale must be positive.");
-    }
-    NodeData& nd = _get_node_data(_node_id);
-    if (nd._scale.sx != s || nd._scale.sy != s) {
-        nd._scale.sx = nd._scale.sy = s;
-        nd._propagate_dirty(_sgdh);
-    }
-}
-
-/**
- * Set scale to ``s``, relative to ``other``.
- */
-void scenegraph::Node::
-set_scale(Node& other, const double s) {
-    if (s <= 0.0) {
-        throw std::domain_error("Scale must be positive.");
-    }
-    _check_dirty(*this, other);
-    Scale t_rel = get_relative_scale();
-    Scale t_s = get_scale();
-    Scale o_rel = other.get_relative_scale();
-    set_scale(
-        t_s.sx / o_rel.sx * s / t_rel.sx,
-        t_s.sy / o_rel.sy * s / t_rel.sy
-    );
-}
-
-/**
- * Set scale to ``sx``, ``sy``.
- */
-void scenegraph::Node::
-set_scale(const double sx, const double sy) {
-    if (sx <= 0.0 || sy <= 0.0) {
-        throw std::domain_error("Scale must be positive.");
-    }
-    NodeData& nd = _get_node_data(_node_id);
-    if (nd._scale.sx != sx || nd._scale.sy != sy) {
-        nd._scale.sx = sx;
-        nd._scale.sy = sy;
-        nd._propagate_dirty(_sgdh);
-    }
-}
-
-/**
- * Set scale to ``sx``, ``sy``, relative to ``other``.
- */
-void scenegraph::Node::
-set_scale(Node& other, const double sx, const double sy) {
-    if (sx <= 0.0 || sy <= 0.0) {
-        throw std::domain_error("Scale must be positive.");
-    }
-    _check_dirty(*this, other);
-    Scale t_rel = get_relative_scale();
-    Scale t_s = get_scale();
-    Scale o_rel = other.get_relative_scale();
-    set_scale(
-        t_s.sx / o_rel.sx * sx / t_rel.sx,
-        t_s.sy / o_rel.sy * sy / t_rel.sy
-    );
-}
-
-/**
- * Set scale to ``s``.
- */
-void scenegraph::Node::
-set_scale(const Scale& s) {
-    if (s.sx <= 0.0 || s.sy <= 0.0) {
-        throw std::domain_error("Scale must be positive.");
-    }
-    NodeData& nd = _get_node_data(_node_id);
-    if (nd._scale.sx != s.sx || nd._scale.sy != s.sy) {
-        nd._scale.sx = s.sx;
-        nd._scale.sy = s.sy;
-        nd._propagate_dirty(_sgdh);
-    }
-}
-
-/**
- * Set scale to ``s``, relative to ``other``.
- */
-void scenegraph::Node::
-set_scale(Node& other, const Scale& s) {
-    if (s.sx <= 0.0 || s.sy <= 0.0) {
-        throw std::domain_error("Scale must be positive.");
-    }
-    _check_dirty(*this, other);
-    Scale t_rel = get_relative_scale();
-    Scale t_s = get_scale();
-    Scale o_rel = other.get_relative_scale();
-    set_scale(
-        t_s.sx / o_rel.sx * s.sx / t_rel.sx,
-        t_s.sy / o_rel.sy * s.sy / t_rel.sy
-    );
-}
-
-/**
- *
- */
-scenegraph::Scale scenegraph::Node::
-get_scale() {
-    return _get_node_data(_node_id)._scale;
-}
-
-/**
- *
- */
-scenegraph::Scale scenegraph::Node::
-get_scale(Node& other) {
-    _check_dirty(*this, other);
-    Scale t_rel = get_relative_scale();
-    Scale o_rel = other.get_relative_scale();
-    Scale res;
-    res.sx = t_rel.sx / o_rel.sx;
-    res.sy = t_rel.sy / o_rel.sy;
-    return res;
-}
-
-/**
- * Set angle to ``a`` degrees if ``radians`` is false (default) otherwise
- * to ``a`` radians.
- */
-void scenegraph::Node::
-set_angle(double a, bool radians) {
-    if (radians) {
-        a = a * to_deg;
-    }
-    NodeData& nd = _get_node_data(_node_id);
-    if (a != nd._angle) {
-        // nd._angle = clamp_angle(a);
-        nd._angle = a;
-        nd._propagate_dirty(_sgdh);
-    }
-}
-
-/**
- * Set angle to ``a`` degrees if ``radians`` is false (default) otherwise
- * to ``a`` radians, relative to ``other``.
- */
-void scenegraph::Node::
-set_angle(Node& other, double a, bool radians) {
-    if (radians) {
-        a = a * to_deg;
-    }
-    // a = clamp_angle(a);
-    _check_dirty(*this, other);
-    double rel_a = other.get_relative_angle() + a - get_angle()
-                   + get_relative_angle();
-    // set_angle(clamp_angle(rel_a), false);
-    set_angle(rel_a, false);
-}
-
-/**
- * Get angle in degrees if ``radians`` is false, otherwise in radians.
- */
-double scenegraph::Node::
-get_angle(bool radians) {
-    NodeData& nd = _get_node_data(_node_id);
-    if (radians) {
-        return nd._angle * to_rad;
-    }
-    else {
-        return nd._angle;
-    }
-}
-
-/**
- * Get angle in degrees if ``radians`` is false, otherwise in radians, relative
- * to ``other``.
- */
-double scenegraph::Node::
-get_angle(Node& other, bool radians) {
-    _check_dirty(*this, other);
-    double a_rel = other.get_relative_angle() - get_relative_angle();
-    // a_rel = clamp_angle(a_rel);
-
-    if (radians) {
-        return a_rel * to_rad;
-    }
-    else {
-        return a_rel;
-    }
-}
-
-/**
- *
- */
-void scenegraph::Node::
-set_rotation_center(const double x, const double y) {
-    NodeData& nd = _get_node_data(_node_id);
-    if (nd._rot_center[0] != x || nd._rot_center[1] != y) {
-        nd._rot_center[0] = x;
-        nd._rot_center[1] = y;
-        nd._propagate_dirty(_sgdh);
-    }
-}
-
-/**
- *
- */
-void scenegraph::Node::
-set_rotation_center(Vector2& c) {
-    NodeData& nd = _get_node_data(_node_id);
-    if (nd._rot_center != c) {
-        nd._rot_center[0] = c[0];
-        nd._rot_center[1] = c[1];
-        nd._propagate_dirty(_sgdh);
-    }
-}
-
-/**
- *
- */
-Vector2 scenegraph::Node::
-get_rotation_center() {
-    return _get_node_data(_node_id)._rot_center;
-}
-
-/**
- * Set depth to ``d``.
- */
-void scenegraph::Node::
-set_depth(const int d) {
-    NodeData& nd = _get_node_data(_node_id);
-    if (nd._depth != d) {
-        nd._depth = d;
-        nd._propagate_dirty(_sgdh);
-    }
-}
-
-/**
- * Set depth to ``d``, relative to ``other``.
- */
-void scenegraph::Node::
-set_depth(Node& other, const int d) {
-    _check_dirty(*this, other);
-    set_depth(
-        get_relative_depth() -  get_depth() - other.get_relative_depth() + d);
-}
-
-/**
- *
- */
-int scenegraph::Node::
-get_depth() {
-    return _get_node_data(_node_id)._depth;
-}
-
-/**
- *
- */
-int scenegraph::Node::
-get_depth(Node& other) {
-    _check_dirty(*this, other);
-    return get_relative_depth() - other.get_relative_depth();
-}
-
-/**
- * Set origin to ``o``.
- */
-void scenegraph::Node::
-set_origin(Origin o) {
-    NodeData& nd = _get_node_data(_node_id);
-    if (nd._origin != o) {
-        nd._origin = o;
-        nd._propagate_dirty(_sgdh);  // Necessary?
-    }
-}
-
-/**
- *
- */
-scenegraph::Origin scenegraph::Node::
-get_origin() {
-    return _get_node_data(_node_id)._origin;
-}
-
-/**
- *
- */
-Vector2 scenegraph::Node::
+ * Get the relative position as Vec2.
+ **/
+Vec2 Node::
 get_relative_pos() {
-    return _get_node_data(_node_id)._r_position;
+    clean_node();
+    return Vec2(sgdh.r_pos_x[node_id], sgdh.r_pos_y[node_id]);
 }
 
 /**
- *
- */
-scenegraph::Scale scenegraph::Node::
+ * Get X component of the position.
+ **/
+double Node::
+get_x() {
+    return sgdh.pos_x[node_id];
+}
+
+/**
+ * Get X component of the position, relative to another Node.
+ **/
+double Node::
+get_x(Node& other) {
+    return get_relative_x() - other.get_relative_x();
+}
+
+/**
+ * Get X component of the relative position.
+ **/
+double Node::
+get_relative_x() {
+    clean_node();
+    return sgdh.r_pos_x[node_id];
+}
+
+/**
+ * Get Y component of the position.
+ **/
+double Node::
+get_y() {
+    return sgdh.pos_y[node_id];
+}
+
+/**
+ * Get Y component of the position, relative to another Node.
+ **/
+double Node::
+get_y(Node& other) {
+    return get_relative_y() - other.get_relative_y();
+}
+
+/**
+ * Get Y component of the relative position.
+ **/
+double Node::
+get_relative_y() {
+    clean_node();
+    return sgdh.r_pos_y[node_id];
+}
+
+/**
+ * Set the scale as single value double.
+ **/
+void Node::
+set_scale(const double s) {
+    set_scale(s, s);
+}
+
+/**
+ * Set the scale as two value double.
+ **/
+void Node::
+set_scale(const double sx, const double sy) {
+    if (sgdh.scale_x[node_id] != sx || sgdh.scale_y[node_id] != sy) {
+        sgdh.scale_x[node_id] = sx;
+        sgdh.scale_y[node_id] = sy;
+        propagate_dirty();
+    }
+}
+
+/**
+ * Set the scale as Scale.
+ **/
+void Node::
+set_scale(const Scale& s) {
+    set_scale(s.sx, s.sy);
+}
+
+/**
+ * Set the scale as single value double, relative to another Node.
+ **/
+void Node::
+set_scale(Node& other, const double s) {
+    set_scale(other, s, s);
+}
+
+/**
+ * Set the scale as two value double, relative to another Node.
+ **/
+void Node::
+set_scale(Node& other, const double sx, const double sy) {
+    Scale t_scale = other.get_relative_scale();
+    t_scale.sx = t_scale.sx * sx;
+    t_scale.sy = t_scale.sy * sy;
+
+    Scale r_scale = get_relative_scale();
+
+    if (r_scale != t_scale) {
+        sgdh.scale_x[node_id] = sgdh.scale_x[node_id] / r_scale.sx * t_scale.sx;
+        sgdh.scale_y[node_id] = sgdh.scale_y[node_id] / r_scale.sy * t_scale.sy;
+        propagate_dirty();
+    }
+}
+
+/**
+ * Set the scale as Scale.
+ **/
+void Node::
+set_scale(Node& other, const Scale& s) {
+    set_scale(other, s.sx, s.sy);
+}
+
+/**
+ * Get scale as Scale.
+ **/
+Scale Node::
+get_scale() {
+    return Scale(sgdh.scale_x[node_id], sgdh.scale_y[node_id]);
+}
+
+/**
+ * Get scale as Scale, relative to another Node.
+ **/
+Scale Node::
+get_scale(Node& other) {
+    Scale o_s = other.get_relative_scale();
+    Scale t_s = get_relative_scale();
+    return Scale(t_s.sx / o_s.sx, t_s.sy / o_s.sy);
+}
+
+/**
+ * Get relative scale as Scale.
+ **/
+Scale Node::
 get_relative_scale() {
-    return _get_node_data(_node_id)._r_scale;
+    clean_node();
+    return Scale(sgdh.r_scale_x[node_id], sgdh.r_scale_y[node_id]);
 }
 
 /**
- *
- */
-double scenegraph::Node::
+ * Set angle to double in degrees or radians if true.
+ **/
+void Node::
+set_angle(const double angle, bool radians) {
+    const double deg_angle = radians ? angle * to_deg : angle;
+    if (sgdh.angle_vec[node_id] != deg_angle) {
+        sgdh.angle_vec[node_id] = deg_angle;
+        propagate_dirty();
+    }
+}
+
+/**
+ * Set angle to double in degrees or radians if true, relative to another Node.
+ **/
+void Node::
+set_angle(Node& other, const double angle, bool radians) {
+    const double deg_angle = radians ? angle * to_deg : angle;
+    const double t_angle = other.get_relative_angle() + deg_angle;
+    const double r_angle = get_relative_angle();
+    if (r_angle != t_angle) {
+        sgdh.angle_vec[node_id] += r_angle - t_angle;
+        propagate_dirty();
+    }
+}
+
+/**
+ * Get the angle in degrees or radians if true.
+ **/
+double Node::
+get_angle(bool radians) {
+    return sgdh.angle_vec[node_id] * (radians ? to_rad : 1.0);
+}
+
+/**
+ * Get the angle in degrees or radians if true, relative to another Node.
+ **/
+double Node::
+get_angle(Node& other, bool radians) {
+    const double a = other.get_relative_angle() - get_relative_angle();
+    return a * (radians ? to_rad : 1.0);
+}
+
+/**
+ * Get the relative angle in degrees.
+ **/
+double Node::
 get_relative_angle() {
-    return _get_node_data(_node_id)._r_angle;
+    clean_node();
+    return sgdh.r_angle_vec[node_id];
 }
 
 /**
- *
- */
-int scenegraph::Node::
+ * Set the rotation center to two value double.
+ **/
+void Node::
+set_rotation_center(const double x, const double y) {
+    if (!(sgdh.flag_vec[node_id] & ROTATION_CENTER_SET) ||
+            sgdh.rotation_center_x[node_id] != x ||
+            sgdh.rotation_center_y[node_id] != y) {
+        sgdh.rotation_center_x[node_id] = x;
+        sgdh.rotation_center_y[node_id] = y;
+        sgdh.flag_vec[node_id] = sgdh.flag_vec[node_id] | ROTATION_CENTER_SET;
+        propagate_dirty();
+    }
+}
+
+/**
+ * Set the rotation center to Vec2.
+ **/
+void Node::
+set_rotation_center(Vec2& c) {
+    if (!(sgdh.flag_vec[node_id] & ROTATION_CENTER_SET) ||
+            sgdh.rotation_center_x[node_id] != c[0] ||
+            sgdh.rotation_center_y[node_id] != c[1]) {
+        sgdh.rotation_center_x[node_id] = c[0];
+        sgdh.rotation_center_y[node_id] = c[1];
+        sgdh.flag_vec[node_id] = sgdh.flag_vec[node_id] | ROTATION_CENTER_SET;
+        propagate_dirty();
+    }
+}
+
+/**
+ * Reset rotation center.
+ **/
+void Node::
+reset_rotation_center() {
+    if (sgdh.flag_vec[node_id] & ROTATION_CENTER_SET) {
+        sgdh.flag_vec[node_id] = sgdh.flag_vec[node_id] ^ ROTATION_CENTER_SET;
+    }
+    propagate_dirty();
+}
+
+/**
+ * Get rotation center. If not set, returns the center.
+ **/
+Vec2 Node::
+get_rotation_center() {
+    if (!(sgdh.flag_vec[node_id] & ROTATION_CENTER_SET)) {
+        return Vec2(
+            sgdh.size_x[node_id] / 2.0,
+            sgdh.size_y[node_id] / 2.0
+        );
+    }
+    return Vec2(
+        sgdh.rotation_center_x[node_id],
+        sgdh.rotation_center_y[node_id]
+    );
+}
+
+/**
+ * Set depth.
+ **/
+void Node::
+set_depth(const int depth) {
+    if (sgdh.depth_vec[node_id] != depth) {
+        sgdh.depth_vec[node_id] = depth;
+        propagate_dirty();
+    }
+}
+
+/**
+ * Set depth, relative to another Node.
+ **/
+void Node::
+set_depth(Node& other, const int depth) {
+    const int d = other.get_relative_depth() + depth - get_relative_depth();
+    if (d != 0) {
+        sgdh.depth_vec[node_id] += d;
+        propagate_dirty();
+    }
+}
+
+/**
+ * Get depth.
+ **/
+int Node::
+get_depth() {
+    return sgdh.depth_vec[node_id];
+}
+
+/**
+ * Get depth, relative to another Node.
+ **/
+int Node::
+get_depth(Node& other) {
+    return other.get_relative_depth() - get_relative_depth();
+}
+
+/**
+ * Get relative depth, relative to another Node. !!!!
+ **/
+int Node::
 get_relative_depth() {
-    return _get_node_data(_node_id)._r_depth;
+    clean_node();
+    return sgdh.r_depth_vec[node_id];
 }
 
 /**
- * Return the relative size.
- */
-scenegraph::Size scenegraph::Node::
-get_relative_size() {
-    return _get_node_data(_node_id)._r_size;
+ * Set size as two value double.
+ **/
+void Node::
+set_size(const double x, const double y) {
+    if (sgdh.size_x[node_id] != x || sgdh.size_y[node_id] != y) {
+        sgdh.size_x[node_id] = x;
+        sgdh.size_y[node_id] = y;
+        propagate_dirty();
+    }
 }
 
 /**
- * Set the represented size in world space of Node.
- */
-void scenegraph::Node::
+ * Set size as Size.
+ **/
+void Node::
 set_size(const Size& s) {
-    NodeData& nd = _get_node_data(_node_id);
-    if (s.w >= 0.0 && s.h >= 0.0) {
-        nd._size = s;
-        nd._propagate_dirty(_sgdh);
-    }
-    else {
-        throw std::domain_error("Size must be positive.");
+    if (sgdh.size_x[node_id] != s.w || sgdh.size_y[node_id] != s.h) {
+        sgdh.size_x[node_id] = s.w;
+        sgdh.size_y[node_id] = s.h;
+        propagate_dirty();
     }
 }
 
 /**
- * Set the represented size in world space of Node.
- */
-void scenegraph::Node::
-set_size(const double w, const double h) {
-    NodeData& nd = _get_node_data(_node_id);
-    if (w >= 0.0 && h >= 0.0) {
-        nd._size.w = w;
-        nd._size.h = h;
-        nd._propagate_dirty(_sgdh);
-    }
-    else {
-        throw std::domain_error("Size must be positive.");
-    }
-}
-
-/**
- *
- */
-scenegraph::Size scenegraph::Node::
+ * Get size as Size.
+ **/
+Size Node::
 get_size() {
-    return _get_node_data(_node_id)._size;
+    return Size(sgdh.size_x[node_id], sgdh.size_y[node_id]);
 }
 
 /**
- *
- */
-void scenegraph::Node::
-set_distance_relative(const bool v) {
-    NodeData& nd = _get_node_data(_node_id);
-    if (v != nd._distance_relative) {
-        nd._distance_relative = v;
-        nd._propagate_dirty(_sgdh);
+ * Get relative size as Size.
+ **/
+Size Node::
+get_relative_size() {
+    clean_node();
+    return Size(
+        sgdh.size_x[node_id] * sgdh.r_scale_x[node_id],
+        sgdh.size_y[node_id] * sgdh.r_scale_y[node_id]
+    );
+}
+
+/**
+ * Set origin.
+ **/
+void Node::
+set_origin(Origin o) {
+    if (sgdh.origin_vec[node_id] != o) {
+        sgdh.origin_vec[node_id] = o;
+        propagate_dirty();
     }
 }
 
 /**
- *
- */
-bool scenegraph::Node::
-get_distance_relative() {
-    return _get_node_data(_node_id)._distance_relative;
+ * Get origin.
+ **/
+Origin Node::
+get_origin() {
+    return sgdh.origin_vec[node_id];
 }
 
 /**
- *
- */
-AABB scenegraph::Node::
-get_aabb() {
-    return _get_node_data(_node_id)._aabb;
+ * Set or remove relative distance flag.
+ **/
+void Node::
+set_distance_relative(const bool v) {
+    if (!(sgdh.flag_vec[node_id] & DISTANCE_RELATIVE) && v) {
+        sgdh.flag_vec[node_id] = sgdh.flag_vec[node_id] | DISTANCE_RELATIVE;
+        propagate_dirty();
+    }
+    else if ((sgdh.flag_vec[node_id] & DISTANCE_RELATIVE) && !v) {
+        sgdh.flag_vec[node_id] = sgdh.flag_vec[node_id] ^ DISTANCE_RELATIVE;
+        propagate_dirty();
+    }
 }
+
+/**
+ * Get whether the relative distance flag has been set.
+ **/
+bool Node::
+get_distance_relative() {
+    return (sgdh.flag_vec[node_id] & DISTANCE_RELATIVE) > 0;
+}
+
+/**
+ * Return the AABB of the Node.
+ **/
+AABB Node::
+get_aabb() {
+    Size r_sz = get_relative_size();
+    Vec2 r_pos = get_relative_pos();
+    Scale r_sc = get_relative_scale();
+
+    double min_x = r_pos[0], max_x = r_pos[0] + r_sz.w;
+    double min_y = r_pos[1], max_y = r_pos[1] + r_sz.h;
+    Vec2 top_left(min_x, min_y);
+    Vec2 top_right(max_x, min_y);
+    Vec2 bottom_left(min_x, max_y);
+    Vec2 bottom_right(max_x, max_y);
+    Vec2 rot_center = get_rotation_center();
+    rot_center = Vec2(rot_center[0] * r_sc.sx, rot_center[1] * r_sc.sy) + r_pos;
+    Vec2 rot;
+    const double a = get_relative_angle();
+
+    rot = (top_left - rot_center).rotated(a) + rot_center;
+    min_x = std::min(min_x, rot[0]);
+    max_x = std::max(max_x, rot[0]);
+    min_y = std::min(min_y, rot[1]);
+    max_y = std::max(max_y, rot[1]);
+
+    rot = (top_right - rot_center).rotated(a) + rot_center;
+    min_x = std::min(min_x, rot[0]);
+    max_x = std::max(max_x, rot[0]);
+    min_y = std::min(min_y, rot[1]);
+    max_y = std::max(max_y, rot[1]);
+
+    rot = (bottom_left - rot_center).rotated(a) + rot_center;
+    min_x = std::min(min_x, rot[0]);
+    max_x = std::max(max_x, rot[0]);
+    min_y = std::min(min_y, rot[1]);
+    max_y = std::max(max_y, rot[1]);
+
+    rot = (bottom_right - rot_center).rotated(a) + rot_center;
+    min_x = std::min(min_x, rot[0]);
+    max_x = std::max(max_x, rot[0]);
+    min_y = std::min(min_y, rot[1]);
+    max_y = std::max(max_y, rot[1]);
+
+    const double hw = (max_x - min_x) / 2.0;
+    const double hh = (max_y - min_y) / 2.0;
+    return AABB(min_x + hw, min_y + hh, hw, hh);
+}
+
+
+// Systems
+
+/**
+ * Traverse the scene graph, optionally starting at a specified Node. Traversal
+ * first finds the first either non dirty or root node (depending on which is
+ * found first) and traverses the scene from that node.
+ **/
+bool scene_traverse(SceneGraphDataHandler& sgdh, const size_t start_node) {
+    bool was_dirty = false;
+    const size_t parent = sgdh.parent_vec[start_node];
+    if (parent != start_node && (sgdh.flag_vec[start_node] & DIRTY)) {
+        minimal_clean(sgdh, parent);
+        was_dirty = true;
+    }
+
+    SmallList<size_t> to_process;
+    SmallList<size_t> nodes;
+    nodes.reserve(sgdh.flag_vec.size());
+
+    nodes.push_back(start_node);
+    to_process.push_back(start_node);
+    size_t current_proc_id = 0;
+    while (to_process.size() > current_proc_id) {
+        const size_t pid = to_process[current_proc_id];
+        for (size_t i = 0; i < sgdh.parent_vec.size(); ++i) {
+            if (i == pid || sgdh.flag_vec[i] & FREE) {
+                continue;
+            }
+            if (sgdh.parent_vec[i] == pid) {
+                to_process.push_back(i);
+                nodes.push_back(i);
+            }
+        }
+        ++current_proc_id;
+    }
+
+    process_angle(sgdh, nodes);
+    process_depth(sgdh, nodes);
+    process_scale(sgdh, nodes);
+    process_pos(sgdh, nodes);
+    if (clear_dirty_flag(sgdh, nodes) && !was_dirty) {
+        was_dirty = true;
+    }
+
+    return was_dirty;
+}
+
+
+/**
+ * Perform the least amount of traversal to clean a Node.
+ **/
+void minimal_clean(SceneGraphDataHandler &sgdh, const size_t node_id) {
+    SmallList<size_t> path;
+    path.push_back(node_id);
+    dirty_path(sgdh, node_id, path);
+    path.reverse();
+    process_angle(sgdh, path);
+    process_depth(sgdh, path);
+    process_scale(sgdh, path);
+    process_pos(sgdh, path);
+    clear_dirty_flag(sgdh, path);
+}
+
+/**
+ * Populates a list of dirty node ids to traverse, to get to the specified
+ * Node in reversed order. Does not clear the list.
+ **/
+void dirty_path(SceneGraphDataHandler &sgdh, const size_t node_id,
+                SmallList<size_t>& path) {
+    size_t base_node = node_id;
+    while (base_node > 0 && sgdh.parent_vec[base_node] != base_node) {
+        if (!(sgdh.flag_vec[base_node] & DIRTY)) {
+            break;
+        }
+        if (sgdh.flag_vec[base_node] & FREE) {
+            throw std::runtime_error("Encountered a removed Node.");
+        }
+        base_node = sgdh.parent_vec[base_node];
+        path.push_back(base_node);
+    }
+}
+
+/**
+ * Process all angles of nodes in path.
+ **/
+void process_angle(SceneGraphDataHandler& sgdh, SmallList<size_t>& path) {
+    for (size_t i = 0; i < path.size(); ++i) {
+        const size_t pid = path[i];
+        const size_t parent = sgdh.parent_vec[pid];
+        const double rel = parent == pid ? 0.0 : sgdh.r_angle_vec[parent];
+        sgdh.r_angle_vec[pid] = rel + sgdh.angle_vec[pid];
+    }
+}
+
+/**
+ * Process all depths of nodes in path.
+ **/
+void process_depth(SceneGraphDataHandler& sgdh, SmallList<size_t>& path) {
+    for (size_t i = 0; i < path.size(); ++i) {
+        const size_t pid = path[i];
+        const size_t parent = sgdh.parent_vec[pid];
+        const double rel = parent == pid ? 0 : sgdh.r_depth_vec[parent];
+        sgdh.r_depth_vec[pid] = rel + sgdh.depth_vec[pid];
+    }
+}
+
+/**
+ * Process all scale factors of nodes in path.
+ **/
+void process_scale(SceneGraphDataHandler& sgdh, SmallList<size_t>& path) {
+    for (size_t i = 0; i < path.size(); ++i) {
+        const size_t pid = path[i];
+        const size_t parent = sgdh.parent_vec[pid];
+        const double rel = parent == pid ? 1.0 : sgdh.r_scale_x[parent];
+        sgdh.r_scale_x[pid] = rel * sgdh.scale_x[pid];
+    }
+    for (size_t i = 0; i < path.size(); ++i) {
+        const size_t pid = path[i];
+        const size_t parent = sgdh.parent_vec[pid];
+        const double rel = parent == pid ? 1.0 : sgdh.r_scale_y[parent];
+        sgdh.r_scale_y[pid] = rel * sgdh.scale_y[pid];
+    }
+}
+
+/**
+ * Process all positions of nodes in path.
+ **/
+void process_pos(SceneGraphDataHandler& sgdh, SmallList<size_t>& path) {
+    for (size_t i = 0; i < path.size(); ++i) {
+        const size_t pid = path[i];
+        const size_t parent = sgdh.parent_vec[pid];
+        const double rel_x = parent == pid ? 0.0 : sgdh.r_pos_x[parent];
+        const double rel_y = parent == pid ? 0.0 : sgdh.r_pos_y[parent];
+        const double hw = sgdh.size_x[pid] / 2.0, hh = sgdh.size_y[pid] / 2.0;
+        const bool dist_rel = (sgdh.flag_vec[pid] & DISTANCE_RELATIVE) > 0;
+        const double sx = sgdh.r_scale_x[pid];
+        const double sy = sgdh.r_scale_y[pid];
+
+        double x = sgdh.pos_x[pid], y = sgdh.pos_y[pid];
+        x -= (sgdh.origin_vec[pid] % 3) * hw;
+        y -= (sgdh.origin_vec[pid] / 3) * hh;
+        if (dist_rel) {
+            x = dist_rel ? x * sx : x;
+            y = dist_rel ? y * sy : y;
+        }
+        if (sgdh.r_angle_vec[pid] != 0.0) {
+            const double rad = sgdh.r_angle_vec[pid] * -to_rad;
+            const double sa = std::sin(rad), ca = std::cos(rad);
+            double rot_cen_x, rot_cen_y;
+            if (sgdh.flag_vec[pid] & ROTATION_CENTER_SET) {
+                rot_cen_x = x + sgdh.rotation_center_x[pid] * sx;
+                rot_cen_y = y + sgdh.rotation_center_y[pid] * sy;
+            }
+            else {
+                rot_cen_x = x + hw * sx;
+                rot_cen_y = y + hh * sy;
+            }
+            const double tmp_x = ca * (x - rot_cen_x) - sa * (y - rot_cen_y);
+            const double tmp_y = sa * (x - rot_cen_x) + ca * (y - rot_cen_y);
+            x = tmp_x + rot_cen_x;
+            y = tmp_y + rot_cen_y;
+        }
+        sgdh.r_pos_x[pid] = rel_x + x;
+        sgdh.r_pos_y[pid] = rel_y + y;
+    }
+}
+
+/**
+ * Clear all dirty flags.
+ **/
+bool clear_dirty_flag(SceneGraphDataHandler& sgdh, SmallList<size_t>& path) {
+    bool dirty = false;
+    int count = 0;
+    for (size_t i = 0; i < path.size(); ++i) {
+        if (sgdh.flag_vec[path[i]] & DIRTY) {
+            if (!dirty) {
+                dirty = true;
+            }
+            sgdh.flag_vec[path[i]] = sgdh.flag_vec[path[i]] ^ DIRTY;
+            ++count;
+        }
+    }
+    return dirty;
+}
+
+
+}  // namespace scene
+}  // namespace foolysh

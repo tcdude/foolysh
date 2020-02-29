@@ -52,5 +52,5 @@ class Origin(Enum):
     CENTER = 4
     CENTER_RIGHT = 5
     BOTTOM_LEFT = 6
-    BOTTOM_RIGHT = 7
-    BOTTOM_CENTER = 8
+    BOTTOM_CENTER = 7
+    BOTTOM_RIGHT = 8

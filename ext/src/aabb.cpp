@@ -24,10 +24,13 @@
 #include <stdexcept>
 #include <iostream>
 
+namespace foolysh {
+namespace tools {
+
 /**
  *
  */
-tools::AABB::
+AABB::
 AABB() {
     x = 0.0;
     y = 0.0;
@@ -38,7 +41,7 @@ AABB() {
 /**
  *
  */
-tools::AABB::
+AABB::
 AABB(double _x, double _y, double _hw, double _hh) {
     if (_hw < 0.0 && _hh < 0.0) {
         throw std::invalid_argument("invalid AABB: negative width or height");
@@ -52,7 +55,7 @@ AABB(double _x, double _y, double _hw, double _hh) {
 /**
  * Return whether ``aabb`` lies entirely inside this.
  */
-bool tools::AABB::
+bool AABB::
 inside(const AABB& aabb) {
     const double l = x - hw, r = x + hw, t = y - hh, b = y + hh;
     return (l <= aabb.x - aabb.hw && r >= aabb.x + aabb.hw
@@ -62,7 +65,7 @@ inside(const AABB& aabb) {
 /**
  * Return whether ``x, y`` lies entirely inside this.
  */
-bool tools::AABB::
+bool AABB::
 inside(double _x, double _y) {
     const double l = x - hw, r = x + hw, t = y - hh, b = y + hh;
     return (l <= _x && r >= _x && t <= _y && b >= _y) ? true : false;
@@ -71,7 +74,7 @@ inside(double _x, double _y) {
 /**
  * Return whether ``aabb`` overlaps this.
  */
-bool tools::AABB::
+bool AABB::
 overlap(const AABB& aabb) {
     const double l = x - hw, r = x + hw;
     const double l_o = aabb.x - aabb.hw;
@@ -92,7 +95,7 @@ overlap(const AABB& aabb) {
 /**
  * Return AABB reflecting quadrant ``_q`` from this, split at the origin.
  */
-tools::AABB tools::AABB::
+AABB AABB::
 split(Quadrant _q) {
     return split(x, y, _q);
 }
@@ -100,7 +103,7 @@ split(Quadrant _q) {
 /**
  * Return AABB reflecting quadrant ``_q`` from this, split at point ``_x/_y``.
  */
-tools::AABB tools::AABB::
+AABB AABB::
 split(double _x, double _y, Quadrant _q) {
     if (! inside(_x, _y)) {
         throw std::invalid_argument("invalid x/y: not inside AABB");
@@ -143,7 +146,7 @@ split(double _x, double _y, Quadrant _q) {
  * Returns the quadrant in which ``_x`` and ``_y`` lie. Does not check whether
  * the point lies inside the bounds of this AABB.
  */
-tools::Quadrant tools::AABB::
+Quadrant AABB::
 find_quadrant(double _x, double _y) {
     if (_x < x) {
         return (_y < y) ? TL : BL;
@@ -152,3 +155,6 @@ find_quadrant(double _x, double _y) {
         return (_y < y) ? TR : BR;
     }
 }
+
+}  // namespace tools
+}  // namespace foolysh

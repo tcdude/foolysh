@@ -12,8 +12,8 @@ from libcpp.memory cimport unique_ptr
 from .scene.cppnode cimport Node as _Node
 from .scene.node cimport Node
 from .scene.cppnode cimport Scale as _Scale
-from .tools.cppvector2 cimport Vector2 as _Vector2
-from .tools.vector2 cimport Vector2
+from .tools.cppvec2 cimport Vec2 as _Vec2
+from .tools.vec2 cimport Vec2
 
 from .cppanimation cimport Interval as _Interval
 from .cppanimation cimport Animation as _Animation
@@ -288,13 +288,13 @@ cdef class AnimationType(AnimationBase):
         Add position modifier to AnimationType.
 
         Args:
-            v1: :class:`~foolysh.tools.vector2.Vector2` end position or start
+            v1: :class:`~foolysh.tools.vec2.Vec2` end position or start
                 position, if `v2` is provided.
-            v2: :class:`~foolysh.tools.vector2.Vector2` see `v1`.
+            v2: :class:`~foolysh.tools.vec2.Vec2` see `v1`.
             rel: :class:`~foolysh.scene.node.Node` optional relative Node.
         """
-        v1a = isinstance(v1, Vector2)
-        v2a = isinstance(v2, Vector2)
+        v1a = isinstance(v1, Vec2)
+        v2a = isinstance(v2, Vec2)
         rela = isinstance(rel, Node)
         if v1a and v2 is None and rel is None:
             self.add_pos_e(v1)
@@ -308,7 +308,7 @@ cdef class AnimationType(AnimationBase):
             raise TypeError('Illegal combination of arguments')
         self._modifiers['pos'] = (v1, v2, rel)
 
-    cdef void add_pos_e(self, Vector2 v):
+    cdef void add_pos_e(self, Vec2 v):
         if isinstance(self, Interval):
             try:
                 deref(__am).get_interval(self._id).add_pos(deref(v.thisptr))
@@ -324,7 +324,7 @@ cdef class AnimationType(AnimationBase):
         else:
             raise NotImplementedError
 
-    cdef void add_pos_es(self, Vector2 v1, Vector2 v2):
+    cdef void add_pos_es(self, Vec2 v1, Vec2 v2):
         if isinstance(self, Interval):
             try:
                 deref(__am).get_interval(self._id).add_pos(
@@ -346,7 +346,7 @@ cdef class AnimationType(AnimationBase):
         else:
             raise NotImplementedError
 
-    cdef void add_pos_er(self, Vector2 v, Node rel):
+    cdef void add_pos_er(self, Vec2 v, Node rel):
         if isinstance(self, Interval):
             try:
                 deref(__am).get_interval(self._id).add_pos(
@@ -368,7 +368,7 @@ cdef class AnimationType(AnimationBase):
         else:
             raise NotImplementedError
 
-    cdef void add_pos_esr(self, Vector2 v1, Vector2 v2, Node rel):
+    cdef void add_pos_esr(self, Vec2 v1, Vec2 v2, Node rel):
         if isinstance(self, Interval):
             try:
                 deref(__am).get_interval(self._id).add_pos(
@@ -661,16 +661,16 @@ cdef class AnimationType(AnimationBase):
         Add rotation center position modifier to AnimationType.
 
         Args:
-            v1: :class:`~foolysh.tools.vector2.Vector2` end position or start
+            v1: :class:`~foolysh.tools.vec2.Vec2` end position or start
                 position, if `v2` is provided.
-            v2: :class:`~foolysh.tools.vector2.Vector2` see `v1`.
+            v2: :class:`~foolysh.tools.vec2.Vec2` see `v1`.
         """
-        if isinstance(v1, Vector2):
+        if isinstance(v1, Vec2):
             v1a = True
         else:
             raise TypeError
 
-        if isinstance(v2, Vector2):
+        if isinstance(v2, Vec2):
             v2a = True
         elif v2 is None:
             v2a = False
@@ -685,7 +685,7 @@ cdef class AnimationType(AnimationBase):
             raise TypeError('Illegal combination of arguments')
         self._modifiers['rotation_center'] = (v1, v2)
 
-    cdef void add_rot_center_e(self, Vector2 v):
+    cdef void add_rot_center_e(self, Vec2 v):
         if isinstance(self, Interval):
             try:
                 deref(__am).get_interval(self._id).add_rotation_center(
@@ -705,7 +705,7 @@ cdef class AnimationType(AnimationBase):
         else:
             raise NotImplementedError
 
-    cdef void add_rot_center_es(self, Vector2 v1, Vector2 v2):
+    cdef void add_rot_center_es(self, Vec2 v1, Vec2 v2):
         if isinstance(self, Interval):
             try:
                 deref(__am).get_interval(self._id).add_rotation_center(
@@ -1067,7 +1067,7 @@ def PosInterval(node, duration, v1, v2=None, rel=None, blend=None):
     Args:
         node: :class:`~foolysh.scene.node.Node` the manipulated node instance.
         duration: ``float`` duration of the Interval in seconds.
-        v1: :class:`~foolysh.tools.vector2.Vector2` the end or start position,
+        v1: :class:`~foolysh.tools.vec2.Vec2` the end or start position,
             depending on whether `v2` is provided.
         v2: see `v1`
         rel: :class:`~foolysh.scene.node.Node` optional relative node.
@@ -1135,7 +1135,7 @@ def RotationCenterInterval(node, duration, v1, v2=None, blend=None):
     Args:
         node: :class:`~foolysh.scene.node.Node` the manipulated node instance.
         duration: ``float`` duration of the Interval in seconds.
-        v1: :class:`~foolysh.tools.vector2.Vector2` the end or start position of
+        v1: :class:`~foolysh.tools.vec2.Vec2` the end or start position of
             the rotation center, depending on whether `v2` is provided.
         v2: see `v1`
         blend: :class:`~foolysh.animation.BlendType` optional blending.
@@ -1180,7 +1180,7 @@ def PosAnimation(node, speed, v1, v2=None, rel=None, blend=None):
     Args:
         node: :class:`~foolysh.scene.node.Node` the manipulated node instance.
         speed: ``float`` speed of the Animation in units per second.
-        v1: :class:`~foolysh.tools.vector2.Vector2` the end or start position,
+        v1: :class:`~foolysh.tools.vec2.Vec2` the end or start position,
             depending on whether `v2` is provided.
         v2: see `v1`
         rel: :class:`~foolysh.scene.node.Node` optional relative node.
@@ -1248,7 +1248,7 @@ def RotationCenterAnimation(node, speed, v1, v2=None, blend=None):
     Args:
         node: :class:`~foolysh.scene.node.Node` the manipulated node instance.
         speed: ``float`` speed of the Animation in units per second.
-        v1: :class:`~foolysh.tools.vector2.Vector2` the end or start position of
+        v1: :class:`~foolysh.tools.vec2.Vec2` the end or start position of
             the rotation center, depending on whether `v2` is provided.
         v2: see `v1`
         blend: :class:`~foolysh.animation.BlendType` optional blending.

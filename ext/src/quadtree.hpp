@@ -31,11 +31,12 @@
 #include <vector>
 #include "aabb.hpp"
 #include "list_t.hpp"
-#include "vector2.hpp"
+#include "vec2.hpp"
 
-using tools::FreeList;
-using tools::SmallList;
+using foolysh::tools::FreeList;
+using foolysh::tools::SmallList;
 
+namespace foolysh {
 namespace tools {
     struct QuadNode {
         int first_child;
@@ -62,7 +63,7 @@ namespace tools {
         bool remove(const int id, AABB& aabb);
         bool cleanup();
         bool inside(const double x, const double y);
-        bool inside(Vector2& v);
+        bool inside(Vec2& v);
         void resize(AABB& aabb);
 
     private:
@@ -79,5 +80,6 @@ namespace tools {
         double _max_w, _max_h;
     };
 }  // namespace tools
+}  // namespace foolysh
 
 #endif

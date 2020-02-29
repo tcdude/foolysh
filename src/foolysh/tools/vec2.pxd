@@ -3,7 +3,7 @@
 Basic 2D Vector implementation.
 """
 
-from .cppvector2 cimport Vector2 as _Vector2
+from .cppvec2 cimport Vec2 as _Vec2
 
 from libcpp.memory cimport unique_ptr
 
@@ -31,25 +31,25 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE."""
 
 
-cdef class Vector2:
-    cdef unique_ptr[_Vector2] thisptr
+cdef class Vec2:
+    cdef unique_ptr[_Vec2] thisptr
 
-    cdef double _dot(self, Vector2 other)
-    cdef Vector2 _normalized(self) except +
+    cdef double _dot(self, Vec2 other)
+    cdef Vec2 _normalized(self) except +
     cpdef void rotate(self, double a, bint radians=*)
-    cpdef Vector2 rotated(self, double a, bint radians=*)
-    cpdef Vector2 _add(self, Vector2 other)
-    cdef void _iadd_vec(Vector2 self, Vector2 other)
-    cpdef Vector2 _add_scalar(self, const double other)
-    cpdef Vector2 _sub(self, Vector2 other)
-    cdef void _isub_vec(Vector2 self, Vector2 other)
-    cpdef Vector2 _sub_scalar(self, const double other)
-    cpdef Vector2 _sub_scalar_r(self, const double other)
-    cpdef Vector2 _neg(self)
-    cpdef Vector2 _mul(self, const double other)
-    cpdef Vector2 _tdiv(self, double value)
-    cpdef bint _eq(self, Vector2 other)
+    cpdef Vec2 rotated(self, double a, bint radians=*)
+    cpdef Vec2 _add(self, Vec2 other)
+    cdef void _iadd_vec(Vec2 self, Vec2 other)
+    cpdef Vec2 _add_scalar(self, const double other)
+    cpdef Vec2 _sub(self, Vec2 other)
+    cdef void _isub_vec(Vec2 self, Vec2 other)
+    cpdef Vec2 _sub_scalar(self, const double other)
+    cpdef Vec2 _sub_scalar_r(self, const double other)
+    cpdef Vec2 _neg(self)
+    cpdef Vec2 _mul(self, const double other)
+    cpdef Vec2 _tdiv(self, double value)
+    cpdef bint _eq(self, Vec2 other)
     cpdef bint _eq_scalar(self, double other)
-    cpdef bint _ne(self, Vector2 other)
+    cpdef bint _ne(self, Vec2 other)
     cpdef bint _ne_scalar(self, double other)
-    cdef public _Vector2 vector2(self)
+    cdef public _Vec2 vec2(self)

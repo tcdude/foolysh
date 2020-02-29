@@ -7,7 +7,7 @@ from libcpp cimport bool
 from libcpp.memory cimport unique_ptr
 from .scene.cppnode cimport Node
 from .scene.cppnode cimport Scale
-from .tools.cppvector2 cimport Vector2
+from .tools.cppvec2 cimport Vec2
 
 __author__ = 'Tiziano Bettio'
 __license__ = 'MIT'
@@ -33,11 +33,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE."""
 
 
-cdef extern from "src/animation.cpp" namespace "animation":
+cdef extern from "src/animation.cpp" namespace "foolysh::animation":
     pass
 
-cdef extern from "src/animation.hpp" namespace "animation":
-    cdef enum BlendType "animation::BlendType":
+cdef extern from "src/animation.hpp" namespace "foolysh::animation":
+    cdef enum BlendType "foolysh::animation::BlendType":
         NO_BLEND,
         EASE_IN,
         EASE_OUT,
@@ -55,10 +55,10 @@ cdef extern from "src/animation.hpp" namespace "animation":
     cdef cppclass Interval(AnimationType):
         void set_duration(const double)
 
-        void add_pos(Vector2)
-        void add_pos(Vector2, Node)
-        void add_pos(Vector2, Vector2)
-        void add_pos(Vector2, Vector2, Node)
+        void add_pos(Vec2)
+        void add_pos(Vec2, Node)
+        void add_pos(Vec2, Vec2)
+        void add_pos(Vec2, Vec2, Node)
 
         void add_scale(Scale)
         void add_scale(Scale, Node)
@@ -70,8 +70,8 @@ cdef extern from "src/animation.hpp" namespace "animation":
         void add_rotation(double, double)
         void add_rotation(double, double, Node)
 
-        void add_rotation_center(Vector2)
-        void add_rotation_center(Vector2, Vector2)
+        void add_rotation_center(Vec2)
+        void add_rotation_center(Vec2, Vec2)
 
         void add_depth(int)
         void add_depth(int, Node)
@@ -85,10 +85,10 @@ cdef extern from "src/animation.hpp" namespace "animation":
         void set_rotation_center_speed(const double)
         void set_depth_speed(const double)
 
-        void add_pos(Vector2)
-        void add_pos(Vector2, Node)
-        void add_pos(Vector2, Vector2)
-        void add_pos(Vector2, Vector2, Node)
+        void add_pos(Vec2)
+        void add_pos(Vec2, Node)
+        void add_pos(Vec2, Vec2)
+        void add_pos(Vec2, Vec2, Node)
 
         void add_scale(Scale)
         void add_scale(Scale, Node)
@@ -100,8 +100,8 @@ cdef extern from "src/animation.hpp" namespace "animation":
         void add_rotation(double, double)
         void add_rotation(double, double, Node)
 
-        void add_rotation_center(Vector2)
-        void add_rotation_center(Vector2, Vector2)
+        void add_rotation_center(Vec2)
+        void add_rotation_center(Vec2, Vec2)
 
         void add_depth(int)
         void add_depth(int, Node)

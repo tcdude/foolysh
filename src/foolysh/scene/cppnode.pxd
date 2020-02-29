@@ -3,7 +3,7 @@
 NodePath implementation.
 """
 
-from ..tools.cppvector2 cimport Vector2
+from ..tools.cppvec2 cimport Vec2
 from ..tools.cppaabb cimport AABB
 
 __author__ = 'Tiziano Bettio'
@@ -38,7 +38,7 @@ cdef extern from "src/quadtree.cpp":
 cdef extern from "src/quadtree.hpp":
     pass
 
-cdef extern from "src/list_t.hpp" namespace "tools":
+cdef extern from "src/list_t.hpp" namespace "foolysh::tools":
     cdef cppclass FreeList[T]:
         FreeList()
         int insert(T&)
@@ -66,8 +66,8 @@ cdef extern from "src/list_t.hpp" namespace "tools":
 cdef extern from "src/node.cpp":
     pass
 
-cdef extern from "src/node.hpp" namespace "scenegraph":
-    cdef enum Origin "scenegraph::Origin":
+cdef extern from "src/node.hpp" namespace "foolysh::scene":
+    cdef enum Origin "foolysh::scene::Origin":
         TOP_LEFT,
         TOP_RIGHT,
         TOP_CENTER,
@@ -78,11 +78,16 @@ cdef extern from "src/node.hpp" namespace "scenegraph":
         BOTTOM_RIGHT,
         BOTTOM_CENTER
 
-    cdef cppclass Size "scenegraph::Size":
+    cdef cppclass Size:
+        Size() except +
+        Size(const double, const double) except +
         double w
         double h
 
-    cdef cppclass Scale "scenegraph::Scale":
+    cdef cppclass Scale:
+        Scale() except +
+        Scale(const double) except +
+        Scale(const double, const double) except +
         double sx
         double sy
         Scale operator*(const Scale&)
@@ -98,23 +103,23 @@ cdef extern from "src/node.hpp" namespace "scenegraph":
 
         Node attach_node()
         void reparent_to(Node&) except +
-        void reparent_to(const int) except +
-        bint traverse() except +
-        SmallList[int] query(AABB&, const bint) except +
+        void reparent_to(const unsigned long) except +
+        bint traverse(bint local = False) except +
+        SmallList[unsigned long] query(AABB&, const bint) except +
         void hide()
         void show()
         void propagate_dirty()
 
-        int get_id()
-        int get_parent_id()
+        unsigned long get_id()
+        unsigned long get_parent_id()
         void set_pos(const double)
         void set_pos(Node&, const double)
         void set_pos(const double, const double)
         void set_pos(Node&, const double, const double)
-        void set_pos(Vector2&)
-        void set_pos(Node&, Vector2&)
-        Vector2 get_pos()
-        Vector2 get_pos(Node&)
+        void set_pos(Vec2&)
+        void set_pos(Node&, Vec2&)
+        Vec2 get_pos()
+        Vec2 get_pos(Node&)
         void set_scale(const double)
         void set_scale(Node&, const double)
         void set_scale(const double, const double)
@@ -128,8 +133,8 @@ cdef extern from "src/node.hpp" namespace "scenegraph":
         double get_angle(bint)
         double get_angle(Node&, bint)
         void set_rotation_center(const double, const double)
-        void set_rotation_center(Vector2&)
-        Vector2 get_rotation_center()
+        void set_rotation_center(Vec2&)
+        Vec2 get_rotation_center()
         void set_depth(const int)
         void set_depth(Node&, const int)
         int get_depth()
@@ -137,7 +142,7 @@ cdef extern from "src/node.hpp" namespace "scenegraph":
         void set_origin(Origin)
         Origin get_origin()
 
-        Vector2 get_relative_pos()
+        Vec2 get_relative_pos()
         Scale get_relative_scale()
         double get_relative_angle()
         int get_relative_depth()

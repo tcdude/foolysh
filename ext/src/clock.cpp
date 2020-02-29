@@ -24,7 +24,10 @@
 #include "clock.hpp"
 #include <chrono>
 
-void tools::Clock::
+namespace foolysh {
+namespace tools {
+
+void Clock::
 tick() {
     using namespace std::chrono;
     long current = duration_cast<nanoseconds>(
@@ -40,7 +43,7 @@ tick() {
     }
 }
 
-double tools::Clock::
+double Clock::
 get_dt() {
     if (_clock_stat.start < 0) {
         tick();
@@ -48,7 +51,7 @@ get_dt() {
     return _clock_stat.delta_time;
 }
 
-double tools::Clock::
+double Clock::
 get_time() {
     if (_clock_stat.start < 0) {
         tick();
@@ -56,3 +59,6 @@ get_time() {
     return (double)(_clock_stat.current - _clock_stat.start) * 1e-9;
 }
 
+
+}  // namespace tools
+}  // namespace foolysh

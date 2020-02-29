@@ -7,6 +7,7 @@ from typing import Tuple
 from typing import Union
 
 from . import node
+from ..tools.common import Origin
 
 __author__ = 'Tiziano Bettio'
 __license__ = 'MIT'
@@ -81,8 +82,8 @@ class GridLayout(object):
 
     Example usage:
 
-    >>> parent_np = node.Node()
-    >>> grid = GridLayout(parent_np, (0.0, 0.0, 1.7, 1.0), rows=(10, None, 20))
+    >>> parent_nd = node.Node()
+    >>> grid = GridLayout(parent_nd, (0.0, 0.0, 1.7, 1.0), rows=(10, None, 20))
     >>> content_node_path = node.Node('Cell [0, 0]', parent=grid[1])
     >>> grid[1]
     Node(GridCell(1, 0))
@@ -139,10 +140,10 @@ class GridLayout(object):
                              'None.')
 
         self._root = parent.attach_node(f'GridLayout({row_count}, {col_count})')
-        self._root.center = node.Origin.TOP_LEFT
+        self._root.origin = Origin.TOP_LEFT
         size = (box[2] - box[0], box[3] - box[1])
-        self._root.set_dummy_size(size)
-        self._root.position = box[:2]
+        self._root.size = size
+        self._root.pos = box[:2]
         self._cells = []
         y_start = box[1]
         for row_id, row_space in enumerate(row_spacing):
@@ -154,20 +155,17 @@ class GridLayout(object):
             y_end = y_start + r_dist
             x_start = box[0]
             for col_id, col_space in enumerate(col_spacing):
-                np = self._root.attach_new_node_path(f'GridCell({row_id}, '
-                                                     f'{col_id})')
+                nd = self._root.attach_node(f'GridCell({row_id}, {col_id})')
                 c_dist = col_space * size[0]
                 if c_dist <= margins[0] * 2:
                     raise ValueError(f'column margins are equal or larger in '
                                      f'size than the column with index '
                                      f'{col_id}')
-                np.set_dummy_size(
-                    (c_dist - 2 * margins[0], r_dist - 2 * margins[1])
-                )
+                nd.size = c_dist - 2 * margins[0], r_dist - 2 * margins[1]
                 x_end = x_start + c_dist
-                np.position = x_start + margins[0], y_start + margins[1]
+                nd.pos = x_start + margins[0], y_start + margins[1]
                 x_start = x_end
-                self._cells[-1].append(np)
+                self._cells[-1].append(nd)
             y_start = y_end
 
     def __getitem__(self, item):

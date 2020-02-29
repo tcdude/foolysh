@@ -28,6 +28,7 @@
 #include <string>
 #include <memory>
 
+namespace foolysh {
 namespace tools {
 
     struct Task {
@@ -64,5 +65,6 @@ namespace tools {
     };
 
 }  // namespace tools
+}  // namespace foolysh
 
 #endif

@@ -31,10 +31,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE."""
 
 
-cdef extern from "src/taskmgr.cpp" namespace "tools":
+cdef extern from "src/taskmgr.cpp" namespace "foolysh::tools":
     pass
 
-cdef extern from "src/taskmgr.hpp" namespace "tools":
+cdef extern from "src/taskmgr.hpp" namespace "foolysh::tools":
     ctypedef void (*callback)(void*, void*, void*, const double, const bool)
 
     cdef cppclass TaskManager:

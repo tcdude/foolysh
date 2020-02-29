@@ -34,7 +34,7 @@ SOFTWARE."""
 cdef extern from "src/quadtree.cpp":
     pass
 
-cdef extern from "src/quadtree.hpp" namespace "tools":
+cdef extern from "src/quadtree.hpp" namespace "foolysh::tools":
     cdef cppclass Quadtree:
         Quadtree() except +
         Quadtree(const AABB&, const int, const int) except +

@@ -24,53 +24,16 @@
 #include <algorithm>
 
 #include "animation.hpp"
-#include "node.hpp"
-#include "vector2.hpp"
 
-
-/**
- * Linear interpolation of two values to the range [0, 1] with optional
- * blending.
- */
-inline double animation::
-lerp(double pos, double total, BlendType blend) {
-    if (pos >= total) {
-        return 1.0;
-    }
-    if (pos == 0.0) {
-        return 0.0;
-    }
-
-    double v = pos / total;
-
-    switch (blend) {
-        case NO_BLEND: {
-            return v;
-        }
-        case EASE_IN: {
-            double vsq = v * v;
-            return ((3.0 * vsq) - (vsq * v)) * 0.5;
-        }
-        case EASE_OUT: {
-            double vsq = v * v;
-            return ((3.0 * v) - (vsq * v)) * 0.5;
-        }
-        case EASE_IN_OUT: {
-            double vsq = v * v;
-            return (3.0 * vsq) - (2.0 * v * vsq);
-        }
-    }
-
-    throw std::runtime_error("Unknown blend_type");
-}
-
+namespace foolysh {
+namespace animation {
 
 // AnimationData
 
 /**
  *
  */
-animation::AnimationData::
+AnimationData::
 AnimationData(){
     _ref_count = 1;
 }
@@ -80,7 +43,7 @@ AnimationData(){
 /**
  * Reset command that needs to be overridden in subclasses.
  */
-void animation::AnimationBase::
+void AnimationBase::
 reset() {
     throw std::runtime_error("Cannot be called from AnimationBase class.");
 }
@@ -88,7 +51,7 @@ reset() {
 /**
  * Step command that needs to be overridden in subclasses.
  */
-double animation::AnimationBase::
+double AnimationBase::
 step(const double dt, ActiveAnimationMap& aam) {
     return 0.0;
 }
@@ -96,7 +59,7 @@ step(const double dt, ActiveAnimationMap& aam) {
 /**
  * Retrieve a copy of the Animation. Needs to be overridden in subclasses.
  */
-std::unique_ptr<animation::AnimationBase> animation::AnimationBase::
+std::unique_ptr<AnimationBase> AnimationBase::
 get_copy() {
     throw std::runtime_error("Cannot be called from AnimationBase class.");
 }
@@ -105,7 +68,7 @@ get_copy() {
  * Virtual method to set looping behavior. Currently only implemented for
  * Sequence.
  */
-void animation::AnimationBase::
+void AnimationBase::
 loop(const bool l) {
     throw std::runtime_error("Invalid sub-type for loop().");
 }
@@ -116,7 +79,7 @@ loop(const bool l) {
 /**
  * Default Constructor: Create a new AnimationData instance.
  */
-animation::AnimationType::
+AnimationType::
 AnimationType() {
     _animation_id = AnimationData::_ad.insert(new AnimationData());
     AnimationData::_ad[_animation_id]->animation_id = _animation_id;
@@ -127,7 +90,7 @@ AnimationType() {
  * Destructor: Decrements AnimationData ref_count, deletes AnimationData if
  * ref_count drops to zero.
  */
-animation::AnimationType::
+AnimationType::
 ~AnimationType() {
     if (_animation_id > -1) {
         AnimationData& ad = _get_animation_data(_animation_id);
@@ -145,7 +108,7 @@ animation::AnimationType::
  * Copy Constructor. Creates a copy of AnimationType ``other`` with access to
  * the same AnimationData instance.
  */
-animation::AnimationType::
+AnimationType::
 AnimationType(const AnimationType& other) {
     _animation_id = other._animation_id;
     AnimationData& ad = _get_animation_data(_animation_id);
@@ -155,7 +118,7 @@ AnimationType(const AnimationType& other) {
 /**
  * Move Constructor. Invalidates ``other``.
  */
-animation::AnimationType::
+AnimationType::
 AnimationType(AnimationType&& other) noexcept {
     _animation_id = other._animation_id;
     other._animation_id = -1;
@@ -165,7 +128,7 @@ AnimationType(AnimationType&& other) noexcept {
  * Copy Assignment Operator. Creates a copy of AnimationType ``other`` with
  * access to the same AnimationData instance.
  */
-animation::AnimationType& animation::AnimationType::
+AnimationType& AnimationType::
 operator=(const AnimationType& other) {
     if (AnimationData::_ad.active(_animation_id)) {
         AnimationData& ad = _get_animation_data(_animation_id);
@@ -180,7 +143,7 @@ operator=(const AnimationType& other) {
 /**
  * Move Assignment Operator. Invalidates ``other``.
  */
-animation::AnimationType& animation::AnimationType::
+AnimationType& AnimationType::
 operator=(AnimationType&& other) noexcept {
     if (AnimationData::_ad.active(_animation_id)) {
         AnimationData& ad = _get_animation_data(_animation_id);
@@ -197,16 +160,16 @@ operator=(AnimationType&& other) noexcept {
 /**
  * Set the node, the animation will apply to.
  */
-void animation::AnimationType::
-set_node(scenegraph::Node& n) {
+void AnimationType::
+set_node(Node& n) {
     AnimationData& ad = _get_animation_data(_animation_id);
-    ad.node.reset(new scenegraph::Node(n));
+    ad.node.reset(new Node(n));
 }
 
 /**
  * Set the BlendType, used for the animation.
  */
-void animation::AnimationType::
+void AnimationType::
 set_blend(BlendType b) {
     AnimationData& ad = _get_animation_data(_animation_id);
     ad.blend = b;
@@ -215,8 +178,8 @@ set_blend(BlendType b) {
 /**
  * Add a position animation, only specifying the end point.
  */
-void animation::AnimationType::
-add_pos(tools::Vector2 end) {
+void AnimationType::
+add_pos(Vec2 end) {
     AnimationData& ad = _get_animation_data(_animation_id);
     ad.pos.active = true;
     ad.pos.end = end;
@@ -230,20 +193,20 @@ add_pos(tools::Vector2 end) {
  * Add a position animation relative to a Node, specifying the end point and a
  * Node.
  */
-void animation::AnimationType::
-add_pos(tools::Vector2 end, scenegraph::Node relative_node) {
+void AnimationType::
+add_pos(Vec2 end, Node relative_node) {
     AnimationData& ad = _get_animation_data(_animation_id);
     ad.pos.active = true;
     ad.pos.end = end;
     ad.pos.has_start = false;
-    ad.pos.relative_node.reset(new scenegraph::Node(relative_node));
+    ad.pos.relative_node.reset(new Node(relative_node));
 }
 
 /**
  * Add a position animation, specifying start and end points.
  */
-void animation::AnimationType::
-add_pos(tools::Vector2 start, tools::Vector2 end) {
+void AnimationType::
+add_pos(Vec2 start, Vec2 end) {
     AnimationData& ad = _get_animation_data(_animation_id);
     ad.pos.active = true;
     ad.pos.start = start;
@@ -258,22 +221,22 @@ add_pos(tools::Vector2 start, tools::Vector2 end) {
  * Add a position animation relative to a Node, specifying the start, end point
  * and a Node.
  */
-void animation::AnimationType::
-add_pos(tools::Vector2 start, tools::Vector2 end,
-        scenegraph::Node relative_node) {
+void AnimationType::
+add_pos(Vec2 start, Vec2 end,
+        Node relative_node) {
     AnimationData& ad = _get_animation_data(_animation_id);
     ad.pos.active = true;
     ad.pos.start = start;
     ad.pos.end = end;
     ad.pos.has_start = true;
-    ad.pos.relative_node.reset(new scenegraph::Node(relative_node));
+    ad.pos.relative_node.reset(new Node(relative_node));
 }
 
 /**
  * Add a scale animation, only specifying the end scale.
  */
-void animation::AnimationType::
-add_scale(scenegraph::Scale end) {
+void AnimationType::
+add_scale(Scale end) {
     AnimationData& ad = _get_animation_data(_animation_id);
     ad.scale.active = true;
     ad.scale.end = end;
@@ -287,20 +250,20 @@ add_scale(scenegraph::Scale end) {
  * Add a scale animation relative to a Node, specifying the end scale and a
  * Node.
  */
-void animation::AnimationType::
-add_scale(scenegraph::Scale end, scenegraph::Node relative_node) {
+void AnimationType::
+add_scale(Scale end, Node relative_node) {
     AnimationData& ad = _get_animation_data(_animation_id);
     ad.scale.active = true;
     ad.scale.end = end;
     ad.scale.has_start = false;
-    ad.scale.relative_node.reset(new scenegraph::Node(relative_node));
+    ad.scale.relative_node.reset(new Node(relative_node));
 }
 
 /**
  * Add a scale animation, specifying the start and end scale.
  */
-void animation::AnimationType::
-add_scale(scenegraph::Scale start, scenegraph::Scale end) {
+void AnimationType::
+add_scale(Scale start, Scale end) {
     AnimationData& ad = _get_animation_data(_animation_id);
     ad.scale.active = true;
     ad.scale.start = start;
@@ -315,21 +278,21 @@ add_scale(scenegraph::Scale start, scenegraph::Scale end) {
  * Add a scale animation relative to a Node, specifying the start and end scale
  * and a Node.
  */
-void animation::AnimationType::
-add_scale(scenegraph::Scale start, scenegraph::Scale end,
-          scenegraph::Node relative_node) {
+void AnimationType::
+add_scale(Scale start, Scale end,
+          Node relative_node) {
     AnimationData& ad = _get_animation_data(_animation_id);
     ad.scale.active = true;
     ad.scale.start = start;
     ad.scale.end = end;
     ad.scale.has_start = false;
-    ad.scale.relative_node.reset(new scenegraph::Node(relative_node));
+    ad.scale.relative_node.reset(new Node(relative_node));
 }
 
 /**
  * Add a rotation animation, only specifying the end angle in degrees.
  */
-void animation::AnimationType::
+void AnimationType::
 add_rotation(double end) {
     AnimationData& ad = _get_animation_data(_animation_id);
     ad.angle.active = true;
@@ -344,19 +307,19 @@ add_rotation(double end) {
  * Add a rotation animation relative to a Node, specifying the end angle in
  * degrees and a Node.
  */
-void animation::AnimationType::
-add_rotation(double end, scenegraph::Node relative_node) {
+void AnimationType::
+add_rotation(double end, Node relative_node) {
     AnimationData& ad = _get_animation_data(_animation_id);
     ad.angle.active = true;
     ad.angle.end = end;
     ad.angle.has_start = false;
-    ad.angle.relative_node.reset(new scenegraph::Node(relative_node));
+    ad.angle.relative_node.reset(new Node(relative_node));
 }
 
 /**
  * Add a rotation animation, specifying the start and end angle in degrees.
  */
-void animation::AnimationType::
+void AnimationType::
 add_rotation(double start, double end) {
     AnimationData& ad = _get_animation_data(_animation_id);
     ad.angle.active = true;
@@ -372,22 +335,22 @@ add_rotation(double start, double end) {
  * Add a rotation animation relative to a Node, specifying the start and end
  * angle in degrees and a Node.
  */
-void animation::AnimationType::
-add_rotation(double start, double end, scenegraph::Node relative_node) {
+void AnimationType::
+add_rotation(double start, double end, Node relative_node) {
     AnimationData& ad = _get_animation_data(_animation_id);
     ad.angle.active = true;
     ad.angle.end = start;
     ad.angle.end = end;
     ad.angle.has_start = true;
-    ad.angle.relative_node.reset(new scenegraph::Node(relative_node));
+    ad.angle.relative_node.reset(new Node(relative_node));
 }
 
 /**
  * Add a position animation for the rotation center, only specifying the end
  * point.
  */
-void animation::AnimationType::
-add_rotation_center(tools::Vector2 end) {
+void AnimationType::
+add_rotation_center(Vec2 end) {
     AnimationData& ad = _get_animation_data(_animation_id);
     ad.center_pos.active = true;
     ad.center_pos.end = end;
@@ -398,8 +361,8 @@ add_rotation_center(tools::Vector2 end) {
  * Add a position animation for the rotation center, specifying the end and
  * start point.
  */
-void animation::AnimationType::
-add_rotation_center(tools::Vector2 start, tools::Vector2 end) {
+void AnimationType::
+add_rotation_center(Vec2 start, Vec2 end) {
     AnimationData& ad = _get_animation_data(_animation_id);
     ad.center_pos.active = true;
     ad.center_pos.start = start;
@@ -410,7 +373,7 @@ add_rotation_center(tools::Vector2 start, tools::Vector2 end) {
 /**
  * Add a depth animation, only specifying the end depth.
  */
-void animation::AnimationType::
+void AnimationType::
 add_depth(int end) {
     AnimationData& ad = _get_animation_data(_animation_id);
     ad.depth.active = true;
@@ -425,19 +388,19 @@ add_depth(int end) {
  * Add a depth animation relative to a Node, specifying the end depth and a
  * Node.
  */
-void animation::AnimationType::
-add_depth(int end, scenegraph::Node relative_node) {
+void AnimationType::
+add_depth(int end, Node relative_node) {
     AnimationData& ad = _get_animation_data(_animation_id);
     ad.depth.active = true;
     ad.depth.end = end;
     ad.depth.has_start = false;
-    ad.depth.relative_node.reset(new scenegraph::Node(relative_node));
+    ad.depth.relative_node.reset(new Node(relative_node));
 }
 
 /**
  * Add a depth animation, specifying the start and end depth.
  */
-void animation::AnimationType::
+void AnimationType::
 add_depth(int start, int end) {
     AnimationData& ad = _get_animation_data(_animation_id);
     ad.depth.active = true;
@@ -453,14 +416,14 @@ add_depth(int start, int end) {
  * Add a depth animation relative to a Node, specifying the start and end depth
  * and a Node.
  */
-void animation::AnimationType::
-add_depth(int start, int end, scenegraph::Node relative_node) {
+void AnimationType::
+add_depth(int start, int end, Node relative_node) {
     AnimationData& ad = _get_animation_data(_animation_id);
     ad.depth.active = true;
     ad.depth.start = start;
     ad.depth.end = end;
     ad.depth.has_start = true;
-    ad.depth.relative_node.reset(new scenegraph::Node(relative_node));
+    ad.depth.relative_node.reset(new Node(relative_node));
 }
 
 
@@ -469,7 +432,7 @@ add_depth(int start, int end, scenegraph::Node relative_node) {
 /**
  * Reset command that needs to be overridden in subclasses.
  */
-void animation::AnimationType::
+void AnimationType::
 reset() {
     AnimationData& ad = _get_animation_data(_animation_id);
     ad.playback_pos = -1.0;
@@ -517,7 +480,7 @@ reset() {
 /**
  * Returns the current playback position in seconds.
  */
-double animation::AnimationType::
+double AnimationType::
 get_playback_pos() {
     AnimationData& ad = _get_animation_data(_animation_id);
     return ad.playback_pos;
@@ -526,7 +489,7 @@ get_playback_pos() {
 /**
  *
  */
-char animation::AnimationType::
+char AnimationType::
 active_animations() {
     return 0;
 }
@@ -534,7 +497,7 @@ active_animations() {
 /**
  *
  */
-int animation::AnimationType::
+int AnimationType::
 node_id() {
     AnimationData& ad = _get_animation_data(_animation_id);
     return ad.node->get_id();
@@ -544,7 +507,7 @@ node_id() {
  * Helper method to retrieve the AnimationData for the specified
  * ``animation_id``.
  */
-animation::AnimationData& animation::AnimationType::
+AnimationData& AnimationType::
 _get_animation_data(const int animation_id) {
     if (!AnimationData::_ad.active(animation_id)) {
         throw std::logic_error("Tried to access invalid AnimationData");
@@ -558,7 +521,7 @@ _get_animation_data(const int animation_id) {
 /**
  * Set the duration in seconds.
  */
-void animation::Interval::
+void Interval::
 set_duration(const double d) {
     AnimationData& ad = _get_animation_data(_animation_id);
     ad.duration = d;
@@ -568,7 +531,7 @@ set_duration(const double d) {
  * Reset to initial state. Updates start states, for the active animation types,
  * where none have been explicitly specified.
  */
-void animation::Interval::
+void Interval::
 reset() {
     AnimationType::reset();
 }
@@ -578,7 +541,7 @@ reset() {
  * of ``dt`` seconds remaining after the Interval was complete. Returns -2.0
  * if executing the Interval would cause a conflict.
  */
-double animation::Interval::
+double Interval::
 step(const double dt, ActiveAnimationMap& aam) {
     AnimationData& ad = _get_animation_data(_animation_id);
 
@@ -613,12 +576,12 @@ step(const double dt, ActiveAnimationMap& aam) {
 /**
  * Update the underlying Node
  */
-void animation::Interval::
+void Interval::
 _update(const double prog) {
     AnimationData& ad = _get_animation_data(_animation_id);
     // position
     if (ad.pos.active) {
-		tools::Vector2 v = tools::Vector2(
+		Vec2 v = Vec2(
 				(ad.pos.end - ad.pos.start) * prog + ad.pos.start);
         if (ad.pos.relative_node) {
             ad.node->set_pos(*ad.pos.relative_node, v);
@@ -630,7 +593,7 @@ _update(const double prog) {
 
     // rotation_center
     if (ad.center_pos.active) {
-		tools::Vector2 v = tools::Vector2(
+		Vec2 v = Vec2(
 				(ad.center_pos.end - ad.center_pos.start) * prog
 				+ ad.center_pos.start);
         ad.node->set_rotation_center(v);
@@ -638,7 +601,7 @@ _update(const double prog) {
 
     // scale
     if (ad.scale.active) {
-		scenegraph::Scale s = (ad.scale.end - ad.scale.start)
+		Scale s = (ad.scale.end - ad.scale.start)
 			* prog + ad.scale.start;
         if (ad.scale.relative_node) {
             ad.node->set_scale(*ad.scale.relative_node, s);
@@ -677,7 +640,7 @@ _update(const double prog) {
 /**
  *
  */
-std::unique_ptr<animation::AnimationBase> animation::Interval::
+std::unique_ptr<AnimationBase> Interval::
 get_copy() {
     std::unique_ptr<Interval> ptr;
     ptr.reset(new Interval());
@@ -697,12 +660,12 @@ get_copy() {
     ptr_ad.dur_angle = ad.dur_angle;
     ptr_ad.dur_center_pos = ad.dur_center_pos;
     ptr_ad.dur_depth = ad.dur_depth;
-    ptr_ad.node.reset(new scenegraph::Node(*ad.node));
+    ptr_ad.node.reset(new Node(*ad.node));
     ptr_ad.blend = ad.blend;
     ptr_ad.pos.start = ad.pos.start;
     ptr_ad.pos.end = ad.pos.end;
     if (ad.pos.relative_node) {
-		ptr_ad.pos.relative_node.reset(new scenegraph::Node(
+		ptr_ad.pos.relative_node.reset(new Node(
 					*ad.pos.relative_node));
 	}
     ptr_ad.pos.active = ad.pos.active;
@@ -714,7 +677,7 @@ get_copy() {
     ptr_ad.scale.start = ad.scale.start;
     ptr_ad.scale.end = ad.scale.end;
     if (ad.scale.relative_node) {
-		ptr_ad.scale.relative_node.reset(new scenegraph::Node(
+		ptr_ad.scale.relative_node.reset(new Node(
 					*ad.scale.relative_node));
 	}
     ptr_ad.scale.active = ad.scale.active;
@@ -722,7 +685,7 @@ get_copy() {
     ptr_ad.angle.start = ad.angle.start;
     ptr_ad.angle.end = ad.angle.end;
     if (ad.angle.relative_node) {
-	    ptr_ad.angle.relative_node.reset(new scenegraph::Node(
+	    ptr_ad.angle.relative_node.reset(new Node(
 	    			*ad.angle.relative_node));
 	}
     ptr_ad.angle.active = ad.angle.active;
@@ -730,7 +693,7 @@ get_copy() {
     ptr_ad.depth.start = ad.depth.start;
     ptr_ad.depth.end = ad.depth.end;
     if (ad.depth.relative_node) {
-    	ptr_ad.depth.relative_node.reset(new scenegraph::Node(
+    	ptr_ad.depth.relative_node.reset(new Node(
     				*ad.depth.relative_node));
     }
     ptr_ad.depth.active = ad.depth.active;
@@ -741,7 +704,7 @@ get_copy() {
 /**
  *
  */
-char animation::Interval::
+char Interval::
 active_animations() {
     char active_anim = 0;
     AnimationData& ad = _get_animation_data(_animation_id);
@@ -769,7 +732,7 @@ active_animations() {
 /**
  *
  */
-void animation::Animation::
+void Animation::
 set_pos_speed(const double s) {
     _get_animation_data(_animation_id).pos_speed = s;
 }
@@ -777,7 +740,7 @@ set_pos_speed(const double s) {
 /**
  *
  */
-void animation::Animation::
+void Animation::
 set_scale_speed(const double s) {
     _get_animation_data(_animation_id).scale_speed = s;
 }
@@ -785,7 +748,7 @@ set_scale_speed(const double s) {
 /**
  *
  */
-void animation::Animation::
+void Animation::
 set_rotation_speed(const double s) {
     _get_animation_data(_animation_id).rotation_speed = s;
 }
@@ -793,7 +756,7 @@ set_rotation_speed(const double s) {
 /**
  *
  */
-void animation::Animation::
+void Animation::
 set_rotation_center_speed(const double s) {
     _get_animation_data(_animation_id).rotation_center_speed = s;
 }
@@ -801,7 +764,8 @@ set_rotation_center_speed(const double s) {
 /**
  *
  */
-void animation::Animation::set_depth_speed(const double s) {
+void Animation::
+set_depth_speed(const double s) {
     _get_animation_data(_animation_id).depth_speed = s;
 }
 
@@ -809,7 +773,7 @@ void animation::Animation::set_depth_speed(const double s) {
  * Reset to initial state. Updates start states, for the active animation types,
  * where none have been explicitly specified and translates speed into duration.
  */
-void animation::Animation::
+void Animation::
 reset() {
     AnimationType::reset();
     AnimationData& ad = _get_animation_data(_animation_id);
@@ -891,7 +855,7 @@ reset() {
  * of ``dt`` seconds remaining after the Animation was complete. Returns -2.0
  * if executing the Animation would cause a conflict.
  */
-double animation::Animation::
+double Animation::
 step(const double dt, ActiveAnimationMap& aam) {
 
     AnimationData& ad = _get_animation_data(_animation_id);
@@ -918,7 +882,7 @@ step(const double dt, ActiveAnimationMap& aam) {
 
     // position
     if (ad.pos.active) {
-        tools::Vector2 p = (ad.pos.relative_node)
+        Vec2 p = (ad.pos.relative_node)
                         ? ad.node->get_pos(*ad.pos.relative_node)
                         : ad.node->get_pos();
         if (p != ad.pos.end) {
@@ -932,7 +896,7 @@ step(const double dt, ActiveAnimationMap& aam) {
             }
             else {
                 double prog = lerp(ad.playback_pos, ad.dur_pos, ad.blend);
-				tools::Vector2 v = tools::Vector2((ad.pos.end - ad.pos.start)
+				Vec2 v = Vec2((ad.pos.end - ad.pos.start)
 						* prog + ad.pos.start);
                 if (ad.pos.relative_node) {
                     ad.node->set_pos(*ad.pos.relative_node, v);
@@ -946,7 +910,7 @@ step(const double dt, ActiveAnimationMap& aam) {
 
     // rotation_center
     if (ad.center_pos.active) {
-        tools::Vector2 p = ad.node->get_rotation_center();
+        Vec2 p = ad.node->get_rotation_center();
         if (p != ad.center_pos.end) {
             if (ad.playback_pos >= ad.dur_center_pos) {
                 ad.node->set_rotation_center(ad.center_pos.end);
@@ -954,7 +918,7 @@ step(const double dt, ActiveAnimationMap& aam) {
             else {
                 double prog = lerp(ad.playback_pos, ad.dur_center_pos,
                     ad.blend);
-				tools::Vector2 v = tools::Vector2(
+				Vec2 v = Vec2(
 						(ad.center_pos.end - ad.center_pos.start) * prog
 						+ ad.center_pos.start);
                 ad.node->set_rotation_center(v);
@@ -964,10 +928,10 @@ step(const double dt, ActiveAnimationMap& aam) {
 
     // scale
     if (ad.scale.active) {
-        scenegraph::Scale s = (ad.scale.relative_node)
+        Scale s = (ad.scale.relative_node)
                             ? ad.node->get_scale(*ad.scale.relative_node)
                             : ad.node->get_scale();
-        scenegraph::Scale new_scale = s;
+        Scale new_scale = s;
         if (s.sx != ad.scale.end.sx) {
             if (ad.playback_pos >= ad.dur_scalex) {
                 new_scale.sx = ad.scale.end.sx;
@@ -1067,7 +1031,7 @@ step(const double dt, ActiveAnimationMap& aam) {
 /**
  *
  */
-std::unique_ptr<animation::AnimationBase> animation::Animation::
+std::unique_ptr<AnimationBase> Animation::
 get_copy() {
     std::unique_ptr<Animation> ptr;
     ptr.reset(new Animation());
@@ -1087,12 +1051,12 @@ get_copy() {
     ptr_ad.dur_angle = ad.dur_angle;
     ptr_ad.dur_center_pos = ad.dur_center_pos;
     ptr_ad.dur_depth = ad.dur_depth;
-    ptr_ad.node.reset(new scenegraph::Node(*ad.node));
+    ptr_ad.node.reset(new Node(*ad.node));
     ptr_ad.blend = ad.blend;
     ptr_ad.pos.start = ad.pos.start;
     ptr_ad.pos.end = ad.pos.end;
     if (ad.pos.relative_node) {
-		ptr_ad.pos.relative_node.reset(new scenegraph::Node(
+		ptr_ad.pos.relative_node.reset(new Node(
 					*ad.pos.relative_node));
 	}
     ptr_ad.pos.active = ad.pos.active;
@@ -1104,7 +1068,7 @@ get_copy() {
     ptr_ad.scale.start = ad.scale.start;
     ptr_ad.scale.end = ad.scale.end;
     if (ad.scale.relative_node) {
-		ptr_ad.scale.relative_node.reset(new scenegraph::Node(
+		ptr_ad.scale.relative_node.reset(new Node(
 					*ad.scale.relative_node));
 	}
     ptr_ad.scale.active = ad.scale.active;
@@ -1112,7 +1076,7 @@ get_copy() {
     ptr_ad.angle.start = ad.angle.start;
     ptr_ad.angle.end = ad.angle.end;
     if (ad.angle.relative_node) {
-	    ptr_ad.angle.relative_node.reset(new scenegraph::Node(
+	    ptr_ad.angle.relative_node.reset(new Node(
 	    			*ad.angle.relative_node));
 	}
     ptr_ad.angle.active = ad.angle.active;
@@ -1120,7 +1084,7 @@ get_copy() {
     ptr_ad.depth.start = ad.depth.start;
     ptr_ad.depth.end = ad.depth.end;
     if (ad.depth.relative_node) {
-    	ptr_ad.depth.relative_node.reset(new scenegraph::Node(
+    	ptr_ad.depth.relative_node.reset(new Node(
     				*ad.depth.relative_node));
     }
     ptr_ad.depth.active = ad.depth.active;
@@ -1131,7 +1095,7 @@ get_copy() {
 /**
  *
  */
-char animation::Animation::
+char Animation::
 active_animations() {
     char active_anim = 0;
     AnimationData& ad = _get_animation_data(_animation_id);
@@ -1161,8 +1125,8 @@ active_animations() {
 /**
  *
  */
-void animation::Sequence::
-append(std::unique_ptr<animation::AnimationBase>& a) {
+void Sequence::
+append(std::unique_ptr<AnimationBase>& a) {
     _v.push_back(a->get_copy());
 
     // Make sure no sequences with loop = true are appended.
@@ -1172,7 +1136,7 @@ append(std::unique_ptr<animation::AnimationBase>& a) {
 /**
  *
  */
-void animation::Sequence::
+void Sequence::
 reset() {
     if (!_v.size()) {
         throw std::runtime_error("Tried to reset empty Sequence.");
@@ -1184,7 +1148,7 @@ reset() {
 /**
  *
  */
-double animation::Sequence::
+double Sequence::
 step(const double dt, ActiveAnimationMap& aam) {
     if (!_v.size()) {
         throw std::runtime_error("Tried to step empty Sequence.");
@@ -1216,7 +1180,7 @@ step(const double dt, ActiveAnimationMap& aam) {
 /**
  *
  */
-void animation::Sequence::
+void Sequence::
 loop(const bool l) {
     _loop = l;
 }
@@ -1224,7 +1188,7 @@ loop(const bool l) {
 /**
  *
  */
-std::unique_ptr<animation::AnimationBase> animation::Sequence::
+std::unique_ptr<AnimationBase> Sequence::
 get_copy() {
     std::unique_ptr<AnimationBase> ptr;
     ptr.reset(new Sequence());
@@ -1240,7 +1204,7 @@ get_copy() {
 /**
  * Returns the id of a new and empty Interval.
  */
-int animation::AnimationManager::
+int AnimationManager::
 new_interval() {
     ++_max_anim;
     _anims[_max_anim] = std::unique_ptr<AnimationBase>(new Interval());
@@ -1251,7 +1215,7 @@ new_interval() {
 /**
  * Returns the id of a new and empty Animation.
  */
-int animation::AnimationManager::
+int AnimationManager::
 new_animation() {
     ++_max_anim;
     _anims[_max_anim] = std::unique_ptr<AnimationBase>(new Animation());
@@ -1262,7 +1226,7 @@ new_animation() {
 /**
  * Returns the id of a new and empty Sequence.
  */
-int animation::AnimationManager::
+int AnimationManager::
 new_sequence() {
     ++_max_anim;
     _anims[_max_anim] = std::unique_ptr<AnimationBase>(new Sequence());
@@ -1273,7 +1237,7 @@ new_sequence() {
 /**
  * Return a Interval reference for the specified id.
  */
-animation::Interval& animation::AnimationManager::
+Interval& AnimationManager::
 get_interval(const int i_id) {
     if (_anims.find(i_id) == _anims.end()) {
         throw std::range_error("Specified id is not an active Interval");
@@ -1284,7 +1248,7 @@ get_interval(const int i_id) {
 /**
  * Return a Animation reference for the specified id.
  */
-animation::Animation& animation::AnimationManager::
+Animation& AnimationManager::
 get_animation(const int a_id) {
     if (_anims.find(a_id) == _anims.end()) {
         throw std::range_error("Specified id is not an active Animation");
@@ -1295,7 +1259,7 @@ get_animation(const int a_id) {
 /**
  * Return a Sequence reference for the specified id.
  */
-animation::Sequence& animation::AnimationManager::
+Sequence& AnimationManager::
 get_sequence(const int s_id) {
     if (_anims.find(s_id) == _anims.end()) {
         throw std::range_error("Specified id is not an active Sequence");
@@ -1306,7 +1270,7 @@ get_sequence(const int s_id) {
 /**
  * Return a AnimationBase unique_ptr reference for the specified id.
  */
-std::unique_ptr<animation::AnimationBase>& animation::AnimationManager::
+std::unique_ptr<AnimationBase>& AnimationManager::
 get_animation_base_ptr(const int i_id) {
     if (_anims.find(i_id) == _anims.end()) {
         throw std::range_error("Specified id is not an active Interval");
@@ -1317,7 +1281,7 @@ get_animation_base_ptr(const int i_id) {
 /**
  * Removes the specified Interval.
  */
-void animation::AnimationManager::
+void AnimationManager::
 remove_interval(const int i_id) {
     if (_anims.find(i_id) == _anims.end()) {
         throw std::range_error("Specified id is not an active Interval");
@@ -1328,7 +1292,7 @@ remove_interval(const int i_id) {
 
 /**
  * Removes the specified Animation.
- */void animation::AnimationManager::
+ */void AnimationManager::
 remove_animation(const int a_id) {
     if (_anims.find(a_id) == _anims.end()) {
         throw std::range_error("Specified id is not an active Animation");
@@ -1340,7 +1304,7 @@ remove_animation(const int a_id) {
 /**
  * Removes the specified Sequence.
  */
-void animation::AnimationManager::
+void AnimationManager::
 remove_sequence(const int s_id) {
     if (_anims.find(s_id) == _anims.end()) {
         throw std::range_error("Specified id is not an active Sequence");
@@ -1352,7 +1316,7 @@ remove_sequence(const int s_id) {
 /**
  * Play Interval from beginning.
  */
-void animation::AnimationManager::
+void AnimationManager::
 play_interval(const int i_id) {
     auto search = _anim_status.find(i_id);
     if (search != _anim_status.end()) {
@@ -1366,7 +1330,7 @@ play_interval(const int i_id) {
 /**
  * Play Animation from beginning.
  */
-void animation::AnimationManager::
+void AnimationManager::
 play_animation(const int a_id) {
     auto search = _anim_status.find(a_id);
     if (search != _anim_status.end()) {
@@ -1380,7 +1344,7 @@ play_animation(const int a_id) {
 /**
  * Play Sequence from beginning.
  */
-void animation::AnimationManager::
+void AnimationManager::
 play_sequence(const int s_id) {
     auto search = _anim_status.find(s_id);
     if (search != _anim_status.end()) {
@@ -1394,7 +1358,7 @@ play_sequence(const int s_id) {
 /**
  * Pause Interval.
  */
-void animation::AnimationManager::
+void AnimationManager::
 pause_interval(const int i_id) {
     auto search = _anim_status.find(i_id);
     if (search != _anim_status.end()) {
@@ -1411,7 +1375,7 @@ pause_interval(const int i_id) {
 /**
  * Pause Animation.
  */
-void animation::AnimationManager::
+void AnimationManager::
 pause_animation(const int a_id) {
     auto search = _anim_status.find(a_id);
     if (search != _anim_status.end()) {
@@ -1428,7 +1392,7 @@ pause_animation(const int a_id) {
 /**
  * Pause Sequence.
  */
-void animation::AnimationManager::
+void AnimationManager::
 pause_sequence(const int s_id) {
     auto search = _anim_status.find(s_id);
     if (search != _anim_status.end()) {
@@ -1445,7 +1409,7 @@ pause_sequence(const int s_id) {
 /**
  * Resume Interval.
  */
-void animation::AnimationManager::
+void AnimationManager::
 resume_interval(const int i_id) {
     auto search = _anim_status.find(i_id);
     if (search != _anim_status.end()) {
@@ -1462,7 +1426,7 @@ resume_interval(const int i_id) {
 /**
  * Resume Animation.
  */
-void animation::AnimationManager::
+void AnimationManager::
 resume_animation(const int a_id) {
     auto search = _anim_status.find(a_id);
     if (search != _anim_status.end()) {
@@ -1479,7 +1443,7 @@ resume_animation(const int a_id) {
 /**
  * Resume Sequence.
  */
-void animation::AnimationManager::
+void AnimationManager::
 resume_sequence(const int s_id) {
     auto search = _anim_status.find(s_id);
     if (search != _anim_status.end()) {
@@ -1496,7 +1460,7 @@ resume_sequence(const int s_id) {
 /**
  * Stop Interval.
  */
-void animation::AnimationManager::
+void AnimationManager::
 stop_interval(const int i_id) {
     auto search = _anim_status.find(i_id);
     if (search != _anim_status.end()) {
@@ -1510,7 +1474,7 @@ stop_interval(const int i_id) {
 /**
  * Stop Animation.
  */
-void animation::AnimationManager::
+void AnimationManager::
 stop_animation(const int a_id) {
     auto search = _anim_status.find(a_id);
     if (search != _anim_status.end()) {
@@ -1524,7 +1488,7 @@ stop_animation(const int a_id) {
 /**
  * Stop Sequence.
  */
-void animation::AnimationManager::
+void AnimationManager::
 stop_sequence(const int s_id) {
     auto search = _anim_status.find(s_id);
     if (search != _anim_status.end()) {
@@ -1538,7 +1502,7 @@ stop_sequence(const int s_id) {
 /**
  * Return playback status of an Interval.
  */
-char animation::AnimationManager::
+char AnimationManager::
 get_interval_status(const int i_id) {
 	auto search = _anim_status.find(i_id);
 	if (search == _anim_status.end()) {
@@ -1551,19 +1515,19 @@ get_interval_status(const int i_id) {
 /**
  * Return playback status of an Animation.
  */
-char animation::AnimationManager::
+char AnimationManager::
 get_animation_status(const int a_id) {
 	auto search = _anim_status.find(a_id);
 	if (search == _anim_status.end()) {
 		throw std::range_error("Specified id is not an active Animation.");
 	}
-	return _anim_status[a_id];
+	return get_interval_status(a_id);
 }
 
 /**
  * Return playback status of an Interval.
  */
-char animation::AnimationManager::
+char AnimationManager::
 get_sequence_status(const int s_id) {
 	auto search = _anim_status.find(s_id);
 	if (search == _anim_status.end()) {
@@ -1575,7 +1539,7 @@ get_sequence_status(const int s_id) {
 /*
  * Append to Sequence by id.
  */
-void animation::AnimationManager::
+void AnimationManager::
 append(const int s_id, const int a_id) {
     if (s_id == a_id) {
         throw std::runtime_error("Cannot append sequence to itself.");
@@ -1586,7 +1550,7 @@ append(const int s_id, const int a_id) {
 /**
  * Advance animation playback by ``dt`` seconds.
  */
-void animation::AnimationManager::
+void AnimationManager::
 animate(const double dt) {
 	_aam.clear();
 	// Animations/Intervals
@@ -1609,3 +1573,7 @@ animate(const double dt) {
         }
 	}
 }
+
+
+}  // namespace animation
+}  // namespace foolysh

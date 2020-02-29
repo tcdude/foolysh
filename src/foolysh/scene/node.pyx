@@ -11,8 +11,8 @@ from .cppnode cimport Size
 from .cppnode cimport Origin as _Origin
 from ..tools.cppaabb cimport AABB as _AABB
 from ..tools.aabb cimport AABB
-from ..tools.cppvector2 cimport Vector2 as _Vector2
-from ..tools.vector2 cimport Vector2
+from ..tools.cppvec2 cimport Vec2 as _Vec2
+from ..tools.vec2 cimport Vec2
 from ..tools.common import Origin
 
 from cython.operator cimport dereference as deref
@@ -227,7 +227,7 @@ cdef class Node:
         return self._query(aabb, depth_sorted)
 
     cdef list _query(self, AABB aabb, bint depth_sorted) except +:
-        cdef SmallList[int] r = deref(self.thisptr).query(
+        cdef SmallList[unsigned long] r = deref(self.thisptr).query(
             deref(aabb.thisptr),
             depth_sorted
         )
@@ -251,12 +251,12 @@ cdef class Node:
     @property
     def pos(self):
         """
-        :class:`foolysh.tools.vector2.Vector2` position of this Node, relative
+        :class:`foolysh.tools.vec2.Vec2` position of this Node, relative
         to its parent.
 
         :setter:
-            * :class:`foolysh.tools.vector2.Vector2` -> sets the position to the
-                specified :class:`foolysh.tools.vector2.Vector2`.
+            * :class:`foolysh.tools.vec2.Vec2` -> sets the position to the
+                specified :class:`foolysh.tools.vec2.Vec2`.
             * ``float``/``int`` -> sets the x and y coordinates to the specified
                 value.
             * ``tuple`` of two ``int``/``float`` -> sets the x and y
@@ -265,7 +265,7 @@ cdef class Node:
                 the respective coordinates, relative to the specified Node.
 
         .. warning::
-            The returned :class:`foolysh.tools.vector2.Vector2` is a copy of the
+            The returned :class:`foolysh.tools.vec2.Vec2` is a copy of the
             current pos. Any changes made to it are independent from the
             internally stored position!
         """
@@ -273,7 +273,7 @@ cdef class Node:
 
     @pos.setter
     def pos(self, v):
-        if isinstance(v, Vector2):
+        if isinstance(v, Vec2):
             self._set_pos(v.x, v.y)
         elif isinstance(v, (int, float)):
             self._set_pos_single(v)
@@ -283,7 +283,7 @@ cdef class Node:
         elif isinstance(v, tuple) and isinstance(v[0], Node):
             if len(v) == 2 and isinstance(v[1], (int, float)):
                 self._set_pos_relative(v[0], v[1], v[1])
-            elif len(v) == 2 and isinstance(v[1], Vector2):
+            elif len(v) == 2 and isinstance(v[1], Vec2):
                 self._set_pos_relative(v[0], v[1].x, v[1].y)
             elif len(v) == 3 and isinstance(v[1], (int, float)) \
                  and isinstance(v[2], (int, float)):
@@ -357,14 +357,14 @@ cdef class Node:
         Args:
             other: The Node used as reference.
         Returns:
-            :class:`foolysh.tools.vector2.Vector2` Position relative to another
+            :class:`foolysh.tools.vec2.Vec2` Position relative to another
             Node.
         """
         return self._get_pos_node(other)
 
-    cdef Vector2 _get_pos(self):
-        cdef _Vector2 v = deref(self.thisptr).get_pos()
-        return Vector2(v[0], v[1])
+    cdef Vec2 _get_pos(self):
+        cdef _Vec2 v = deref(self.thisptr).get_pos()
+        return Vec2(v[0], v[1])
 
     cdef void _set_pos_single(self, const double v):
         deref(self.thisptr).set_pos(v)
@@ -380,9 +380,9 @@ cdef class Node:
     ):
         deref(self.thisptr).set_pos(deref(other.thisptr), x, y)
 
-    cdef Vector2 _get_pos_node(self, Node other):
-        cdef _Vector2 v = deref(self.thisptr).get_pos(deref(other.thisptr))
-        return Vector2(v[0], v[1])
+    cdef Vec2 _get_pos_node(self, Node other):
+        cdef _Vec2 v = deref(self.thisptr).get_pos(deref(other.thisptr))
+        return Vec2(v[0], v[1])
 
     @property
     def scale(self):
@@ -390,8 +390,8 @@ cdef class Node:
         ``tuple`` scale of this Node, relative to its parent.
 
         :setter:
-            * :class:`foolysh.tools.vector2.Vector2` -> sets the position to the
-                specified :class:`foolysh.tools.vector2.Vector2`.
+            * :class:`foolysh.tools.vec2.Vec2` -> sets the position to the
+                specified :class:`foolysh.tools.vec2.Vec2`.
             * ``float``/``int`` -> sets the x and y scale to the specified
                 value.
             * ``tuple`` of two ``int``/``float`` -> sets the x and y scale to
@@ -574,11 +574,11 @@ cdef class Node:
     @property
     def rotation_center(self):
         """
-        :class:`foolysh.tools.vector2.Vector2` rotation center of this Node,
+        :class:`foolysh.tools.vec2.Vec2` rotation center of this Node,
         relative to its parent.
 
         :setter:
-            * :class:`foolysh.tools.vector2.Vector2` or ``tuple`` of two
+            * :class:`foolysh.tools.vec2.Vec2` or ``tuple`` of two
                 ``float`` / ``int`` -> sets the rotation center to the specified
                 value.
             * ``0`` -> Resets the rotation center to the default value.
@@ -587,7 +587,7 @@ cdef class Node:
 
     @rotation_center.setter
     def rotation_center(self, v):
-        if isinstance(v, Vector2):
+        if isinstance(v, Vec2):
             self._set_rotation_center(v.x, v.y)
         elif v == 0:
             self._set_rotation_center(0.0, 0.0)
@@ -597,9 +597,9 @@ cdef class Node:
         else:
             raise TypeError
 
-    cdef Vector2 _get_rotation_center(self):
-        cdef _Vector2 v = deref(self.thisptr).get_rotation_center()
-        return Vector2(v[0], v[1])
+    cdef Vec2 _get_rotation_center(self):
+        cdef _Vec2 v = deref(self.thisptr).get_rotation_center()
+        return Vec2(v[0], v[1])
 
     cdef void _set_rotation_center(self, const double x, const double y):
         deref(self.thisptr).set_rotation_center(x, y)
@@ -653,9 +653,9 @@ cdef class Node:
         """
         return self._get_relative_pos()
 
-    cdef Vector2 _get_relative_pos(self):
-        cdef _Vector2 v = deref(self.thisptr).get_relative_pos()
-        return Vector2(v[0], v[1])
+    cdef Vec2 _get_relative_pos(self):
+        cdef _Vec2 v = deref(self.thisptr).get_relative_pos()
+        return Vec2(v[0], v[1])
 
     @property
     def relative_scale(self):

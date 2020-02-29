@@ -27,6 +27,7 @@
 #define AABB_HPP
 
 
+namespace foolysh {
 namespace tools {
     enum Quadrant {
         TL,
@@ -56,4 +57,6 @@ namespace tools {
         double x, y, hw, hh;
     };
 }  // namespace tools
+}  // namespace foolysh
+
 #endif

@@ -54,7 +54,7 @@
 #define ANIMATION_HPP
 
 #include "list_t.hpp"
-#include "vector2.hpp"
+#include "vec2.hpp"
 #include "node.hpp"
 #include <utility>
 #include <map>
@@ -62,7 +62,13 @@
 #include <vector>
 
 
+namespace foolysh {
 namespace animation {
+    typedef foolysh::tools::Vec2 Vec2;
+    typedef foolysh::scene::Node Node;
+    typedef foolysh::scene::Scale Scale;
+    using foolysh::tools::ExtFreeList;
+
     enum BlendType {
         NO_BLEND,
         EASE_IN,
@@ -70,14 +76,47 @@ namespace animation {
         EASE_IN_OUT
     };
 
-    inline double lerp(double pos, double total, BlendType blend);
+    /**
+    * Linear interpolation of two values to the range [0, 1] with optional
+    * blending.
+    */
+    inline double lerp(double pos, double total, BlendType blend) {
+        if (pos >= total) {
+            return 1.0;
+        }
+        if (pos == 0.0) {
+            return 0.0;
+        }
+
+        double v = pos / total;
+
+        switch (blend) {
+            case NO_BLEND: {
+                return v;
+            }
+            case EASE_IN: {
+                double vsq = v * v;
+                return ((3.0 * vsq) - (vsq * v)) * 0.5;
+            }
+            case EASE_OUT: {
+                double vsq = v * v;
+                return ((3.0 * v) - (vsq * v)) * 0.5;
+            }
+            case EASE_IN_OUT: {
+                double vsq = v * v;
+                return (3.0 * vsq) - (2.0 * v * vsq);
+            }
+        }
+
+        throw std::runtime_error("Unknown blend_type");
+    }
 
     /**
      * Hold information for a positional animation.
      */
     struct PositionData {
-        tools::Vector2 start, end;
-        std::unique_ptr<scenegraph::Node> relative_node;
+        Vec2 start, end;
+        std::unique_ptr<Node> relative_node;
         bool active = false, has_start = false;
     };
 
@@ -85,8 +124,8 @@ namespace animation {
      * Hold information for a scale animation.
      */
     struct ScaleData {
-        scenegraph::Scale start, end;
-        std::unique_ptr<scenegraph::Node> relative_node;
+        Scale start, end;
+        std::unique_ptr<Node> relative_node;
         bool active = false, has_start = false;
     };
 
@@ -95,7 +134,7 @@ namespace animation {
      */
     struct AngleData {
         double start, end;
-        std::unique_ptr<scenegraph::Node> relative_node;
+        std::unique_ptr<Node> relative_node;
         bool active = false, has_start = false;
     };
 
@@ -104,7 +143,7 @@ namespace animation {
      */
     struct DepthData {
         int start, end;
-        std::unique_ptr<scenegraph::Node> relative_node;
+        std::unique_ptr<Node> relative_node;
         bool active = false, has_start = false;
     };
 
@@ -120,7 +159,7 @@ namespace animation {
             rotation_center_speed = -1.0, depth_speed = -1.0;
         double dur_pos, dur_scalex, dur_scaley, dur_angle, dur_center_pos,
             dur_depth;
-        std::unique_ptr<scenegraph::Node> node;
+        std::unique_ptr<Node> node;
         BlendType blend = NO_BLEND;
         PositionData pos, center_pos;   // flags: 1, 2
         ScaleData scale;                // flags: 4
@@ -159,34 +198,34 @@ namespace animation {
         AnimationType& operator=(AnimationType&& other) noexcept;
 
         // Setup
-        void set_node(scenegraph::Node& n);
+        void set_node(Node& n);
         void set_blend(BlendType b);
 
-        void add_pos(tools::Vector2 end);
-        void add_pos(tools::Vector2 end, scenegraph::Node relative_node);
-        void add_pos(tools::Vector2 start, tools::Vector2 end);
-        void add_pos(tools::Vector2 start, tools::Vector2 end,
-                     scenegraph::Node relative_node);
+        void add_pos(Vec2 end);
+        void add_pos(Vec2 end, Node relative_node);
+        void add_pos(Vec2 start, Vec2 end);
+        void add_pos(Vec2 start, Vec2 end,
+                     Node relative_node);
 
-        void add_scale(scenegraph::Scale end);
-        void add_scale(scenegraph::Scale end, scenegraph::Node relative_node);
-        void add_scale(scenegraph::Scale start, scenegraph::Scale end);
-        void add_scale(scenegraph::Scale start, scenegraph::Scale end,
-                       scenegraph::Node relative_node);
+        void add_scale(Scale end);
+        void add_scale(Scale end, Node relative_node);
+        void add_scale(Scale start, Scale end);
+        void add_scale(Scale start, Scale end,
+                       Node relative_node);
 
         void add_rotation(double end);
-        void add_rotation(double end, scenegraph::Node relative_node);
+        void add_rotation(double end, Node relative_node);
         void add_rotation(double start, double end);
         void add_rotation(double start, double end,
-                          scenegraph::Node relative_node);
+                          Node relative_node);
 
-        void add_rotation_center(tools::Vector2 end);
-        void add_rotation_center(tools::Vector2 start, tools::Vector2 end);
+        void add_rotation_center(Vec2 end);
+        void add_rotation_center(Vec2 start, Vec2 end);
 
         void add_depth(int end);
-        void add_depth(int end, scenegraph::Node relative_node);
+        void add_depth(int end, Node relative_node);
         void add_depth(int start, int end);
-        void add_depth(int start, int end, scenegraph::Node relative_node);
+        void add_depth(int start, int end, Node relative_node);
 
         // Control
         void reset();
@@ -316,5 +355,6 @@ namespace animation {
     };
 
 }  // namespace animation
+}  // namespace foolysh
 
 #endif

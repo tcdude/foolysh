@@ -27,10 +27,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE."""
 
 
-cdef extern from "src/clock.cpp" namespace "tools":
+cdef extern from "src/clock.cpp" namespace "foolysh::tools":
     pass
 
-cdef extern from "src/clock.hpp" namespace "tools":
+cdef extern from "src/clock.hpp" namespace "foolysh::tools":
     cdef cppclass Clock:
         void tick()
         double get_dt()

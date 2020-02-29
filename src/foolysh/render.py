@@ -14,7 +14,7 @@ from .tools import common
 from .scene import node
 from .tools import aabb
 from .tools import spriteloader
-from .tools import vector2
+from .tools import vec2
 
 __author__ = 'Tiziano Bettio'
 __license__ = 'MIT'
@@ -56,7 +56,7 @@ class HWRenderer(sdl2.ext.TextureSpriteRenderSystem):
         self._base_scale = 1.0
         self._zoom = 1.0
         self._sprite_loader = None
-        self._view_pos = vector2.Vector2(0.0, 0.0)
+        self._view_pos = vec2.Vec2(0.0, 0.0)
         self._view_aabb = aabb.AABB(0.0, 0.0, 0.0, 0.0)
         self._dirty = True
         self._last_w_size = window.size
@@ -237,13 +237,13 @@ class HWRenderer(sdl2.ext.TextureSpriteRenderSystem):
 
     @property
     def view_pos(self):
-        # type: () -> vector2.Vector2
+        # type: () -> vec2.Vec2
         return self._view_pos
 
     @view_pos.setter
     def view_pos(self, value):
-        # type: (vector2.Vector2)
-        if not isinstance(value, vector2.Vector2):
+        # type: (vec2.Vec2)
+        if not isinstance(value, vec2.Vec2):
             raise TypeError
         if self._view_pos != value:
             self._view_pos = value

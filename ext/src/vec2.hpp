@@ -23,55 +23,58 @@
  * Basic 2D Vector implementation.
  */
 
-#ifndef VECTOR2_HPP
-#define VECTOR2_HPP
+#ifndef VEC2_HPP
+#define VEC2_HPP
 
+namespace foolysh {
 namespace tools {
-    class Vector2 {
+    class Vec2 {
     public:
-        Vector2();
-        Vector2(const double v);
-        Vector2(const double x, const double y);
-        Vector2(const Vector2& other);
-        Vector2& operator=(const Vector2& other);
+        Vec2();
+        Vec2(const double v);
+        Vec2(const double x, const double y);
+        Vec2(const Vec2& other);
+        Vec2& operator=(const Vec2& other);
 
-        double dot(const Vector2& other);
+        double dot(const Vec2& other);
         bool normalize();
-        Vector2 normalized();
+        Vec2 normalized();
         double magnitude();
         double length();
         void rotate(double a, bool radians = false);
-        Vector2 rotated(double a, bool radians = false);
-        bool almost_equal(Vector2& other, const double d = 1e-6);
+        Vec2 rotated(double a, bool radians = false);
+        bool almost_equal(Vec2& other, const double d = 1e-6);
 
         double& operator[](const int idx);
-        Vector2 operator+(const Vector2& rhs);
-        Vector2 operator+(const double rhs);
-        Vector2& operator+=(const Vector2& rhs);
-        Vector2& operator+=(const double rhs);
-        void iadd(const Vector2& rhs);
+        Vec2 operator+(const Vec2& rhs);
+        Vec2 operator+(const double rhs);
+        Vec2& operator+=(const Vec2& rhs);
+        Vec2& operator+=(const double rhs);
+        void iadd(const Vec2& rhs);
         void iadd(const double rhs);
-        Vector2 operator-(const Vector2& rhs);
-        Vector2 operator-(const double rhs);
-        Vector2& operator-=(const Vector2& rhs);
-        Vector2& operator-=(const double rhs);
-        void isub(const Vector2& rhs);
+        Vec2 operator-(const Vec2& rhs);
+        Vec2 operator-(const double rhs);
+        Vec2& operator-=(const Vec2& rhs);
+        Vec2& operator-=(const double rhs);
+        void isub(const Vec2& rhs);
         void isub(const double rhs);
-        Vector2 operator*(const double rhs);
-        Vector2& operator*=(const double rhs);
+        Vec2 operator*(const double rhs);
+        Vec2& operator*=(const double rhs);
         void imul(const double rhs);
-        Vector2 operator/(const double rhs);
-        Vector2 div(const double rhs);
-        Vector2& operator/=(const double rhs);
+        Vec2 operator/(const double rhs);
+        Vec2 div(const double rhs);
+        Vec2& operator/=(const double rhs);
         void idiv(const double rhs);
-        bool operator==(const Vector2& rhs);
-        bool operator!=(const Vector2& rhs);
+        bool operator==(const Vec2& rhs);
+        bool operator!=(const Vec2& rhs);
         bool operator==(const double rhs);
         bool operator!=(const double rhs);
     private:
         double _x, _y, _magnitude, _length;
         unsigned char _state;  // 0 = dirty, 1 = have mag, 2 = have mag + len
     };
-}  // namespace scenegraph
+
+}  // namespace tools
+}  // namespace foolysh
 
 #endif

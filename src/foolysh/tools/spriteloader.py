@@ -19,7 +19,7 @@ from sdl2 import pixels
 from sdl2.ext import SDLError
 
 from . import sdf
-from . import vector2
+from . import vec2
 
 __author__ = 'Tiziano Bettio'
 __license__ = 'MIT'
@@ -365,7 +365,7 @@ class Asset:
         self.cache_prefix = cache_name[2:]
         self.cache_suffix = '.' + relative_path.split('.')[-1]
         self.abs_path = os.path.join(parent.asset_dir, relative_path)
-        self._img_size = vector2.Point2(Image.open(self.abs_path).size)
+        self._img_size = vec2.Point2(Image.open(self.abs_path).size)
         self._cached_items = {}
         self.parent = parent
         self._refresh_cached()

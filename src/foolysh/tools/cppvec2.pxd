@@ -30,39 +30,39 @@ SOFTWARE."""
 cdef extern from "src/common.hpp":
     pass
 
-cdef extern from "src/vector2.cpp":
+cdef extern from "src/vec2.cpp":
     pass
 
-cdef extern from "src/vector2.hpp" namespace "tools":
-    cdef cppclass Vector2:
-        Vector2() except +
-        Vector2(const double) except +
-        Vector2(const double, const double) except +
-        Vector2(Vector2) except +
+cdef extern from "src/vec2.hpp" namespace "foolysh::tools":
+    cdef cppclass Vec2:
+        Vec2() except +
+        Vec2(const double) except +
+        Vec2(const double, const double) except +
+        Vec2(Vec2) except +
 
-        double dot(const Vector2&)
+        double dot(const Vec2&)
         bint normalize()
-        Vector2 normalized() except +
+        Vec2 normalized() except +
         double magnitude()
         double length()
         void rotate(double, bint)
-        Vector2 rotated(double, bint)
-        bint almost_equal(Vector2& other, const double)
+        Vec2 rotated(double, bint)
+        bint almost_equal(Vec2& other, const double)
         double& operator[](const int) except +
-        Vector2 operator+(const Vector2&)
-        Vector2 operator+(const double)
-        Vector2 operator-(const Vector2&)
-        Vector2 operator-(const double)
-        Vector2 operator*(const double)
-        Vector2 div(const double)
-        void iadd(const Vector2&)
+        Vec2 operator+(const Vec2&)
+        Vec2 operator+(const double)
+        Vec2 operator-(const Vec2&)
+        Vec2 operator-(const double)
+        Vec2 operator*(const double)
+        Vec2 div(const double)
+        void iadd(const Vec2&)
         void iadd(const double)
-        void isub(const Vector2&)
+        void isub(const Vec2&)
         void isub(const double)
         void imul(const double)
         void idiv(const double)
-        bint operator==(Vector2)
-        bint operator!=(Vector2)
+        bint operator==(Vec2)
+        bint operator!=(Vec2)
         bint operator==(const double)
         bint operator!=(const double)
 

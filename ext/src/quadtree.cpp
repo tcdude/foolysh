@@ -31,10 +31,13 @@
 #include <stdexcept>
 #include <iostream>
 
+namespace foolysh {
+namespace tools {
+
 /**
  * Default constructor, splits leafs at 8 elements and limits depth to 8.
  */
-tools::Quadtree::
+Quadtree::
 Quadtree() {
     _aabb = AABB(0.0, 0.0, 1.0, 1.0);
     _max_leaf_elements = 8;
@@ -50,7 +53,7 @@ Quadtree() {
 /**
  *
  */
-tools::Quadtree::
+Quadtree::
 Quadtree(AABB& aabb, const int max_leaf_elements, const int max_depth) {
     _aabb = aabb;
     _max_leaf_elements = max_leaf_elements;
@@ -66,7 +69,7 @@ Quadtree(AABB& aabb, const int max_leaf_elements, const int max_depth) {
 /**
  * Return ``SmallList<int>`` with ids intersecting with ``aabb``.
  */
-SmallList<int> tools::Quadtree::
+SmallList<int> Quadtree::
 query(AABB& aabb) {
     SmallList<int> result;
     if (_nodes[0].first_child == -1) {
@@ -109,7 +112,7 @@ query(AABB& aabb) {
 /**
  * Insert ``id`` into Quadtree using ``aabb``. Return ``true`` if successful.
  */
-bool tools::Quadtree::
+bool Quadtree::
 insert(const int id, AABB& aabb) {
     QuadElement qe;
     qe.id = id;
@@ -135,7 +138,7 @@ insert(const int id, AABB& aabb) {
  * Return last element_node index for insertion of an element and increments
  * the node count by 1.
  */
-int tools::Quadtree::
+int Quadtree::
 _insert_element_node(AABB& aabb) {
     AABB current_quadrant = _aabb;
     SmallList<int> to_process;
@@ -169,7 +172,7 @@ _insert_element_node(AABB& aabb) {
             }
         }
         /* Is Branch */
-        tools::Quadrant quadrant = current_quadrant.find_quadrant(aabb.x, aabb.y);
+        Quadrant quadrant = current_quadrant.find_quadrant(aabb.x, aabb.y);
         to_process.push_back(_nodes[node_index].first_child + (int) quadrant);
         current_quadrant = current_quadrant.split(quadrant);
         ++depth;
@@ -180,7 +183,7 @@ _insert_element_node(AABB& aabb) {
 /**
  * Convert Leaf to Branch.
  */
-void tools::Quadtree::
+void Quadtree::
 _leaf_to_branch(const int node_id, AABB& aabb) {
     SmallList<int> elements;
     if (_nodes[node_id].first_child != -1) {
@@ -225,7 +228,7 @@ _leaf_to_branch(const int node_id, AABB& aabb) {
  * Move ``id`` in Quadtree from ``aabb_from`` to ``aabb_to``. Return ``true``
  * if successful.
  */
-bool tools::Quadtree::
+bool Quadtree::
 move(const int id, AABB& aabb_from, AABB& aabb_to) {
     if (remove(id, aabb_from)) {
         return insert(id, aabb_to);
@@ -236,7 +239,7 @@ move(const int id, AABB& aabb_from, AABB& aabb_to) {
 /**
  * Remove ``id`` in Quadtree at ``aabb``. Return ``true`` if successful.
  */
-bool tools::Quadtree::
+bool Quadtree::
 remove(const int id, AABB& aabb) {
 /*    if (_nodes[0].count != -1) {
         throw std::logic_error("Unable to remove, Quadtree is empty");
@@ -299,7 +302,7 @@ remove(const int id, AABB& aabb) {
 /**
  * Deferred cleanup of the Quadtree.
  */
-bool tools::Quadtree::
+bool Quadtree::
 cleanup() {
     SmallList<int> to_process;
     if (_nodes[0].count == -1){
@@ -337,7 +340,7 @@ cleanup() {
 /**
  * Return true when point (``x``, ``y``) lie inside the quadtree.
  */
-bool tools::Quadtree::
+bool Quadtree::
 inside(const double x, const double y) {
     return _aabb.inside(x, y);
 }
@@ -345,8 +348,8 @@ inside(const double x, const double y) {
 /**
  * Return true when ``v`` lies inside the quadtree.
  */
-bool tools::Quadtree::
-inside(Vector2& v) {
+bool Quadtree::
+inside(Vec2& v) {
     return _aabb.inside(v[0], v[1]);
 }
 
@@ -354,7 +357,7 @@ inside(Vector2& v) {
  * Resize Quadtree to new ``aabb``. Temporarily stores all QuadElement indices
  * for later reinsertion into the cleared and resized Quadtree.
  */
-void tools::Quadtree::
+void Quadtree::
 resize(AABB& aabb) {
     SmallList<int> elements, to_process;
     if (_nodes[0].count == -1){
@@ -391,3 +394,6 @@ resize(AABB& aabb) {
         _elements.erase(element_id);
     }
 }
+
+}  // namespace tools
+}  // namespace foolysh

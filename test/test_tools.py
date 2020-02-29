@@ -7,7 +7,7 @@ import math
 # noinspection PyPackageRequirements
 import pytest
 
-from foolysh.tools import vector2
+from foolysh.tools import vec2
 from foolysh.tools import aabb
 from foolysh.tools import quadtree
 
@@ -36,15 +36,15 @@ SOFTWARE."""
 
 
 def test_vector_math():
-    v_a = vector2.Vector2()
-    v_b = vector2.Vector2(1.0, 1.0)
-    assert v_a - v_b == vector2.Vector2(-1, -1)
-    assert v_a + v_b * 2 == vector2.Vector2(2, 2)
-    assert v_a + v_b / 2 == vector2.Vector2(0.5, 0.5)
-    # assert v_b // 3 == vector2.Vector2()
-    assert 3 * v_b == vector2.Vector2(3, 3)
-    assert 1 + v_a == vector2.Vector2(1, 1)
-    assert 1 - v_b == vector2.Vector2()
+    v_a = vec2.Vec2()
+    v_b = vec2.Vec2(1.0, 1.0)
+    assert v_a - v_b == vec2.Vec2(-1, -1)
+    assert v_a + v_b * 2 == vec2.Vec2(2, 2)
+    assert v_a + v_b / 2 == vec2.Vec2(0.5, 0.5)
+    # assert v_b // 3 == vec2.Vec2()
+    assert 3 * v_b == vec2.Vec2(3, 3)
+    assert 1 + v_a == vec2.Vec2(1, 1)
+    assert 1 - v_b == vec2.Vec2()
     assert v_b.length == math.sqrt(2)
     assert v_b.magnitude == 2
     assert pytest.approx(v_b.normalized().length) == 1
@@ -63,8 +63,8 @@ def test_aabb():
     b_b = aabb.AABB(0.5, 0.5, 0.4, 0.4)
     b_c = aabb.AABB(0.55, 0.55, 0.45, .45)
     b_d = aabb.AABB(0, 0, 0.5, 0.5)
-    p_a = vector2.Point2(1.0, 1.0)
-    p_b = vector2.Point2(1 - 1e-7, 1 - 1e-7)
+    p_a = vec2.Point2(1.0, 1.0)
+    p_b = vec2.Point2(1 - 1e-7, 1 - 1e-7)
     assert b_a.inside_aabb(b_b) is True
     assert b_a.inside_aabb(b_c) is True
     assert b_a.overlap(b_c) is True

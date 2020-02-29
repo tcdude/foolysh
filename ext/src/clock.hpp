@@ -24,6 +24,7 @@
 #define CLOCK_HPP
 
 
+namespace foolysh {
 namespace tools {
     struct ClockStatus{
         long start = -1;
@@ -41,5 +42,6 @@ namespace tools {
     };
 
 }  // namespace tools
+}  // namespace foolysh
 
 #endif

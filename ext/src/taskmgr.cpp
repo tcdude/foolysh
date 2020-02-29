@@ -23,9 +23,12 @@
 #include "taskmgr.hpp"
 #include "clock.hpp"
 
+namespace foolysh {
+namespace tools {
+
 /**
  */
-tools::TaskManager::
+TaskManager::
 TaskManager() {
     _clock.reset(new Clock());
 }
@@ -33,7 +36,7 @@ TaskManager() {
 /**
  * Set the callback function from Python
  */
-void tools::TaskManager::
+void TaskManager::
 set_callback(callback cb) {
     _cb = cb;
 }
@@ -41,7 +44,7 @@ set_callback(callback cb) {
 /**
  * Add a new task with unique ``name``.
  */
-void tools::TaskManager::
+void TaskManager::
 add_task(std::string name, const double delay, const bool with_dt, void* func,
          void* args, void* kwargs) {
     Task t;
@@ -57,7 +60,7 @@ add_task(std::string name, const double delay, const bool with_dt, void* func,
 /**
  * Remove task ``name``.
  */
-void tools::TaskManager::
+void TaskManager::
 remove_task(std::string name) {
     _tasks.erase(name);
 }
@@ -65,7 +68,7 @@ remove_task(std::string name) {
 /**
  * To be called every frame.
  */
-void tools::TaskManager::
+void TaskManager::
 execute() {
     _clock->tick();
     const double dt = _clock->get_dt();
@@ -88,7 +91,7 @@ execute() {
 /**
  * Change delay for task ``name``.
  */
-void tools::TaskManager::
+void TaskManager::
 set_delay(std::string name, const double delay) {
     Task& t = _tasks[name];
     t.delay = t.remaining = delay;
@@ -97,7 +100,7 @@ set_delay(std::string name, const double delay) {
 /**
  * Pause task ``name``.
  */
-void tools::TaskManager::
+void TaskManager::
 pause(std::string name) {
     Task& t = _tasks[name];
     t.running = false;
@@ -106,7 +109,7 @@ pause(std::string name) {
 /**
  * Resume task ``name``.
  */
-void tools::TaskManager::
+void TaskManager::
 resume(std::string name) {
     Task& t = _tasks[name];
     t.running = true;
@@ -115,7 +118,7 @@ resume(std::string name) {
 /**
  * Return ``true`` if task ``name`` is running, otherwise ``false``.
  */
-bool tools::TaskManager::
+bool TaskManager::
 state(std::string name) {
     Task& t = _tasks[name];
     return t.running;
@@ -124,8 +127,12 @@ state(std::string name) {
 /**
  * Return the delay for task ``name``.
  */
-double tools::TaskManager::
+double TaskManager::
 get_delay(std::string name) {
     Task& t = _tasks[name];
     return t.delay;
 }
+
+
+}  // namespace tools
+}  // namespace foolysh

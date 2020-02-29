@@ -4,7 +4,7 @@ Unittests for foolysh.animation
 
 from foolysh import animation
 from foolysh.scene import node
-from foolysh.tools import vector2
+from foolysh.tools import vec2
 from foolysh.tools import aabb
 
 __author__ = 'Tiziano Bettio'
@@ -33,15 +33,15 @@ SOFTWARE."""
 
 def test_pos_interval():
     nd = node.Node()
-    b = vector2.Vector2(0)
-    e = vector2.Vector2(1)
+    b = vec2.Vec2(0)
+    e = vec2.Vec2(1)
     ival = animation.PosInterval(nd, 1.0, b, e).play()
     aam = animation.AnimationManager()
     assert nd.traverse() is True
     assert nd.pos == b
     aam.animate(0.5)
     assert nd.traverse() is True
-    assert nd.pos == vector2.Vector2(0.5)
+    assert nd.pos == vec2.Vec2(0.5)
     aam.animate(0.5)
     assert nd.traverse() is True
     assert nd.pos == e
@@ -85,15 +85,15 @@ def test_rotation_interval():
 
 def test_rot_center_interval():
     nd = node.Node()
-    b = vector2.Vector2(0)
-    e = vector2.Vector2(1)
+    b = vec2.Vec2(0)
+    e = vec2.Vec2(1)
     ival = animation.RotationCenterInterval(nd, 1.0, b, e).play()
     aam = animation.AnimationManager()
     assert nd.traverse() is True
     assert nd.rotation_center == b
     aam.animate(0.5)
     assert nd.traverse() is True
-    assert nd.rotation_center == vector2.Vector2(0.5)
+    assert nd.rotation_center == vec2.Vec2(0.5)
     aam.animate(0.5)
     assert nd.traverse() is True
     assert nd.rotation_center == e
@@ -119,8 +119,8 @@ def test_depth_interval():
 
 def test_combined_interval():
     nd = node.Node()
-    pb = vector2.Vector2(0)
-    pe = vector2.Vector2(1)
+    pb = vec2.Vec2(0)
+    pe = vec2.Vec2(1)
     db = 1
     de = 11
     ival = animation.PosInterval(nd, 1.0, pb, pe)
@@ -132,7 +132,7 @@ def test_combined_interval():
     assert nd.depth == db
     aam.animate(0.5)
     assert nd.traverse() is True
-    assert nd.pos == vector2.Vector2(0.5)
+    assert nd.pos == vec2.Vec2(0.5)
     assert nd.depth == 6
     aam.animate(0.5)
     assert nd.traverse() is True
@@ -143,15 +143,15 @@ def test_combined_interval():
 
 def test_pos_animation():
     nd = node.Node()
-    b = vector2.Vector2(0)
-    e = vector2.Vector2(1, 0)
+    b = vec2.Vec2(0)
+    e = vec2.Vec2(1, 0)
     ival = animation.PosAnimation(nd, 1.0, b, e).play()
     aam = animation.AnimationManager()
     assert nd.traverse() is True
     assert nd.pos == b
     aam.animate(0.5)
     assert nd.traverse() is True
-    assert nd.pos == vector2.Vector2(0.5, 0)
+    assert nd.pos == vec2.Vec2(0.5, 0)
     aam.animate(0.5)
     assert nd.traverse() is True
     assert nd.pos == e
@@ -195,15 +195,15 @@ def test_rotation_animation():
 
 def test_rot_center_animation():
     nd = node.Node()
-    b = vector2.Vector2(0)
-    e = vector2.Vector2(1, 0)
+    b = vec2.Vec2(0)
+    e = vec2.Vec2(1, 0)
     ival = animation.RotationCenterAnimation(nd, 1.0, b, e).play()
     aam = animation.AnimationManager()
     assert nd.traverse() is True
     assert nd.rotation_center == b
     aam.animate(0.5)
     assert nd.traverse() is True
-    assert nd.rotation_center == vector2.Vector2(0.5, 0)
+    assert nd.rotation_center == vec2.Vec2(0.5, 0)
     aam.animate(0.5)
     assert nd.traverse() is True
     assert nd.rotation_center == e

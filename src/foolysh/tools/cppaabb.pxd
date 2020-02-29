@@ -30,8 +30,8 @@ SOFTWARE."""
 cdef extern from "src/aabb.cpp":
     pass
 
-cdef extern from "src/aabb.hpp" namespace "tools":
-    cdef enum Quadrant "tools::Quadrant":
+cdef extern from "src/aabb.hpp" namespace "foolysh::tools":
+    cdef enum Quadrant "foolysh::tools::Quadrant":
         TL,
         TR,
         BL,

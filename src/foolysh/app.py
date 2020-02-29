@@ -18,7 +18,7 @@ from . import render
 from .scene import node
 from . import taskmanager
 from . import tools
-from .tools import vector2
+from .tools import vec2
 from .tools import spriteloader
 from .tools import clock
 
@@ -99,7 +99,7 @@ class AppStats:
     """Class for keeping runtime stats of the App."""
     clock: clock.Clock
     window_title: str
-    mouse_pos: vector2.Point2 = vector2.Point2()
+    mouse_pos: vec2.Point2 = vec2.Point2()
     frames: int = 0
     fps: float = 0.0
     running: bool = False
@@ -222,9 +222,9 @@ class App:
 
     @property
     def mouse_pos(self):
-        # type: () -> vector2.Vector2
+        # type: () -> vec2.Vec2
         """``Point`` -> current mouse position (=last touch location)"""
-        return self.__stats.mouse_pos + vector2.Vector2()
+        return self.__stats.mouse_pos + vec2.Vec2()
 
     @property
     def screen_size(self):

@@ -33,6 +33,7 @@
 #include <algorithm>
 #include <iterator>
 
+namespace foolysh {
 namespace tools {
     template <class T>
     class FreeList {
@@ -68,14 +69,16 @@ namespace tools {
         SmallList<T>& operator=(SmallList<T>&& other) noexcept;
         void push_back(const T& element);
         T pop_back();
-        int size();
+        size_t size();
+        void reverse();
+        void reserve(const size_t size);
         void clear();
-        T& operator[](int n);
-        const T& operator[](int n) const;
+        T& operator[](const size_t n);
+        const T& operator[](const size_t n) const;
     private:
         T _a[128];
         std::vector<T> _v;
-        int _size;
+        size_t _size;
         bool _is_vec;
     };
 
@@ -102,7 +105,6 @@ namespace tools {
         int first_free;
         int free_count;
     };
-}  // namespace tools
 
 
 /**
@@ -113,13 +115,13 @@ namespace tools {
  *
  */
 template <class T>
-tools::FreeList<T>::FreeList(): first_free(-1) {}
+FreeList<T>::FreeList(): first_free(-1) {}
 
 /**
  *
  */
 template <class T>
-int tools::FreeList<T>::
+int FreeList<T>::
 insert(const T& element) {
     if (first_free != -1) {
         const int index = first_free;
@@ -139,7 +141,7 @@ insert(const T& element) {
  *
  */
 template <class T>
-void tools::FreeList<T>::
+void FreeList<T>::
 erase(int n) {
     data[n].next = first_free;
     first_free = n;
@@ -149,7 +151,7 @@ erase(int n) {
  *
  */
 template <class T>
-void tools::FreeList<T>::
+void FreeList<T>::
 clear() {
     data.clear();
     first_free = -1;
@@ -159,7 +161,7 @@ clear() {
  *
  */
 template <class T>
-int tools::FreeList<T>::
+int FreeList<T>::
 range() const {
     return static_cast<int>(data.size());
 }
@@ -168,7 +170,7 @@ range() const {
  *
  */
 template <class T>
-T& tools::FreeList<T>::
+T& FreeList<T>::
 operator[](int n) {
     return data[n].element;
 }
@@ -177,7 +179,7 @@ operator[](int n) {
  *
  */
 template <class T>
-const T& tools::FreeList<T>::
+const T& FreeList<T>::
 operator[](int n) const {
     return data[n].element;
 }
@@ -191,19 +193,19 @@ operator[](int n) const {
  *
  */
 template <class T>
-tools::SmallList<T>::SmallList() : _size(0), _is_vec(false) {}
+SmallList<T>::SmallList() : _size(0), _is_vec(false) {}
 
 /**
  *
  */
 template <class T>
-tools::SmallList<T>::~SmallList() {}
+SmallList<T>::~SmallList() {}
 
 /**
  *
  */
 template <class T>
-tools::SmallList<T>::SmallList(const SmallList<T>& other) {
+SmallList<T>::SmallList(const SmallList<T>& other) {
     if (other._is_vec) {
         _is_vec = true;
         _v.insert(_v.begin(), other._v.begin(), other._v.end());
@@ -219,7 +221,7 @@ tools::SmallList<T>::SmallList(const SmallList<T>& other) {
  *
  */
 template <class T>
-tools::SmallList<T>::SmallList(SmallList<T>&& other) noexcept {
+SmallList<T>::SmallList(SmallList<T>&& other) noexcept {
     if (other._is_vec) {
         _is_vec = true;
         _v.swap(other._v);
@@ -235,7 +237,7 @@ tools::SmallList<T>::SmallList(SmallList<T>&& other) noexcept {
  *
  */
 template <class T>
-tools::SmallList<T>& tools::SmallList<T>::
+SmallList<T>& SmallList<T>::
 operator=(const SmallList<T>& other) {
     return *this = SmallList(other);
 }
@@ -244,7 +246,7 @@ operator=(const SmallList<T>& other) {
  *
  */
 template <class T>
-tools::SmallList<T>& tools::SmallList<T>::
+SmallList<T>& SmallList<T>::
 operator=(SmallList<T>&& other) noexcept {
     if (other._is_vec) {
         _is_vec = true;
@@ -262,7 +264,7 @@ operator=(SmallList<T>&& other) noexcept {
  *
  */
 template <class T>
-void tools::SmallList<T>::
+void SmallList<T>::
 push_back(const T& element) {
     if (_is_vec) {
         _v.push_back(element);
@@ -287,7 +289,7 @@ push_back(const T& element) {
  *
  */
 template <class T>
-T tools::SmallList<T>::
+T SmallList<T>::
 pop_back() {
     if (_is_vec) {
         T ret = _v.back();
@@ -302,10 +304,10 @@ pop_back() {
  *
  */
 template <class T>
-int tools::SmallList<T>::
+size_t SmallList<T>::
 size() {
     if (_is_vec) {
-        return static_cast<int>(_v.size());
+        return _v.size();
     }
     return _size;
 }
@@ -314,7 +316,44 @@ size() {
  *
  */
 template <class T>
-void tools::SmallList<T>::
+void SmallList<T>::
+reverse() {
+    if (_is_vec) {
+        std::reverse(_v.begin(), _v.end());
+    }
+    else {
+        for (size_t i = 0; i < _size / 2; ++i) {
+            std::swap(_a[i], _a[_size - 1 - i]);
+        }
+    }
+}
+
+/**
+ *
+ */
+template <class T>
+void SmallList<T>::
+reserve(const size_t size) {
+    if (size <= 128 && !_is_vec) {
+        return;
+    }
+    if (size <= _size) {
+        return;
+    }
+    _v.reserve(size);
+    if (!_is_vec) {
+        _is_vec = true;
+        for (size_t i = 0; i < _size; ++i) {
+            _v.push_back(_a[i]);
+        }
+    }
+}
+
+/**
+ *
+ */
+template <class T>
+void SmallList<T>::
 clear() {
     if (_is_vec) {
         _v.clear();
@@ -326,8 +365,8 @@ clear() {
  *
  */
 template <class T>
-T& tools::SmallList<T>::
-operator[](int n) {
+T& SmallList<T>::
+operator[](const size_t n) {
     if (_is_vec) {
         return _v[n];
     }
@@ -338,8 +377,8 @@ operator[](int n) {
  *
  */
 template <class T>
-const T& tools::SmallList<T>::
-operator[](int n) const {
+const T& SmallList<T>::
+operator[](const size_t n) const {
     if (_is_vec) {
         return _v[n];
     }
@@ -355,13 +394,13 @@ operator[](int n) const {
  *
  */
 template <class T>
-tools::ExtFreeList<T>::ExtFreeList(): first_free(-1), free_count(0) {}
+ExtFreeList<T>::ExtFreeList(): first_free(-1), free_count(0) {}
 
 /**
  *
  */
 template <class T>
-int tools::ExtFreeList<T>::
+int ExtFreeList<T>::
 insert(const T& element) {
     if (first_free != -1) {
         const int index = first_free;
@@ -384,7 +423,7 @@ insert(const T& element) {
  *
  */
 template <class T>
-void tools::ExtFreeList<T>::
+void ExtFreeList<T>::
 erase(int n) {
     data[n].next = first_free;
     data[n].free = true;
@@ -399,7 +438,7 @@ erase(int n) {
  *
  */
 template <class T>
-void tools::ExtFreeList<T>::
+void ExtFreeList<T>::
 clear() {
     data.clear();
     first_free = -1;
@@ -410,7 +449,7 @@ clear() {
  *
  */
 template <class T>
-int tools::ExtFreeList<T>::
+int ExtFreeList<T>::
 range() const {
     return static_cast<int>(data.size()) - free_count;
 }
@@ -419,7 +458,7 @@ range() const {
  *
  */
 template <class T>
-bool tools::ExtFreeList<T>::
+bool ExtFreeList<T>::
 active(int n) {
     if (n < (int) data.size() && n > -1) {
         return (data[n].free) ? false : true;
@@ -431,7 +470,7 @@ active(int n) {
  *
  */
 template <class T>
-T& tools::ExtFreeList<T>::
+T& ExtFreeList<T>::
 operator[](int n) {
     return data[n].element;
 }
@@ -440,10 +479,13 @@ operator[](int n) {
  *
  */
 template <class T>
-const T& tools::ExtFreeList<T>::
+const T& ExtFreeList<T>::
 operator[](int n) const {
     return data[n].element;
 }
 
+
+}  // namespace tools
+}  // namespace foolysh
 
 #endif

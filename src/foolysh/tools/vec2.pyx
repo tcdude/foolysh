@@ -3,7 +3,7 @@
 Basic 2D Vector implementation.
 """
 
-from .cppvector2 cimport Vector2 as _Vector2
+from .cppvec2 cimport Vec2 as _Vec2
 
 cimport cython
 from cython.operator cimport dereference as deref
@@ -35,46 +35,46 @@ SOFTWARE."""
 
 
 @cython.freelist(10)
-cdef class Vector2:
+cdef class Vec2:
     """
     Basic 2D Vector implementation with the following overloaded operators:
 
       * Arithmetic operators ``(+, +=, -, -=, *, *=, /, /=)``
-      * Comparison against other ``Vector2`` objects and scalars ``(==, !=)``
+      * Comparison against other ``Vec2`` objects and scalars ``(==, !=)``
     """
     def __cinit__(self, *args, **kwargs):
         if args:
             if len(args) == 1:
                 if isinstance(args[0], (int, float)):
-                    self.thisptr.reset(new _Vector2(<double> args[0]))
+                    self.thisptr.reset(new _Vec2(<double> args[0]))
                 elif isinstance(args[0], tuple) and len(args[0]) == 2 \
                      and isinstance(args[0][0], (int, float)) \
                      and isinstance(args[0][1], (int, float)):
                     self.thisptr.reset(
-                        new _Vector2(<double> args[0][0], <double> args[0][1])
+                        new _Vec2(<double> args[0][0], <double> args[0][1])
                     )
                 else:
                     raise TypeError
             elif len(args) == 2 and isinstance(args[0], (int, float)) \
                  and isinstance(args[1], (int, float)):
-                self.thisptr.reset(new _Vector2(args[0], args[1]))
+                self.thisptr.reset(new _Vec2(args[0], args[1]))
         else:
-            self.thisptr.reset(new _Vector2())
+            self.thisptr.reset(new _Vec2())
 
     def dot(self, other):
         """
         Args:
-            other: ``Vector2``
+            other: ``Vec2``
 
         Returns:
             Dot product of this and `other`.
         """
-        if not isinstance(other, Vector2):
-            raise TypeError(f'Expected type Vector2, got '
+        if not isinstance(other, Vec2):
+            raise TypeError(f'Expected type Vec2, got '
                             f'{type(other).__name__} instead.')
         return self._dot(other)
 
-    cdef double _dot(self, Vector2 other):
+    cdef double _dot(self, Vec2 other):
         return deref(self.thisptr).dot(deref(other.thisptr))
 
     def normalize(self):
@@ -89,16 +89,16 @@ cdef class Vector2:
     def normalized(self):
         """
         Returns:
-            ``Vector2`` of this vector normalized to unit length.
+            ``Vec2`` of this vector normalized to unit length.
         """
         return self._normalized()
 
-    cdef Vector2 _normalized(self) except +:
-        cdef _Vector2* v = new _Vector2(
+    cdef Vec2 _normalized(self) except +:
+        cdef _Vec2* v = new _Vec2(
             deref(self.thisptr)[0], deref(self.thisptr)[1]
         )
         v.normalize()
-        ret = Vector2.__new__(Vector2, deref(v)[0], deref(v)[1])
+        ret = Vec2.__new__(Vec2, deref(v)[0], deref(v)[1])
         del v
         return ret
 
@@ -129,7 +129,7 @@ cdef class Vector2:
         """
         deref(self.thisptr).rotate(a, radians)
 
-    cpdef Vector2 rotated(self, double a, bint radians=False):
+    cpdef Vec2 rotated(self, double a, bint radians=False):
         """
 
         Args:
@@ -137,10 +137,10 @@ cdef class Vector2:
             radians: ``bool`` whether to use radians or degrees
 
         Returns:
-            ``Vector2`` of the rotated vector around the origin.
+            ``Vec2`` of the rotated vector around the origin.
         """
-        cdef _Vector2 v = deref(self.thisptr).rotated(a, radians)
-        return Vector2(v[0], v[1])
+        cdef _Vec2 v = deref(self.thisptr).rotated(a, radians)
+        return Vec2(v[0], v[1])
 
     @property
     def x(self):
@@ -171,11 +171,11 @@ cdef class Vector2:
             raise TypeError
 
     def __add__(self, other):
-        if isinstance(other, Vector2) and isinstance(self, Vector2):
+        if isinstance(other, Vec2) and isinstance(self, Vec2):
             return self._add(other)
-        elif isinstance(other, (int, float)) and isinstance(self, Vector2):
+        elif isinstance(other, (int, float)) and isinstance(self, Vec2):
             return self._add_scalar(other)
-        elif isinstance(self, (int, float)) and isinstance(other, Vector2):
+        elif isinstance(self, (int, float)) and isinstance(other, Vec2):
             return other._add_scalar(self)
         return NotImplemented
 
@@ -184,17 +184,17 @@ cdef class Vector2:
             return self
         return NotImplemented
 
-    cpdef Vector2 _add(self, Vector2 other):
-        cdef _Vector2* v = new _Vector2(
+    cpdef Vec2 _add(self, Vec2 other):
+        cdef _Vec2* v = new _Vec2(
             deref(self.thisptr) + deref(other.thisptr)
         )
         try:
-            return Vector2.__new__(Vector2, deref(v)[0], deref(v)[1])
+            return Vec2.__new__(Vec2, deref(v)[0], deref(v)[1])
         finally:
             del v
 
     def _iadd(self, other):
-        if isinstance(other, Vector2):
+        if isinstance(other, Vec2):
             self._iadd_vec(other)
             return True
         elif isinstance(other, (int, float)):
@@ -202,22 +202,22 @@ cdef class Vector2:
             return True
         return False
 
-    cdef void _iadd_vec(Vector2 self, Vector2 other):
-        deref(self.thisptr).iadd(<_Vector2> deref(other.thisptr))
+    cdef void _iadd_vec(Vec2 self, Vec2 other):
+        deref(self.thisptr).iadd(<_Vec2> deref(other.thisptr))
 
-    cpdef Vector2 _add_scalar(self, const double other):
-        cdef _Vector2* v = new _Vector2(deref(self.thisptr) + other)
+    cpdef Vec2 _add_scalar(self, const double other):
+        cdef _Vec2* v = new _Vec2(deref(self.thisptr) + other)
         try:
-            return Vector2.__new__(Vector2, deref(v)[0], deref(v)[1])
+            return Vec2.__new__(Vec2, deref(v)[0], deref(v)[1])
         finally:
             del v
 
     def __sub__(self, other):
-        if isinstance(other, Vector2) and isinstance(self, Vector2):
+        if isinstance(other, Vec2) and isinstance(self, Vec2):
             return self._sub(other)
-        elif isinstance(other, (int, float)) and isinstance(self, Vector2):
+        elif isinstance(other, (int, float)) and isinstance(self, Vec2):
             return self._sub_scalar(other)
-        elif isinstance(self, (int, float)) and isinstance(other, Vector2):
+        elif isinstance(self, (int, float)) and isinstance(other, Vec2):
             return other._sub_scalar_r(self)
         return NotImplemented
 
@@ -226,52 +226,52 @@ cdef class Vector2:
             return self
         return NotImplemented
 
-    cpdef Vector2 _sub(self, Vector2 other):
-        cdef _Vector2* v = new _Vector2(
+    cpdef Vec2 _sub(self, Vec2 other):
+        cdef _Vec2* v = new _Vec2(
             deref(self.thisptr) - deref(other.thisptr)
         )
         try:
-            return Vector2.__new__(Vector2, deref(v)[0], deref(v)[1])
+            return Vec2.__new__(Vec2, deref(v)[0], deref(v)[1])
         finally:
             del v
 
     def _isub(self, other):
-        if isinstance(other, Vector2):
+        if isinstance(other, Vec2):
             self._iadd_vec(other)
             return True
         elif isinstance(other, (int, float)):
             deref(self.thisptr).isub(<double> other)
             return True
         return False
-    cdef void _isub_vec(Vector2 self, Vector2 other):
-        deref(self.thisptr).isub(<_Vector2> deref(other.thisptr))
+    cdef void _isub_vec(Vec2 self, Vec2 other):
+        deref(self.thisptr).isub(<_Vec2> deref(other.thisptr))
 
-    cpdef Vector2 _sub_scalar(self, const double other):
-        cdef _Vector2* v = new _Vector2(deref(self.thisptr) - other)
+    cpdef Vec2 _sub_scalar(self, const double other):
+        cdef _Vec2* v = new _Vec2(deref(self.thisptr) - other)
         try:
-            return Vector2.__new__(Vector2, deref(v)[0], deref(v)[1])
+            return Vec2.__new__(Vec2, deref(v)[0], deref(v)[1])
         finally:
             del v
 
-    cpdef Vector2 _sub_scalar_r(self, const double other):
-        cdef _Vector2* v = new _Vector2(
+    cpdef Vec2 _sub_scalar_r(self, const double other):
+        cdef _Vec2* v = new _Vec2(
             other - deref(self.thisptr)[0], other - deref(self.thisptr)[1]
         )
         try:
-            return Vector2.__new__(Vector2, deref(v)[0], deref(v)[1])
+            return Vec2.__new__(Vec2, deref(v)[0], deref(v)[1])
         finally:
             del v
 
     def __neg__(self):
         return self._neg()
 
-    cpdef Vector2 _neg(self):
-        return Vector2.__new__(Vector2, -deref(self.thisptr)[0], -deref(self.thisptr)[1])
+    cpdef Vec2 _neg(self):
+        return Vec2.__new__(Vec2, -deref(self.thisptr)[0], -deref(self.thisptr)[1])
 
     def __mul__(self, other):
-        if isinstance(other, (int, float)) and isinstance(self, Vector2):
+        if isinstance(other, (int, float)) and isinstance(self, Vec2):
             return self._mul(other)
-        elif isinstance(self, (int, float)) and isinstance(other, Vector2):
+        elif isinstance(self, (int, float)) and isinstance(other, Vec2):
             return other._mul(self)
         return NotImplemented
 
@@ -280,10 +280,10 @@ cdef class Vector2:
             return self
         return NotImplemented
 
-    cpdef Vector2 _mul(self, const double other):
-        cdef _Vector2* v = new _Vector2(deref(self.thisptr) * other)
+    cpdef Vec2 _mul(self, const double other):
+        cdef _Vec2* v = new _Vec2(deref(self.thisptr) * other)
         try:
-            return Vector2.__new__(Vector2, deref(v)[0], deref(v)[1])
+            return Vec2.__new__(Vec2, deref(v)[0], deref(v)[1])
         finally:
             del v
 
@@ -294,9 +294,9 @@ cdef class Vector2:
         return False
 
     def __truediv__(self, other):
-        if isinstance(other, (int, float)) and isinstance(self, Vector2):
+        if isinstance(other, (int, float)) and isinstance(self, Vec2):
             return self._tdiv(other)
-        elif isinstance(self, (int, float)) and isinstance(other, Vector2):
+        elif isinstance(self, (int, float)) and isinstance(other, Vec2):
             return other._tdiv(self)
         return NotImplemented
 
@@ -311,44 +311,44 @@ cdef class Vector2:
             return True
         return False
 
-    cpdef Vector2 _tdiv(self, double value):
-        cdef _Vector2* v = new _Vector2(deref(self.thisptr).div(<double> value))
+    cpdef Vec2 _tdiv(self, double value):
+        cdef _Vec2* v = new _Vec2(deref(self.thisptr).div(<double> value))
         try:
-            return Vector2.__new__(Vector2, deref(v)[0], deref(v)[1])
+            return Vec2.__new__(Vec2, deref(v)[0], deref(v)[1])
         finally:
             del v
 
     def __eq__(self, other):
-        if isinstance(self, Vector2) and isinstance(other, Vector2):
+        if isinstance(self, Vec2) and isinstance(other, Vec2):
             return self._eq(other)
-        elif isinstance(self, Vector2) and isinstance(other, (int, float)):
+        elif isinstance(self, Vec2) and isinstance(other, (int, float)):
             return self._eq_scalar(other)
-        elif isinstance(other, Vector2) and isinstance(self, (int, float)):
+        elif isinstance(other, Vec2) and isinstance(self, (int, float)):
             return other._eq_scalar(self)
         return NotImplemented
 
-    cpdef bint _eq(self, Vector2 other):
+    cpdef bint _eq(self, Vec2 other):
         return deref(self.thisptr) == deref(other.thisptr)
 
     cpdef bint _eq_scalar(self, double other):
         return deref(self.thisptr) == other
 
     def __ne__(self, other):
-        if isinstance(self, Vector2) and isinstance(other, Vector2):
+        if isinstance(self, Vec2) and isinstance(other, Vec2):
             return self._ne(other)
-        elif isinstance(self, Vector2) and isinstance(other, (int, float)):
+        elif isinstance(self, Vec2) and isinstance(other, (int, float)):
             return self._ne_scalar(other)
-        elif isinstance(other, Vector2) and isinstance(self, (int, float)):
+        elif isinstance(other, Vec2) and isinstance(self, (int, float)):
             return other._ne_scalar(self)
         return NotImplemented
 
-    cpdef bint _ne(self, Vector2 other):
+    cpdef bint _ne(self, Vec2 other):
         return deref(self.thisptr) != deref(other.thisptr)
 
     cpdef bint _ne_scalar(self, double other):
         return deref(self.thisptr) != other
 
-    cdef _Vector2 vector2(self):
+    cdef _Vec2 vec2(self):
         return deref(self.thisptr)
 
     def __getitem__(self, key):
@@ -356,7 +356,7 @@ cdef class Vector2:
             return self.x
         if key in (1, 'y'):
             return self.y
-        raise IndexError(f'Invalid Index "{key}" for Vector2 object')
+        raise IndexError(f'Invalid Index "{key}" for Vec2 object')
 
     def __setitem__(self, key, value):
         if key in (0, 'x'):
@@ -364,7 +364,7 @@ cdef class Vector2:
         elif key in (1, 'y'):
             self.y = value
         else:
-            raise IndexError(f'Invalid Index "{key}" for Vector2 object')
+            raise IndexError(f'Invalid Index "{key}" for Vec2 object')
 
     def __len__(self):
         # type: () -> int
@@ -380,10 +380,10 @@ cdef class Vector2:
         return f'({x:.4}, {y:.4})'
 
 
-cdef class Point2(Vector2):
+cdef class Point2(Vec2):
     """
     Stub class to represent a Point2. Underlying there is no difference between
-    this and :class:`Vector2`, other than the fact that ``repr`` will represent
+    this and :class:`Vec2`, other than the fact that ``repr`` will represent
     this as ``Point2``.
     """
     pass
