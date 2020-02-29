@@ -5,6 +5,7 @@ of such.
 
 from typing import Optional
 from typing import Tuple
+from typing import Union
 
 from PIL import Image
 import numpy as np
@@ -31,6 +32,9 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE."""
+
+
+NumT = Union[int, float]
 
 
 def box(width: int, height: int, corner_radius: Optional[int] = 0,
@@ -126,6 +130,56 @@ def framed_box_im(width: int, height: int, corner_radius: Optional[int] = 0,
     return img
 
 
+def framed_box_str(width: NumT, height: NumT, corner_radius: NumT = 0,
+                   border_thickness: Optional[NumT] = None,
+                   frame_color: Optional[Tuple[int, int, int]]
+                   = (160, 160, 160), border_color:
+                   Optional[Tuple[int, int, int]] = (255, 255, 255),
+                   multi_sampling: Optional[int] = 1,
+                   alpha: Optional[int] = 255) -> str:
+    """
+    Generates a box SDF string that can be passed directly to an
+    :class:`~foolysh.scene.node.ImageNode` to be rendered.
+
+    Args:
+        width: ``int``/``float`` -> width in pixel (or world units, when float).
+        height: ``int``/``float`` -> height in pixel (or world units, when
+            float).
+        corner_radius: ``int``/``float`` -> corner radius in pixel (or world
+            units, when float). (default = 0).
+        border_thickness: ``int``/``float`` -> border_thickness in pixel (or
+            world units, when float). (default = 1% of the higher value of
+            `width` and `height`).
+        frame_color: ``Optional[Tuple[int, int, int]]`` -> RGB color of the
+            frame. Values in [0, 255].
+        border_color: ``Optional[Tuple[int, int, int]]`` -> RGB color of the
+            border. Values in [0, 255].
+        multi_sampling: ``Optional[int]`` -> multiplier for the distance_field
+            resolution.
+        alpha: ``Optional[int]`` -> max alpha of the applied color.
+
+    Returns:
+        ``str`` to be used as SDF string with a
+        :class:`~foolysh.scene.node.ImageNode`.
+    """
+    # pylint: disable=too-many-arguments,too-many-locals
+    if multi_sampling < 1:
+        raise ValueError('Expected positive, non zero value for '
+                         'multi_sampling.')
+    sdfstr = 'SDF:box:'
+    sdfisint = isinstance(width, int)
+    sdfstr += 'I:' if sdfisint else 'F:'
+    sdfstr += f'width={width}:height={height}:corner_radius={corner_radius}:'
+    if border_thickness is None:
+        border_thickness = max(width, height) / 100
+        if sdfisint:
+            border_thickness = int(border_thickness + 0.5)
+    sdfstr += f'border_thickness={border_thickness}:frame_color={frame_color}:'
+    sdfstr += f'border_color={border_color}:multi_sampling={multi_sampling}:'
+    sdfstr += f'alpha={alpha}'
+    return sdfstr
+
+
 def circle(radius: int, thickness: Optional[int] = None):
     """
     Generate a SDF of a circle.
@@ -199,6 +253,48 @@ def framed_circle_im(radius: int, border_thickness: Optional[int] = None,
     if multi_sampling > 1:
         return img.resize(target_res, Image.BICUBIC)
     return img
+
+
+def framed_circle_str(radius: NumT, border_thickness: Optional[NumT] = None,
+                      frame_color: Optional[Tuple[int, int, int]]
+                      = (160, 160, 160), border_color:
+                      Optional[Tuple[int, int, int]] = (255, 255, 255),
+                      multi_sampling: Optional[int] = 1,
+                      alpha: Optional[int] = 255) -> str:
+    """
+    Generates a circle SDF string that can be passed directly to an
+    :class:`~foolysh.scene.node.ImageNode` to be rendered.
+
+    Args:
+        radius: ``int``/``float``.
+        border_thickness: ``Optional[int/float]`` -> border_thickness in pixel
+            or world units, if float (default = 2% of the `radius`).
+        frame_color: ``Optional[Tuple[int, int, int]]`` -> RGB color of the
+            frame. Values in [0, 255].
+        border_color: ``Optional[Tuple[int, int, int]]`` -> RGB color of the
+            border. Values in [0, 255].
+        multi_sampling: ``Optional[int]`` -> multiplier for the distance_field
+            resolution.
+        alpha: ``Optional[int]`` -> max alpha of the applied color.
+
+    Returns:
+        ``PIL.Image.Image`` of size (`width` x `height`) in mode ``RGBA``.
+    """
+    if multi_sampling < 1:
+        raise ValueError('Expected positive, non zero value for '
+                         'multi_sampling.')
+    sdfstr = 'SDF:circle:'
+    sdfisint = isinstance(radius, int)
+    sdfstr += 'I:' if sdfisint else 'F:'
+    sdfstr += f'radius={radius}:'
+    if border_thickness is None:
+        border_thickness = radius / 50
+        if sdfisint:
+            border_thickness = int(border_thickness + 0.5)
+    sdfstr += f'border_thickness={border_thickness}:frame_color={frame_color}:'
+    sdfstr += f'border_color={border_color}:multi_sampling={multi_sampling}:'
+    sdfstr += f'alpha={alpha}'
+    return sdfstr
 
 
 def sdf2image(distance_field: np.ndarray, color: Optional[Tuple[int, int, int]]
