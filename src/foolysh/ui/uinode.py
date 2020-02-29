@@ -18,9 +18,8 @@ coordinate system (e.g. :attr:`~foolysh.app.App.ui.top_left`,
 
 """
 
-from enum import Enum
+from typing import Tuple
 
-from ..tools.common import COLOR
 from ..scene import node
 
 __author__ = 'Tiziano Bettio'
@@ -47,9 +46,27 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE."""
 
 
-class ObjectState(Enum):
-    """Possible states an UIObject can be in."""
-    NORMAL = 0
-    HOVER = 1
-    DOWN = 2
-    DISABLED = 3
+class UINode(node.Node):
+    """
+    Node subclass containing shared properties of UI elements.
+
+    Args:
+        name:
+        ...
+    """
+    def __init__(self, name: str = 'Unnamed UINode',
+                 size: Tuple[float, float] = (0.0, 0.0)) -> None:
+        super().__init__(name)
+        self.size = size
+        self._has_focus = False
+
+    @property
+    def focus(self) -> bool:
+        """Whether the Node is focused."""
+        return self._has_focus
+
+    @focus.setter
+    def focus(self, value: bool) -> None:
+        if not isinstance(value, bool):
+            raise TypeError('Expected bool.')
+        self._has_focus = value

@@ -1,10 +1,12 @@
 """
-Common constants and functions.
+Provides the Label class for building UI components.
 """
 
-from enum import Enum
+from typing import Optional
 from typing import Tuple
 from typing import Union
+
+from . import UIObject
 
 __author__ = 'Tiziano Bettio'
 __license__ = 'MIT'
@@ -28,50 +30,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE."""
-
-# Default configuration
-
-DEFAULT_CONFIG = {
-    'base': {
-        'asset_pixel_ratio': 1080,
-        'logical_screen_size_multiplier': 1,
-        'window_size': '720x1280',
-        'cache_dir': 'cache'
-    }
-}
-
-
-# Enums
-
-class Origin(Enum):
-    """
-    Enum: Origin of a :class:`foolysh.scene.node.Node`.
-    """
-    TOP_LEFT = 0
-    TOP_RIGHT = 1
-    TOP_CENTER = 2
-    CENTER_LEFT = 3
-    CENTER = 4
-    CENTER_RIGHT = 5
-    BOTTOM_LEFT = 6
-    BOTTOM_RIGHT = 7
-    BOTTOM_CENTER = 8
-
-# Custom Types & Enumerations
-
-COLOR = Union[Tuple[int, int, int], Tuple[int, int, int, int]]
-
-
-# Type verification helper functions
-
-def valid_color(color: COLOR) -> COLOR:
-    """Check if valid color."""
-    if not isinstance(color, tuple):
-        raise TypeError('Expected tuple.')
-    if sum([not isinstance(i, int) for i in color]):
-        raise TypeError('Expected only int.')
-    if sum([not -1 < i < 256 for i in color]):
-        raise ValueError('Expected values to lie in (0..255).')
-    if not 2 < len(color) < 5:
-        raise ValueError('Expected 3- or 4-value tuple.')
-    return color if len(color) == 4 else color + (255, )
