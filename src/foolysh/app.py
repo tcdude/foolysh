@@ -21,6 +21,7 @@ from . import tools
 from .tools import vec2
 from .tools import spriteloader
 from .tools import clock
+from .ui import uihandler
 
 __author__ = 'Tiziano Bettio'
 __license__ = 'MIT'
@@ -85,8 +86,10 @@ class AppClock:
 @dataclass
 class Systems:
     """Class for keeping track of the various handler/manager objects."""
+    # pylint: disable=too-many-instance-attributes
     task_manager: taskmanager.TaskManager
     event_handler: eventhandler.EventHandler
+    ui_handler: uihandler.UIHandler
     animation_manager: animation.AnimationManager
     sprite_loader: spriteloader.SpriteLoader = None
     window: sdl2.ext.Window = None
@@ -97,9 +100,15 @@ class Systems:
 @dataclass
 class AppStats:
     """Class for keeping runtime stats of the App."""
+    # pylint: disable=too-many-instance-attributes
     clock: clock.Clock
     window_title: str
     mouse_pos: vec2.Point2 = vec2.Point2()
+    mouse_pos: vec2.Point2 = vec2.Point2()
+    mouse_down: Optional[vec2.Point2] = None
+    mouse_up: Optional[vec2.Point2] = None
+    enter_down: bool = False
+    enter: bool = False
     frames: int = 0
     fps: float = 0.0
     running: bool = False
@@ -178,12 +187,13 @@ class App:
                 f'Section "base" missing in loaded config_file '
                 f'("{self.__cfg.cfg_path}")'
             )
+        self.__nodes = _node_setup()
         self.__systems = Systems(
             task_manager=taskmanager.TaskManager(),
             event_handler=eventhandler.EventHandler(),
+            ui_handler=uihandler.UIHandler(self.__nodes.ui.root),
             animation_manager=animation.AnimationManager()
         )
-        self.__nodes = _node_setup()
         window_title = window_title or self.__cfg.get('base', 'window_title',
                                                       fallback='foolysh engine')
         self.__stats = AppStats(clock.Clock(), window_title)
@@ -287,14 +297,31 @@ class App:
 
     def __update_mouse(self):
         # type: (...) -> None
-        """Updates ``App.mouse_pos``."""
+        """Updates 'mouse_pos' (and currently also 'enter')."""
         if not self.__stats.running:
             return
         x, y = ctypes.c_int(0), ctypes.c_int(0)
-        _ = sdl2.mouse.SDL_GetMouseState(ctypes.byref(x), ctypes.byref(y))
+        state = sdl2.mouse.SDL_GetMouseState(ctypes.byref(x), ctypes.byref(y))
         world_unit = 1 / min(self.__systems.window.size)
         self.__stats.mouse_pos.x = x.value * world_unit
         self.__stats.mouse_pos.y = y.value * world_unit
+        if state > 0 and self.__stats.mouse_down is None:
+            self.__stats.mouse_down = self.__stats.mouse_pos + 0.0
+        elif state == 0 and self.__stats.mouse_down is not None \
+                and self.__stats.mouse_up is None:
+            self.__stats.mouse_up = self.__stats.mouse_pos + 0.0
+        elif state == 0 and self.__stats.mouse_down is not None \
+                and self.__stats.mouse_up is not None:
+            self.__stats.mouse_down = None
+            self.__stats.mouse_up = None
+        state = sdl2.SDL_GetKeyboardState(None)
+        if state[sdl2.SDL_SCANCODE_RETURN]:
+            self.__stats.enter_down = True
+        elif not state[sdl2.SDL_SCANCODE_RETURN] and self.__stats.enter_down:
+            self.__stats.enter_down = False
+            self.__stats.enter = True
+        else:
+            self.__stats.enter = False
 
     def run(self):
         """
@@ -306,13 +333,18 @@ class App:
         """
         self.__init_sdl()
         self.__stats.clock.tick()
+        last_time = self.__stats.clock.get_time()
         try:
             frame_clock = clock.Clock()
             self.__stats.running = True
             while self.__stats.running:
                 frame_clock.tick()
-                self.__update_mouse()
                 self.__systems.event_handler()
+                self.__update_mouse()
+                self.__systems.ui_handler(self.__stats.mouse_pos,
+                                          self.__stats.mouse_down,
+                                          self.__stats.mouse_up,
+                                          self.__stats.enter)
                 self.__systems.animation_manager.animate(
                     self.__stats.clock.get_dt())
                 self.__systems.task_manager()
@@ -322,6 +354,11 @@ class App:
                 if sleep_time:
                     time.sleep(sleep_time)
                 self.__stats.frames += 1
+                if self.__stats.frames % 10 == 0:
+                    delta = self.__stats.clock.get_time() - last_time
+                    self.__stats.fps = 10 / delta
+                    last_time = self.__stats.clock.get_time()
+                    print(self.__stats.fps)
                 self.__stats.clock.tick()
         except (KeyboardInterrupt, SystemExit):
             self.quit(blocking=False)
