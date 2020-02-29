@@ -26,7 +26,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE."""
 
 
-class FSM(object):
+class FSM:
     """
     Rudimentary Finite State Machine to organize state changes.
     Takes 1 - n objects from different classes that provide both a enter
@@ -45,10 +45,7 @@ class FSM(object):
 
         :object obj: The class instance containing the enter and exit methods.
         """
-        try:
-            dir(obj).index('enter')
-            dir(obj).index('exit')
-        except ValueError:
+        if not hasattr(obj, 'enter') or not hasattr(obj, 'exit'):
             raise ValueError('Argument obj must contain "enter" and "exit" '
                              'methods.')
         if not (callable(obj.enter) and callable(obj.exit)):
@@ -58,11 +55,16 @@ class FSM(object):
         self._states[k] = obj
 
     def request(self, state_name):
-        sn = state_name.lower()
-        if sn not in self._states:
+        """
+        Request the transition to a registered State.
+        """
+        state_name_lower = state_name.lower()
+        if self._active_state == state_name_lower:
+            return
+        if state_name_lower not in self._states:
             raise ValueError(f'No state with state with name "{state_name}" '
                              f'registered.')
         if self._active_state is not None:
             self._states[self._active_state].exit()
-        self._states[state_name].enter()
-        self._active_state = state_name
+        self._states[state_name_lower].enter()
+        self._active_state = state_name_lower
