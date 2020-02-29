@@ -11,11 +11,11 @@ from PIL import Image
 
 from ..ui import ObjectState
 from ..ui import uinode
-from ..ui import valid_color
 from ..scene.node import ImageNode
 from ..tools import sdf
 from ..tools import vector2
 from ..tools.common import COLOR
+from ..tools.common import valid_color
 
 __author__ = 'Tiziano Bettio'
 __license__ = 'MIT'

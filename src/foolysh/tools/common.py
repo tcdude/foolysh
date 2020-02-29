@@ -60,3 +60,18 @@ class Origin(Enum):
 # Custom Types & Enumerations
 
 COLOR = Union[Tuple[int, int, int], Tuple[int, int, int, int]]
+
+
+# Type verification helper functions
+
+def valid_color(color: COLOR) -> COLOR:
+    """Check if valid color."""
+    if not isinstance(color, tuple):
+        raise TypeError('Expected tuple.')
+    if sum([not isinstance(i, int) for i in color]):
+        raise TypeError('Expected only int.')
+    if sum([not -1 < i < 256 for i in color]):
+        raise ValueError('Expected values to lie in (0..255).')
+    if not 2 < len(color) < 5:
+        raise ValueError('Expected 3- or 4-value tuple.')
+    return color if len(color) == 4 else color + (255, )

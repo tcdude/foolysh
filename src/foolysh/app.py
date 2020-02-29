@@ -104,7 +104,6 @@ class AppStats:
     clock: clock.Clock
     window_title: str
     mouse_pos: vec2.Point2 = vec2.Point2()
-    mouse_pos: vec2.Point2 = vec2.Point2()
     mouse_down: Optional[vec2.Point2] = None
     mouse_up: Optional[vec2.Point2] = None
     enter_down: bool = False
