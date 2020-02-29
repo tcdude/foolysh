@@ -52,7 +52,7 @@ cdef class Vector2:
                      and isinstance(args[0][1], (int, float)):
                     self.thisptr.reset(
                         new _Vector2(<double> args[0][0], <double> args[0][1])
-                    ) 
+                    )
                 else:
                     raise TypeError
             elif len(args) == 2 and isinstance(args[0], (int, float)) \
@@ -350,6 +350,25 @@ cdef class Vector2:
 
     cdef _Vector2 vector2(self):
         return deref(self.thisptr)
+
+    def __getitem__(self, key):
+        if key in (0, 'x'):
+            return self.x
+        if key in (1, 'y'):
+            return self.y
+        raise IndexError(f'Invalid Index "{key}" for Vector2 object')
+
+    def __setitem__(self, key, value):
+        if key in (0, 'x'):
+            self.x = value
+        elif key in (1, 'y'):
+            self.y = value
+        else:
+            raise IndexError(f'Invalid Index "{key}" for Vector2 object')
+
+    def __len__(self):
+        # type: () -> int
+        return 2
 
     def __repr__(self):
         return f'{type(self).__name__}{str(self)}'
