@@ -3,6 +3,7 @@ Common constants and functions.
 """
 
 from enum import Enum
+import re
 from typing import Tuple
 from typing import Union
 
@@ -62,10 +63,20 @@ class Origin(Enum):
 COLOR = Union[Tuple[int, int, int], Tuple[int, int, int, int]]
 
 
-# Type verification helper functions
+# Helper functions
 
 def valid_color(color: COLOR) -> COLOR:
-    """Check if valid color."""
+    """
+    Check if a valid color was passed and if only 3 component value was passed,
+    appends the alpha component with value `255`.
+
+    Args:
+        color: ``3/4 value tuple`` -> the color to verify.
+
+
+    Returns:
+        ``4 value tuple`` -> a valid color tuple.
+    """
     if not isinstance(color, tuple):
         raise TypeError('Expected tuple.')
     if sum([not isinstance(i, int) for i in color]):
@@ -75,3 +86,21 @@ def valid_color(color: COLOR) -> COLOR:
     if not 2 < len(color) < 5:
         raise ValueError('Expected 3- or 4-value tuple.')
     return color if len(color) == 4 else color + (255, )
+
+
+def to_snake_case(expr: str) -> str:
+    """
+    Converts a CamelCase string into a snake_case one.
+
+    Args:
+        expr: ``str`` -> the string to convert.
+
+    Returns:
+        ``str`` -> the string formatted as snake_case.
+    """
+    regex = r'(.+?)([A-Z])'
+
+    def snake(match):
+        return match.group(1).lower() + '_' + match.group(2).lower()
+
+    return re.sub(regex, snake, expr, 0).lower()
