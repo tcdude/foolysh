@@ -18,9 +18,13 @@ coordinate system (e.g. :attr:`~foolysh.app.App.ui.top_left`,
 
 """
 
+import abc
 from typing import Tuple
 
+from . import uihandler
+from . import UIHANDLER_INSTANCE
 from ..scene import node
+from ..tools import vec2
 
 __author__ = 'Tiziano Bettio'
 __license__ = 'MIT'
@@ -48,17 +52,48 @@ SOFTWARE."""
 
 class UINode(node.Node):
     """
-    Node subclass containing shared properties of UI elements.
+    Node subclass containing shared properties of UI elements. This can only be
+    instantiated after :class:`~foolysh.app.App` has been initialized.
 
     Args:
         name:
-        ...
+        size:
+        pos:
     """
     def __init__(self, name: str = 'Unnamed UINode',
-                 size: Tuple[float, float] = (0.0, 0.0)) -> None:
+                 size: Tuple[float, float] = (0.0, 0.0),
+                 pos: vec2.Vec2 = vec2.Vec2()) -> None:
+        if UIHANDLER_INSTANCE is None:
+            raise RuntimeError('UINode objects can only be instantiated after '
+                               'UIHANDLER_INSTANCE has been set (i.e. after '
+                               'the __init__ method of foolysh.app.App has '
+                               'been called).')
         super().__init__(name)
         self.size = size
+        self.pos = pos
         self._has_focus = False
+        self.__dirty = True
+
+    def update(self):
+        """Performs a complete update of this the :class:`UINode`."""
+        if self.__dirty:
+            self._update()
+        self.__dirty = False
+
+    @abc.abstractmethod
+    def _update(self) -> None:
+        pass
+
+    @property
+    def dirty(self) -> bool:
+        """Whether the Node is dirty."""
+        return self.__dirty
+
+    @dirty.setter
+    def dirty(self, value: bool) -> None:
+        if not isinstance(value, bool):
+            raise TypeError('Expected type bool.')
+        self.__dirty = value
 
     @property
     def focus(self) -> bool:
@@ -70,3 +105,11 @@ class UINode(node.Node):
         if not isinstance(value, bool):
             raise TypeError('Expected bool.')
         self._has_focus = value
+
+    @property
+    def ui_handler(self) -> uihandler.UIHandler:
+        """
+        Provides access to the :class:`~foolysh.ui.uihandler.UIHandler` instance
+        used in the running :class:`~foolysh.app.App`.
+        """
+        return UIHANDLER_INSTANCE

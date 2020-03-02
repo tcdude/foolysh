@@ -18,10 +18,10 @@ coordinate system (e.g. :attr:`~foolysh.app.App.ui.top_left`,
 
 """
 
-from enum import Enum
+from typing import Optional
 
+from . import uihandler
 from ..tools.common import COLOR
-from ..scene import node
 
 __author__ = 'Tiziano Bettio'
 __license__ = 'MIT'
@@ -47,9 +47,4 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE."""
 
 
-class ObjectState(Enum):
-    """Possible states an UIObject can be in."""
-    NORMAL = 0
-    HOVER = 1
-    DOWN = 2
-    DISABLED = 3
+UIHANDLER_INSTANCE: Optional[uihandler.UIHandler] = None

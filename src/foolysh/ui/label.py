@@ -3,10 +3,9 @@ Provides the Label class for building UI components.
 """
 
 from typing import Optional
-from typing import Tuple
-from typing import Union
 
-from . import UIObject
+from . import frame
+from ..tools.common import COLOR
 
 __author__ = 'Tiziano Bettio'
 __license__ = 'MIT'
@@ -30,3 +29,95 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE."""
+
+
+class Label(frame.Frame):
+    """
+    A label to display text on a frame.
+
+    See :class:`~foolysh.ui.frame.Frame` for keyword arguments and properties
+    that are inherited. For text specific keyword arguments see
+    :class:`~foolysh.scene.node.TextNode`.
+
+    Args:
+        margin: ``Optional[float]`` -> margin when align is either 'left' or
+            'right'
+        **kwargs: Keyword arguments for :class:`~foolysh.ui.frame.Frame` and
+            :class:`~foolysh.scene.node.TextNode` initialization.
+    """
+
+    def __init__(self, margin: Optional[float] = 0.0, **kwargs) -> None:
+        super().__init__(**kwargs)
+        self._txt_node = self.attach_text_node(**kwargs)
+        self._margin = margin
+
+    def _update(self):
+        if self._txt_node.align == 'left':
+            x = self.border_thickness + self.corner_radius + self._margin
+        elif self._txt_node.align == 'center':
+            x = (self.size[0] - self._txt_node.size[0]) / 2
+        else:
+            x = self.size[0] - self.border_thickness - self.corner_radius
+            x -= self._txt_node[0] + self._margin
+        txt_y = self._txt_node.size[1]
+        y = (self.size[1] - txt_y - (txt_y - self._txt_node.font_size)) / 2
+        self._txt_node.pos = x, y
+        super()._update()
+
+    @property
+    def text(self) -> str:
+        """The current text."""
+        return self._txt_node.text
+
+    @text.setter
+    def text(self, value: str) -> None:
+        self._txt_node.text = value
+        self.dirty = True
+
+    @property
+    def font(self) -> str:
+        """The current asset path to the font."""
+        return self._txt_node.font
+
+    @font.setter
+    def font(self, value: str) -> None:
+        self._txt_node.font = value
+        self.dirty = True
+
+    @property
+    def font_size(self) -> float:
+        """The font size."""
+        return self._txt_node.font_size
+
+    @font_size.setter
+    def font_size(self, value: float) -> None:
+        self._txt_node.font_size = value
+        self.dirty = True
+
+    @property
+    def text_color(self) -> COLOR:
+        """
+        The text color.
+
+        :setter:
+            * ``int`` -> sets all components of the color to the specified
+                value.
+            * 3-/4-``tuple`` of ``int`` -> RGB or RGBA color. The alpha value
+                defaults to 255, if RGB only is provided.
+        """
+        return self._txt_node.text_color
+
+    @text_color.setter
+    def text_color(self, value: COLOR) -> None:
+        self._txt_node.text_color = value
+        self.dirty = True
+
+    @property
+    def align(self) -> str:
+        """Alignment of the text 'left', 'center' or 'right'."""
+        return self._txt_node.align
+
+    @align.setter
+    def align(self, value: str) -> None:
+        self._txt_node.align = value
+        self.dirty = True

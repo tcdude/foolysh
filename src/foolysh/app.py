@@ -22,6 +22,7 @@ from .tools import vec2
 from .tools import spriteloader
 from .tools import clock
 from .ui import uihandler
+from . import ui
 
 __author__ = 'Tiziano Bettio'
 __license__ = 'MIT'
@@ -187,12 +188,14 @@ class App:
                 f'("{self.__cfg.cfg_path}")'
             )
         self.__nodes = _node_setup()
+        event_h = eventhandler.EventHandler()
         self.__systems = Systems(
             task_manager=taskmanager.TaskManager(),
-            event_handler=eventhandler.EventHandler(),
-            ui_handler=uihandler.UIHandler(self.__nodes.ui.root),
+            event_handler=event_h,
+            ui_handler=uihandler.UIHandler(self.__nodes.ui.root, event_h),
             animation_manager=animation.AnimationManager()
         )
+        ui.UIHANDLER_INSTANCE = self.__systems.ui_handler
         window_title = window_title or self.__cfg.get('base', 'window_title',
                                                       fallback='foolysh engine')
         self.__stats = AppStats(clock.Clock(), window_title)
@@ -357,7 +360,6 @@ class App:
                     delta = self.__stats.clock.get_time() - last_time
                     self.__stats.fps = 10 / delta
                     last_time = self.__stats.clock.get_time()
-                    print(self.__stats.fps)
                 self.__stats.clock.tick()
         except (KeyboardInterrupt, SystemExit):
             self.quit(blocking=False)
