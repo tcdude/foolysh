@@ -124,6 +124,16 @@ class UISample(app.App):
         my_entry.onexitfocus(set_text, my_label, text='Exit Focus')
         my_entry.onenter(set_text, my_label, text='Enter/Return Key')
 
+        bottom_right = label.Label(name='Anchor Label', size=(0.6, 0.1),
+                                   pos=(-0.6, -0.1), margin=0.05,
+                                   text='Anchored', font='fonts/SpaceMono.ttf',
+                                   font_size=0.06, text_color=(10, 10, 10, 255),
+                                   align='right', frame_color=(210, 210, 210),
+                                   border_thickness=0.002,
+                                   border_color=(0, 0, 0), corner_radius=0.02,
+                                   alpha=255)
+        bottom_right.reparent_to(self.ui.bottom_right)
+
         self.event_handler.listen(
             'quit',
             sdl2.SDL_QUIT,

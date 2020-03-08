@@ -60,7 +60,7 @@ class Label(frame.Frame):
                 x = (self.size[0] - txt_node.size[0]) / 2
             else:
                 x = self.size[0] - self.border_thickness - self.corner_radius
-                x -= txt_node[0] + self._margin
+                x -= txt_node.size[0] + self._margin
             y = (self.size[1] - txt_node.size[1]) / 2
         else:
             x = y = 0
