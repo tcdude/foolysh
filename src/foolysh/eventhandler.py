@@ -104,7 +104,7 @@ class EventHandler:
             if event.type in self._events:
                 self._exec_event(event)
             if event.type == sdl2.SDL_TEXTINPUT:
-                self._last_text_input = event.text
+                self._last_text_input = event.text.text.decode('utf-8')
 
     def _exec_event(self, event):
         k = sorted(self._events[event.type],

@@ -5,7 +5,7 @@ Sample application to demonstrate the ui submodule.
 import sdl2
 
 from foolysh import app
-from foolysh.ui import frame, label, button
+from foolysh.ui import button, frame, input, label
 
 __author__ = 'Tiziano Bettio'
 __license__ = 'MIT'
@@ -29,6 +29,11 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE."""
+
+
+def set_text(element, text):
+    """A non member callback function."""
+    element.text = text
 
 
 class UISample(app.App):
@@ -59,9 +64,9 @@ class UISample(app.App):
                                alpha=255)
         my_label.reparent_to(my_frame)
 
-        self.but_a = button.Button(name='A Button', size=(0.3, 0.1),
+        self.but_a = button.Button(name='A Button', size=(0.26, 0.1),
                                    pos=(0.1, 0.22), margin=0.05, text='ButtonA',
-                                   font='fonts/SpaceMono.ttf', font_size=0.06,
+                                   font='fonts/SpaceMono.ttf', font_size=0.05,
                                    text_color=(10, 10, 10, 255), align='center',
                                    frame_color=(210, 210, 210),
                                    border_thickness=0.002,
@@ -75,11 +80,11 @@ class UISample(app.App):
         self.but_a.reparent_to(my_frame)
         self.but_a.onclick(self.toggle, 0)
 
-        self.but_b = button.Button(name='A Button', size=(0.3, 0.1),
-                                   pos=(0.4, 0.22), margin=0.05, text='ButtonB',
-                                   font='fonts/SpaceMono.ttf', font_size=0.06,
-                                   text_color=(10, 10, 10, 255), align='center',
-                                   frame_color=(210, 210, 210),
+        self.but_b = button.Button(name='A Button', size=(0.26, 0.1),
+                                   pos=(0.44, 0.22), margin=0.05,
+                                   text='ButtonB', font='fonts/SpaceMono.ttf',
+                                   font_size=0.05, text_color=(10, 10, 10, 255),
+                                   align='center', frame_color=(210, 210, 210),
                                    border_thickness=0.002,
                                    border_color=(0, 0, 0), corner_radius=0.02,
                                    alpha=240, down_frame_color=(255, 255, 255),
@@ -91,6 +96,33 @@ class UISample(app.App):
         self.but_b.reparent_to(my_frame)
         self.but_b.onclick(self.toggle, 1)
         self.but_b.enabled = False
+
+        my_input = input.Input(name='An Input', size=(0.6, 0.1),
+                               pos=(0.1, 0.34), margin=0.01,
+                               hint_text='Enter text...',
+                               hint_text_color=(10, 10, 10, 180),
+                               font='fonts/SpaceMono.ttf', font_size=0.06,
+                               text_color=(10, 10, 10, 255),
+                               align='left', frame_color=(255, 255, 255),
+                               border_thickness=0.001,
+                               border_color=(0, 0, 0), corner_radius=0.02,
+                               alpha=255)
+        my_input.reparent_to(my_frame)
+
+        my_label = label.Label(name='Event Label', size=(0.6, 0.1),
+                               pos=(0.1, 0.46), margin=0.05, text='',
+                               font='fonts/SpaceMono.ttf', font_size=0.04,
+                               text_color=(10, 10, 10, 255),
+                               align='left', frame_color=(210, 210, 210),
+                               border_thickness=0.002,
+                               border_color=(0, 0, 0), corner_radius=0.02,
+                               alpha=255)
+        my_label.reparent_to(my_frame)
+
+        my_input.oninput(set_text, my_label, text='Input Event')
+        my_input.onenterfocus(set_text, my_label, text='Enter Focus')
+        my_input.onexitfocus(set_text, my_label, text='Exit Focus')
+        my_input.onenter(set_text, my_label, text='Enter/Return Key')
 
         self.event_handler.listen(
             'quit',

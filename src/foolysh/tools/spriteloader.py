@@ -294,9 +294,12 @@ class SpriteLoader:
                 img = Image.new('RGBA', im_sz)
                 draw = ImageDraw.Draw(img)
                 func = draw.multiline_text if multiline else draw.text
-                func((0, 0), text=text, fill=color,
-                     font=self._font_cache[font_k], spacing=spacing,
+                func((0, 0), text=text, fill=color, font=fnt, spacing=spacing,
                      align=align)
+                try:
+                    img.tobytes()
+                except SystemError:
+                    print(f'went wrong with {k}')
                 self._sprite_cache[k] = _image2sprite(img, self.factory)
             return self._sprite_cache[k]
         raise ValueError(f'font must be a valid path relative to '

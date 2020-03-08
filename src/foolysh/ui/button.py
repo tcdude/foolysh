@@ -125,7 +125,7 @@ class Button(uinode.UINode):
         """
         self.__cb[uihandler.EventType.DOWN] = down_cb, args, kwargs
 
-    def _update(self):
+    def _update(self):  # pylint: disable=useless-super-delegation
         super()._update()
 
     def _register_state_cb(self):

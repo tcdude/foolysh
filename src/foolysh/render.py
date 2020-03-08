@@ -105,6 +105,8 @@ class HWRenderer(sdl2.ext.TextureSpriteRenderSystem):
         render.SDL_RenderPresent(self.renderer)
 
     def _render_text(self, nd, w, image_scale, x, y):
+        if not nd.text:
+            return
         scale_x, scale_y = nd.relative_scale
         n_id = nd.node_id
         if n_id not in self._sprites or n_id not in self._texts \

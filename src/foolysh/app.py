@@ -109,10 +109,13 @@ class AppStats:
     mouse_up: Optional[vec2.Point2] = None
     enter_down: bool = False
     enter: bool = False
+    backspace_down: bool = False
+    backspace: bool = False
     frames: int = 0
     fps: float = 0.0
     running: bool = False
     clean_exit: bool = True
+    resolution_change: bool = True
 
 
 @dataclass
@@ -299,7 +302,7 @@ class App:
 
     def __update_mouse(self):
         # type: (...) -> None
-        """Updates 'mouse_pos' (and currently also 'enter')."""
+        """Updates 'mouse_pos'."""
         if not self.__stats.running:
             return
         x, y = ctypes.c_int(0), ctypes.c_int(0)
@@ -316,14 +319,44 @@ class App:
                 and self.__stats.mouse_up is not None:
             self.__stats.mouse_down = None
             self.__stats.mouse_up = None
+
+    def __update_keyboard(self):
+        """Updates keyboard state."""
         state = sdl2.SDL_GetKeyboardState(None)
-        if state[sdl2.SDL_SCANCODE_RETURN]:
+        st_e = state[sdl2.SDL_SCANCODE_RETURN]
+        state = sdl2.SDL_GetKeyboardState(None)
+        st_e = st_e or state[sdl2.SDL_SCANCODE_RETURN2]
+        state = sdl2.SDL_GetKeyboardState(None)
+        st_e = st_e or state[sdl2.SDL_SCANCODE_KP_ENTER]
+        if st_e and not self.__stats.enter_down:
             self.__stats.enter_down = True
-        elif not state[sdl2.SDL_SCANCODE_RETURN] and self.__stats.enter_down:
+        elif not st_e and self.__stats.enter_down:
             self.__stats.enter_down = False
             self.__stats.enter = True
         else:
             self.__stats.enter = False
+        state = sdl2.SDL_GetKeyboardState(None)
+        st_bs = state[sdl2.SDL_SCANCODE_BACKSPACE]
+        if st_bs:
+            self.__stats.backspace_down = True
+        elif not st_bs and self.__stats.backspace_down:
+            self.__stats.backspace_down = False
+            self.__stats.backspace = True
+        else:
+            self.__stats.backspace = False
+
+    def __update_ui_anchors(self, new_res):
+        units_x = new_res[0] / min(new_res)
+        units_y = new_res[1] / min(new_res)
+        half_x, half_y = units_x / 2, units_y / 2
+        self.__nodes.ui.top_center.pos = half_x, 0
+        self.__nodes.ui.top_center.pos = units_x, 0
+        self.__nodes.ui.center_left.pos = 0, half_y
+        self.__nodes.ui.center.pos = half_x, half_y
+        self.__nodes.ui.center_right.pos = units_x, half_y
+        self.__nodes.ui.bottom_left.pos = 0, units_y
+        self.__nodes.ui.bottom_center.pos = half_x, units_y
+        self.__nodes.ui.bottom_right.pos = units_x, units_y
 
     def run(self):
         """
@@ -339,14 +372,23 @@ class App:
         try:
             frame_clock = clock.Clock()
             self.__stats.running = True
+            last_resolution = None
             while self.__stats.running:
                 frame_clock.tick()
+                new_res = self.screen_size
+                if new_res != last_resolution:
+                    self.__stats.resolution_change = True
+                    self.__update_ui_anchors(new_res)
+                else:
+                    self.__stats.resolution_change = False
                 self.__systems.event_handler()
                 self.__update_mouse()
+                self.__update_keyboard()
                 if self.__systems.ui_handler(self.__stats.mouse_pos,
                                              self.__stats.mouse_down,
                                              self.__stats.mouse_up,
-                                             self.__stats.enter):
+                                             self.__stats.enter,
+                                             self.__stats.backspace):
                     self.renderer.set_dirty()
                 self.__systems.animation_manager.animate(
                     self.__stats.clock.get_dt())

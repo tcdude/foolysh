@@ -19,7 +19,7 @@ coordinate system (e.g. :attr:`~foolysh.app.App.ui.top_left`,
 """
 
 import abc
-from typing import Optional, Tuple
+from typing import Tuple
 
 from ..scene import node
 from ..tools import vec2
