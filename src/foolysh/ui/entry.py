@@ -1,5 +1,5 @@
 """
-Provides the Input class for building UI components.
+Provides the Entry class for building UI components.
 """
 
 from typing import Callable, Dict, Optional, Tuple
@@ -33,21 +33,21 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE."""
 
 
-class Input(label.Label):
+class Entry(label.Label):
     """
-    Provides a text input field. It does not on its own prevent text to go
+    Provides a text entry field. It does not on its own prevent text to go
     outside the underlying frame.
 
     Args:
-        name: Optional[``str``] -> Optional name of the input field.
+        name: Optional[``str``] -> Optional name of the text entry field.
         blink_rate: Optional[``float``] -> Duration of cursor on/off in seconds.
-        hint_text: Optional[``str``] -> Text displayed when the input field is
-            empty, defaults to an empty string.
-        hint_text_color: ``Optional[COLOR]`` -> color of the frame.
+        hint_text: Optional[``str``] -> Text displayed when the text entry field
+            is empty, defaults to an empty string.
+        hint_text_color: ``Optional[COLOR]`` -> color of the hint text.
         **kwargs: See :class:`~foolysh.ui.label.Label` for available keyword
             arguments.
     """
-    def __init__(self, name: Optional[str] = 'Unnamed Input',
+    def __init__(self, name: Optional[str] = 'Unnamed Entry',
                  blink_rate: Optional[float] = 0.5,
                  hint_text: Optional[str] = '',
                  hint_text_color: Optional[COLOR] = (160, 160, 160),
@@ -58,7 +58,7 @@ class Input(label.Label):
         super().__init__(**kwargs)
         kwargs['text'] = hint_text
         kwargs['text_color'] = hint_text_color
-        self._cursor = self.attach_image_node(f'name_Cursor')
+        self._cursor = self.attach_image_node(f'{name}_Cursor')
         self._cursor_blink = blink_rate
         self._setup_cursor()
         self._hint_text = self.attach_text_node(**kwargs)
@@ -95,7 +95,7 @@ class Input(label.Label):
         Set the onenterfocus callback.
 
         Args:
-            enterfocus_cb: The method/function to call when the input field
+            enterfocus_cb: The method/function to call when the text entry field
                 receives focus.
             *args: Positional arguments to be passed to the callback.
             *kwargs: Keyword arguments to be passed to the callback.
@@ -107,7 +107,7 @@ class Input(label.Label):
         Set the onexitfocus callback.
 
         Args:
-            exitfocus_cb: The method/function to call when the input field
+            exitfocus_cb: The method/function to call when the text entry field
                 receives focus.
             *args: Positional arguments to be passed to the callback.
             *kwargs: Keyword arguments to be passed to the callback.

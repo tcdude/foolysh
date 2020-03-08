@@ -5,7 +5,7 @@ Sample application to demonstrate the ui submodule.
 import sdl2
 
 from foolysh import app
-from foolysh.ui import button, frame, input, label
+from foolysh.ui import button, frame, entry, label
 
 __author__ = 'Tiziano Bettio'
 __license__ = 'MIT'
@@ -97,7 +97,7 @@ class UISample(app.App):
         self.but_b.onclick(self.toggle, 1)
         self.but_b.enabled = False
 
-        my_input = input.Input(name='An Input', size=(0.6, 0.1),
+        my_entry = entry.Entry(name='An Input', size=(0.6, 0.1),
                                pos=(0.1, 0.34), margin=0.01,
                                hint_text='Enter text...',
                                hint_text_color=(10, 10, 10, 180),
@@ -107,7 +107,7 @@ class UISample(app.App):
                                border_thickness=0.001,
                                border_color=(0, 0, 0), corner_radius=0.02,
                                alpha=255)
-        my_input.reparent_to(my_frame)
+        my_entry.reparent_to(my_frame)
 
         my_label = label.Label(name='Event Label', size=(0.6, 0.1),
                                pos=(0.1, 0.46), margin=0.05, text='',
@@ -119,10 +119,10 @@ class UISample(app.App):
                                alpha=255)
         my_label.reparent_to(my_frame)
 
-        my_input.oninput(set_text, my_label, text='Input Event')
-        my_input.onenterfocus(set_text, my_label, text='Enter Focus')
-        my_input.onexitfocus(set_text, my_label, text='Exit Focus')
-        my_input.onenter(set_text, my_label, text='Enter/Return Key')
+        my_entry.oninput(set_text, my_label, text='Input Event')
+        my_entry.onenterfocus(set_text, my_label, text='Enter Focus')
+        my_entry.onexitfocus(set_text, my_label, text='Exit Focus')
+        my_entry.onenter(set_text, my_label, text='Enter/Return Key')
 
         self.event_handler.listen(
             'quit',
