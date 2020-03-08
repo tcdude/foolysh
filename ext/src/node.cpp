@@ -258,6 +258,9 @@ query(AABB& aabb, const bool depth_sorted) {
     to_process.push_back(node_id);
     while(to_process.size()) {
         const size_t pid = to_process.pop_back();
+        if (sgdh.flag_vec[pid] & HIDDEN) {
+            continue;
+        }
         Node n(sgdh, pid);
         if (aabb.overlap(n.get_aabb())) {
             v.emplace_back(DepthSort(n.node_id, n.get_relative_depth()));
