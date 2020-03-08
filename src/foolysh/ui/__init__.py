@@ -18,7 +18,7 @@ coordinate system (e.g. :attr:`~foolysh.app.App.ui.top_left`,
 
 """
 
-from typing import Optional
+import enum
 
 from . import uihandler
 from ..tools.common import COLOR
@@ -47,4 +47,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE."""
 
 
-UIHANDLER_INSTANCE: Optional[uihandler.UIHandler] = None
+
+
+class UIState(enum.Enum):
+    """Possible states a UI element can be in."""
+    NORMAL = 0
+    ACTIVE = 1
+    DISABLED = 2

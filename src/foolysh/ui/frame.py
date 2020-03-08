@@ -8,11 +8,7 @@ from typing import Optional
 from typing import Tuple
 from typing import Union
 
-from PIL import Image
-
-from ..ui import ObjectState
 from ..ui import uinode
-from ..scene.node import ImageNode
 from ..tools import sdf
 from ..tools import vec2
 from ..tools.common import COLOR
@@ -119,6 +115,7 @@ class Frame(uinode.UINode):
         self._frame_sdf.append(FrameSDF(frame_color, border_color,
                                         corner_radius, border_thickness,
                                         multi_sampling, alpha))
+        self.__needs_update = True
         return self._im_node.add_image(self._sdfstr(len(self._frame_sdf) - 1))
 
     def _sdfstr(self, index: int):
@@ -134,6 +131,7 @@ class Frame(uinode.UINode):
         self._im_node.clear_images()
         for i in range(len(self._frame_sdf)):
             self._im_node.add_image(self._sdfstr(i))
+        self.__needs_update = False
         super()._update()
 
     # Properties
@@ -152,6 +150,7 @@ class Frame(uinode.UINode):
     def index(self, value: int) -> None:
         self._im_node.index = value
         self.dirty = True
+        self.__needs_update = True
 
     @property
     def frame_color(self) -> COLOR:
@@ -169,6 +168,7 @@ class Frame(uinode.UINode):
     def frame_color(self, color: COLOR) -> None:
         self._frame_sdf[self._im_node.index].frame_color = valid_color(color)
         self.dirty = True
+        self.__needs_update = True
 
     @property
     def border_thickness(self) -> float:
@@ -184,6 +184,7 @@ class Frame(uinode.UINode):
     def border_thickness(self, thickness: float) -> None:
         self._frame_sdf[self._im_node.index].border_thickness = thickness
         self.dirty = True
+        self.__needs_update = True
 
     @property
     def border_color(self) -> COLOR:
@@ -200,6 +201,7 @@ class Frame(uinode.UINode):
     def border_color(self, color: COLOR) -> None:
         self._frame_sdf[self._im_node.index].border_color = valid_color(color)
         self.dirty = True
+        self.__needs_update = True
 
     @property
     def corner_radius(self) -> float:
@@ -215,6 +217,7 @@ class Frame(uinode.UINode):
     def corner_radius(self, radius: float) -> None:
         self._frame_sdf[self._im_node.index].corner_radius = radius
         self.dirty = True
+        self.__needs_update = True
 
     @property
     def multi_sampling(self) -> int:
@@ -230,6 +233,7 @@ class Frame(uinode.UINode):
     def multi_sampling(self, value: int) -> None:
         self._frame_sdf[self._im_node.index].multi_sampling = value
         self.dirty = True
+        self.__needs_update = True
 
     @property
     def alpha(self) -> int:
@@ -245,3 +249,4 @@ class Frame(uinode.UINode):
     def alpha(self, value: int) -> None:
         self._frame_sdf[self._im_node.index].alpha = value
         self.dirty = True
+        self.__needs_update = True

@@ -285,23 +285,18 @@ class SpriteLoader:
                         os.path.join(self.asset_dir, font),
                         size
                     )
-                img = Image.new(
-                    'RGBA',
-                    self._font_cache[font_k].getsize_multiline(
-                        text,
-                        spacing=spacing
-                    ) if multiline else self._font_cache[font_k].getsize(text)
-                )
+                fnt = self._font_cache[font_k]
+                if multiline:
+                    im_sz = fnt.getsize_multiline(text, spacing=spacing)
+                else:
+                    im_sz = fnt.getsize(text)
+                    im_sz = im_sz[0], max(sum(fnt.getmetrics()), im_sz[1])
+                img = Image.new('RGBA', im_sz)
                 draw = ImageDraw.Draw(img)
                 func = draw.multiline_text if multiline else draw.text
-                func(
-                    (0, 0),
-                    text,
-                    color,
-                    self._font_cache[font_k],
-                    spacing=spacing,
-                    align=align
-                )
+                func((0, 0), text=text, fill=color,
+                     font=self._font_cache[font_k], spacing=spacing,
+                     align=align)
                 self._sprite_cache[k] = _image2sprite(img, self.factory)
             return self._sprite_cache[k]
         raise ValueError(f'font must be a valid path relative to '

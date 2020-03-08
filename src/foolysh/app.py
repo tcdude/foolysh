@@ -22,7 +22,7 @@ from .tools import vec2
 from .tools import spriteloader
 from .tools import clock
 from .ui import uihandler
-from . import ui
+from .ui import uinode
 
 __author__ = 'Tiziano Bettio'
 __license__ = 'MIT'
@@ -158,10 +158,10 @@ def _node_setup() -> AppNodes:
     ]
     uinodes = []
     for name, origin in node_list:
-        uinode = uiroot.attach_node(name)
-        uinode.origin = origin
-        uinode.depth = 0
-        uinodes.append(uinode)
+        uind = uiroot.attach_node(name)
+        uind.origin = origin
+        uind.depth = 0
+        uinodes.append(uind)
     return AppNodes(root, UIAnchors(uiroot, *uinodes))
 
 
@@ -195,7 +195,7 @@ class App:
             ui_handler=uihandler.UIHandler(self.__nodes.ui.root, event_h),
             animation_manager=animation.AnimationManager()
         )
-        ui.UIHANDLER_INSTANCE = self.__systems.ui_handler
+        uinode.UIHANDLER_INSTANCE = self.__systems.ui_handler
         window_title = window_title or self.__cfg.get('base', 'window_title',
                                                       fallback='foolysh engine')
         self.__stats = AppStats(clock.Clock(), window_title)
@@ -271,7 +271,7 @@ class App:
 
     @property
     def ui(self):  # pylint: disable=invalid-name
-        # type: () -> node.Node
+        # type: () -> UIAnchors
         """:class:`UIAnchors`."""
         return self.__nodes.ui
 
@@ -343,10 +343,11 @@ class App:
                 frame_clock.tick()
                 self.__systems.event_handler()
                 self.__update_mouse()
-                self.__systems.ui_handler(self.__stats.mouse_pos,
-                                          self.__stats.mouse_down,
-                                          self.__stats.mouse_up,
-                                          self.__stats.enter)
+                if self.__systems.ui_handler(self.__stats.mouse_pos,
+                                             self.__stats.mouse_down,
+                                             self.__stats.mouse_up,
+                                             self.__stats.enter):
+                    self.renderer.set_dirty()
                 self.__systems.animation_manager.animate(
                     self.__stats.clock.get_dt())
                 self.__systems.task_manager()
@@ -431,6 +432,7 @@ class App:
             self.__cfg.get('base', 'cache_dir', fallback=None)
         )
         self.__systems.renderer.root_node = self.__nodes.root
+        self.__systems.renderer.uiroot = self.__nodes.ui.root
         self.__systems.renderer.asset_pixel_ratio = \
             self.__cfg.getint('base', 'asset_pixel_ratio')
         self.__systems.renderer.sprite_loader = self.__systems.sprite_loader

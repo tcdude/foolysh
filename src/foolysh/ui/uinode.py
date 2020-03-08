@@ -19,10 +19,8 @@ coordinate system (e.g. :attr:`~foolysh.app.App.ui.top_left`,
 """
 
 import abc
-from typing import Tuple
+from typing import Optional, Tuple
 
-from . import uihandler
-from . import UIHANDLER_INSTANCE
 from ..scene import node
 from ..tools import vec2
 
@@ -50,6 +48,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE."""
 
 
+UIHANDLER_INSTANCE = None
+
+
 class UINode(node.Node):
     """
     Node subclass containing shared properties of UI elements. This can only be
@@ -73,12 +74,15 @@ class UINode(node.Node):
         self.pos = pos
         self._has_focus = False
         self.__dirty = True
+        self.__first = 2
 
     def update(self):
         """Performs a complete update of this the :class:`UINode`."""
-        if self.__dirty:
+        if self.__dirty or self.__first:
             self._update()
-        self.__dirty = False
+        self.__first = max(0, self.__first - 1)
+        if not self.__first:
+            self.__dirty = False
 
     @abc.abstractmethod
     def _update(self) -> None:
@@ -93,6 +97,7 @@ class UINode(node.Node):
     def dirty(self, value: bool) -> None:
         if not isinstance(value, bool):
             raise TypeError('Expected type bool.')
+        self.propagate_dirty()
         self.__dirty = value
 
     @property
@@ -107,7 +112,7 @@ class UINode(node.Node):
         self._has_focus = value
 
     @property
-    def ui_handler(self) -> uihandler.UIHandler:
+    def ui_handler(self) -> "foolysh.ui.uihandler.UIHandler":
         """
         Provides access to the :class:`~foolysh.ui.uihandler.UIHandler` instance
         used in the running :class:`~foolysh.app.App`.

@@ -152,17 +152,9 @@ cdef class Node:
         self._attach_node(np)
         return np
 
-    def attach_text_node(
-        self,
-        name='Unnamed Node',
-        text='',
-        font=None,
-        size=0.05,
-        color=(255, 255, 255, 255),
-        align='left',
-        spacing=0,
-        multiline=False
-    ):
+    def attach_text_node(self, name='Unnamed Node', text='', font=None,
+                         font_size=0.05, text_color=(255, 255, 255, 255),
+                         align='left', spacing=0, multiline=False, **unused_kw):
         """
         Attach a new child text node to this Node.
 
@@ -180,7 +172,8 @@ cdef class Node:
         Returns:
             ``TextNode``
         """
-        np = TextNode(name, text, font, size, color, align, spacing, multiline)
+        np = TextNode(name, text, font, font_size, text_color, align, spacing,
+                      multiline)
         self._attach_node(np)
         return np
 
@@ -846,7 +839,7 @@ cdef class TextNode(Node):
     cdef str _text
     cdef str _font
     cdef float _font_size
-    cdef tuple _color
+    cdef tuple _text_color
     cdef str _align
     cdef int _spacing
     cdef bint _multiline

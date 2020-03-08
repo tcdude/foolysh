@@ -15,6 +15,7 @@ from .scene import node
 from .tools import aabb
 from .tools import spriteloader
 from .tools import vec2
+from .ui import uinode
 
 __author__ = 'Tiziano Bettio'
 __license__ = 'MIT'
@@ -52,6 +53,7 @@ class HWRenderer(sdl2.ext.TextureSpriteRenderSystem):
         self._window = window
         self.renderer = self.sdlrenderer
         self._root_node = None
+        self._uiroot = None
         self._asset_pixel_ratio = -1
         self._base_scale = 1.0
         self._zoom = 1.0
@@ -65,11 +67,15 @@ class HWRenderer(sdl2.ext.TextureSpriteRenderSystem):
         self._rcopy = render.SDL_RenderCopyEx
         self._rect = rect.SDL_Rect(0, 0, 0, 0)
 
+    def set_dirty(self):
+        self._dirty = True
+
     def render(self):
         if self._last_w_size != self._window.size:
             self._dirty = True
             self._update_base_scale()
-        if not self.root_node.traverse() and not self._dirty:
+        if not self.root_node.traverse() and not self._dirty \
+              and not self.uiroot.traverse():
             return
         if self._dirty:
             self._update_view_aabb()
@@ -81,6 +87,16 @@ class HWRenderer(sdl2.ext.TextureSpriteRenderSystem):
         image_scale = self._base_scale * self._zoom
         image_scale = image_scale, image_scale
         for nd in self.root_node.query(self._view_aabb):
+            if isinstance(nd, node.ImageNode):
+                self._render_image(nd, w, image_scale, x, y)
+            elif isinstance(nd, node.TextNode):
+                self._render_text(nd, w, image_scale, x, y)
+        ui_aabb = aabb.AABB(*self._view_aabb.size, *self._view_aabb.size)
+        ui_nodes = self.uiroot.query(ui_aabb)
+        for nd in ui_nodes:
+            if isinstance(nd, uinode.UINode):
+                nd.update()
+        for nd in ui_nodes:
             if isinstance(nd, node.ImageNode):
                 self._render_image(nd, w, image_scale, x, y)
             elif isinstance(nd, node.TextNode):
@@ -152,15 +168,10 @@ class HWRenderer(sdl2.ext.TextureSpriteRenderSystem):
             )
             self._sprites[nd.node_id] = Sprite(
                 scale,
-                self.sprite_loader.load_text(
-                    nd.text,
-                    nd.font,
-                    size,
-                    nd.color,
-                    nd.align,
-                    nd.spacing,
-                    nd.multiline
-                ),
+                self.sprite_loader.load_text(text=nd.text, font=nd.font,
+                                             size=size, color=nd.text_color,
+                                             align=nd.align, spacing=nd.spacing,
+                                             multiline=nd.multiline),
                 0,
                 ''
             )
@@ -198,6 +209,21 @@ class HWRenderer(sdl2.ext.TextureSpriteRenderSystem):
         if not isinstance(value, node.Node):
             raise TypeError
         self._root_node = value
+        self._dirty = True
+
+    @property
+    def uiroot(self):
+        # type: () -> node.Node
+        if self._uiroot is None:
+            raise RuntimeError('root_node not set.')
+        return self._uiroot
+
+    @uiroot.setter
+    def uiroot(self, value):
+        # type: (node.Node) -> None
+        if not isinstance(value, node.Node):
+            raise TypeError
+        self._uiroot = value
         self._dirty = True
 
     @property

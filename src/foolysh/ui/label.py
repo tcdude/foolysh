@@ -48,19 +48,23 @@ class Label(frame.Frame):
 
     def __init__(self, margin: Optional[float] = 0.0, **kwargs) -> None:
         super().__init__(**kwargs)
+        kwargs['pos'] = 0, 0
         self._txt_node = self.attach_text_node(**kwargs)
         self._margin = margin
 
     def _update(self):
-        if self._txt_node.align == 'left':
-            x = self.border_thickness + self.corner_radius + self._margin
-        elif self._txt_node.align == 'center':
-            x = (self.size[0] - self._txt_node.size[0]) / 2
+        if self._txt_node.size != (0, 0):
+            if self._txt_node.align == 'left':
+                x = self.border_thickness + self.corner_radius + self._margin
+            elif self._txt_node.align == 'center':
+                x = (self.size[0] - self._txt_node.size[0]) / 2
+            else:
+                x = self.size[0] - self.border_thickness - self.corner_radius
+                x -= self._txt_node[0] + self._margin
+            y = (self.size[1] - self._txt_node.size[1]) / 2
         else:
-            x = self.size[0] - self.border_thickness - self.corner_radius
-            x -= self._txt_node[0] + self._margin
-        txt_y = self._txt_node.size[1]
-        y = (self.size[1] - txt_y - (txt_y - self._txt_node.font_size)) / 2
+            x = y = 0
+            self.ui_handler.need_render = True
         self._txt_node.pos = x, y
         super()._update()
 
@@ -73,6 +77,7 @@ class Label(frame.Frame):
     def text(self, value: str) -> None:
         self._txt_node.text = value
         self.dirty = True
+        self.__needs_update = True
 
     @property
     def font(self) -> str:
@@ -83,6 +88,7 @@ class Label(frame.Frame):
     def font(self, value: str) -> None:
         self._txt_node.font = value
         self.dirty = True
+        self.__needs_update = True
 
     @property
     def font_size(self) -> float:
@@ -93,6 +99,7 @@ class Label(frame.Frame):
     def font_size(self, value: float) -> None:
         self._txt_node.font_size = value
         self.dirty = True
+        self.__needs_update = True
 
     @property
     def text_color(self) -> COLOR:
@@ -111,6 +118,7 @@ class Label(frame.Frame):
     def text_color(self, value: COLOR) -> None:
         self._txt_node.text_color = value
         self.dirty = True
+        self.__needs_update = True
 
     @property
     def align(self) -> str:
@@ -121,3 +129,4 @@ class Label(frame.Frame):
     def align(self, value: str) -> None:
         self._txt_node.align = value
         self.dirty = True
+        self.__needs_update = True
