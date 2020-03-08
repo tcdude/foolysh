@@ -107,7 +107,6 @@ class SDFSample(app.App):
             'quit',
             sdl2.SDL_QUIT,
             self.quit,
-            0,
             blocking=False
         )
 

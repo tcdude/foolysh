@@ -21,6 +21,8 @@ from . import tools
 from .tools import vec2
 from .tools import spriteloader
 from .tools import clock
+from .ui import uihandler
+from .ui import uinode
 
 __author__ = 'Tiziano Bettio'
 __license__ = 'MIT'
@@ -85,8 +87,10 @@ class AppClock:
 @dataclass
 class Systems:
     """Class for keeping track of the various handler/manager objects."""
+    # pylint: disable=too-many-instance-attributes
     task_manager: taskmanager.TaskManager
     event_handler: eventhandler.EventHandler
+    ui_handler: uihandler.UIHandler
     animation_manager: animation.AnimationManager
     sprite_loader: spriteloader.SpriteLoader = None
     window: sdl2.ext.Window = None
@@ -97,13 +101,21 @@ class Systems:
 @dataclass
 class AppStats:
     """Class for keeping runtime stats of the App."""
+    # pylint: disable=too-many-instance-attributes
     clock: clock.Clock
     window_title: str
     mouse_pos: vec2.Point2 = vec2.Point2()
+    mouse_down: Optional[vec2.Point2] = None
+    mouse_up: Optional[vec2.Point2] = None
+    enter_down: bool = False
+    enter: bool = False
+    backspace_down: bool = False
+    backspace: bool = False
     frames: int = 0
     fps: float = 0.0
     running: bool = False
     clean_exit: bool = True
+    resolution_change: bool = True
 
 
 @dataclass
@@ -149,10 +161,10 @@ def _node_setup() -> AppNodes:
     ]
     uinodes = []
     for name, origin in node_list:
-        uinode = uiroot.attach_node(name)
-        uinode.origin = origin
-        uinode.depth = 0
-        uinodes.append(uinode)
+        uind = uiroot.attach_node(name)
+        uind.origin = origin
+        uind.depth = 0
+        uinodes.append(uind)
     return AppNodes(root, UIAnchors(uiroot, *uinodes))
 
 
@@ -178,12 +190,15 @@ class App:
                 f'Section "base" missing in loaded config_file '
                 f'("{self.__cfg.cfg_path}")'
             )
+        self.__nodes = _node_setup()
+        event_h = eventhandler.EventHandler()
         self.__systems = Systems(
             task_manager=taskmanager.TaskManager(),
-            event_handler=eventhandler.EventHandler(),
+            event_handler=event_h,
+            ui_handler=uihandler.UIHandler(self.__nodes.ui.root, event_h),
             animation_manager=animation.AnimationManager()
         )
-        self.__nodes = _node_setup()
+        uinode.UIHANDLER_INSTANCE = self.__systems.ui_handler
         window_title = window_title or self.__cfg.get('base', 'window_title',
                                                       fallback='foolysh engine')
         self.__stats = AppStats(clock.Clock(), window_title)
@@ -259,7 +274,7 @@ class App:
 
     @property
     def ui(self):  # pylint: disable=invalid-name
-        # type: () -> node.Node
+        # type: () -> UIAnchors
         """:class:`UIAnchors`."""
         return self.__nodes.ui
 
@@ -287,14 +302,61 @@ class App:
 
     def __update_mouse(self):
         # type: (...) -> None
-        """Updates ``App.mouse_pos``."""
+        """Updates 'mouse_pos'."""
         if not self.__stats.running:
             return
         x, y = ctypes.c_int(0), ctypes.c_int(0)
-        _ = sdl2.mouse.SDL_GetMouseState(ctypes.byref(x), ctypes.byref(y))
+        state = sdl2.mouse.SDL_GetMouseState(ctypes.byref(x), ctypes.byref(y))
         world_unit = 1 / min(self.__systems.window.size)
         self.__stats.mouse_pos.x = x.value * world_unit
         self.__stats.mouse_pos.y = y.value * world_unit
+        if state > 0 and self.__stats.mouse_down is None:
+            self.__stats.mouse_down = self.__stats.mouse_pos + 0.0
+        elif state == 0 and self.__stats.mouse_down is not None \
+                and self.__stats.mouse_up is None:
+            self.__stats.mouse_up = self.__stats.mouse_pos + 0.0
+        elif state == 0 and self.__stats.mouse_down is not None \
+                and self.__stats.mouse_up is not None:
+            self.__stats.mouse_down = None
+            self.__stats.mouse_up = None
+
+    def __update_keyboard(self):
+        """Updates keyboard state."""
+        state = sdl2.SDL_GetKeyboardState(None)
+        st_e = state[sdl2.SDL_SCANCODE_RETURN]
+        state = sdl2.SDL_GetKeyboardState(None)
+        st_e = st_e or state[sdl2.SDL_SCANCODE_RETURN2]
+        state = sdl2.SDL_GetKeyboardState(None)
+        st_e = st_e or state[sdl2.SDL_SCANCODE_KP_ENTER]
+        if st_e and not self.__stats.enter_down:
+            self.__stats.enter_down = True
+        elif not st_e and self.__stats.enter_down:
+            self.__stats.enter_down = False
+            self.__stats.enter = True
+        else:
+            self.__stats.enter = False
+        state = sdl2.SDL_GetKeyboardState(None)
+        st_bs = state[sdl2.SDL_SCANCODE_BACKSPACE]
+        if st_bs:
+            self.__stats.backspace_down = True
+        elif not st_bs and self.__stats.backspace_down:
+            self.__stats.backspace_down = False
+            self.__stats.backspace = True
+        else:
+            self.__stats.backspace = False
+
+    def __update_ui_anchors(self, new_res):
+        units_x = new_res[0] / min(new_res)
+        units_y = new_res[1] / min(new_res)
+        half_x, half_y = units_x / 2, units_y / 2
+        self.__nodes.ui.top_center.pos = half_x, 0
+        self.__nodes.ui.top_center.pos = units_x, 0
+        self.__nodes.ui.center_left.pos = 0, half_y
+        self.__nodes.ui.center.pos = half_x, half_y
+        self.__nodes.ui.center_right.pos = units_x, half_y
+        self.__nodes.ui.bottom_left.pos = 0, units_y
+        self.__nodes.ui.bottom_center.pos = half_x, units_y
+        self.__nodes.ui.bottom_right.pos = units_x, units_y
 
     def run(self):
         """
@@ -306,13 +368,28 @@ class App:
         """
         self.__init_sdl()
         self.__stats.clock.tick()
+        last_time = self.__stats.clock.get_time()
         try:
             frame_clock = clock.Clock()
             self.__stats.running = True
+            last_resolution = None
             while self.__stats.running:
                 frame_clock.tick()
-                self.__update_mouse()
+                new_res = self.screen_size
+                if new_res != last_resolution:
+                    self.__stats.resolution_change = True
+                    self.__update_ui_anchors(new_res)
+                else:
+                    self.__stats.resolution_change = False
                 self.__systems.event_handler()
+                self.__update_mouse()
+                self.__update_keyboard()
+                if self.__systems.ui_handler(self.__stats.mouse_pos,
+                                             self.__stats.mouse_down,
+                                             self.__stats.mouse_up,
+                                             self.__stats.enter,
+                                             self.__stats.backspace):
+                    self.renderer.set_dirty()
                 self.__systems.animation_manager.animate(
                     self.__stats.clock.get_dt())
                 self.__systems.task_manager()
@@ -322,6 +399,10 @@ class App:
                 if sleep_time:
                     time.sleep(sleep_time)
                 self.__stats.frames += 1
+                if self.__stats.frames % 10 == 0:
+                    delta = self.__stats.clock.get_time() - last_time
+                    self.__stats.fps = 10 / delta
+                    last_time = self.__stats.clock.get_time()
                 self.__stats.clock.tick()
         except (KeyboardInterrupt, SystemExit):
             self.quit(blocking=False)
@@ -393,6 +474,7 @@ class App:
             self.__cfg.get('base', 'cache_dir', fallback=None)
         )
         self.__systems.renderer.root_node = self.__nodes.root
+        self.__systems.renderer.uiroot = self.__nodes.ui.root
         self.__systems.renderer.asset_pixel_ratio = \
             self.__cfg.getint('base', 'asset_pixel_ratio')
         self.__systems.renderer.sprite_loader = self.__systems.sprite_loader

@@ -152,17 +152,9 @@ cdef class Node:
         self._attach_node(np)
         return np
 
-    def attach_text_node(
-        self,
-        name='Unnamed Node',
-        text='',
-        font=None,
-        size=0.05,
-        color=(255, 255, 255, 255),
-        align='left',
-        spacing=0,
-        multiline=False
-    ):
+    def attach_text_node(self, name='Unnamed Node', text='', font=None,
+                         font_size=0.05, text_color=(255, 255, 255, 255),
+                         align='left', spacing=0, multiline=False, **unused_kw):
         """
         Attach a new child text node to this Node.
 
@@ -180,7 +172,8 @@ cdef class Node:
         Returns:
             ``TextNode``
         """
-        np = TextNode(name, text, font, size, color, align, spacing, multiline)
+        np = TextNode(name, text, font, font_size, text_color, align, spacing,
+                      multiline)
         self._attach_node(np)
         return np
 
@@ -831,45 +824,48 @@ cdef class ImageNode(Node):
 cdef class TextNode(Node):
     """
     Node type, that additionally holds a text property.
+
+    Args:
+        name: ``Optional[str]``
+        text: ``Optional[str]``
+        font: ``Optional[str]`` -> path to the font, relative to the `asset_dir`
+            config value.
+        font_size: ``Optional[float]``
+        text_color: ``Optional[Tuple[int, int, int, int]]``
+        align: ``Optional[str]`` -> text alignment on multiline text.
+        spacing: ``Optional[float]`` -> row spacing
+        multiline: ``Optional[bool]`` -> whether the text spans multiple lines.
     """
     cdef str _text
     cdef str _font
     cdef float _font_size
-    cdef tuple _color
+    cdef tuple _text_color
     cdef str _align
     cdef int _spacing
     cdef bint _multiline
 
-    def __init__(
-        self,
-        name=None,
-        text='',
-        font=None,
-        size=0.05,
-        color=(255, 255, 255, 255),
-        align='left',
-        spacing=0,
-        multiline=False
-    ):
+    def __init__(self, name=None, text='', font=None, font_size=0.05,
+                 text_color=(255, 255, 255, 255), align='left', spacing=0,
+                 multiline=False, *args, **kwargs):
         super(TextNode, self).__init__(name=name)
         self._text = ''
         self._font = ''
         self._font_size = 0
-        self._color = ()
+        self._text_color = ()
         self._align = ''
         self._spacing = 0
         self._multiline = False
         self.text = text
         self.font = font or ''
-        self.font_size = size
-        self.color = color
+        self.font_size = font_size
+        self.text_color = text_color
         self.align = align
         self.spacing = spacing
         self.multiline = multiline
 
     @property
     def hashkey(self):
-        return hash(f'{self._text}{self._font}{self._font_size}{self._color}'
+        return hash(f'{self._text}{self._font}{self._font_size}{self._text_color}'
                     f'{self._align}{self._spacing}{self._multiline}')
 
     @property
@@ -918,7 +914,7 @@ cdef class TextNode(Node):
         self._font_size = float(value)
 
     @property
-    def color(self):
+    def text_color(self):
         # type: () -> Tuple[int, int, int, int]
         """
         The text color.
@@ -929,10 +925,10 @@ cdef class TextNode(Node):
             * 3-/4-``tuple`` of ``int`` -> RGB or RGBA color. The alpha value
                 defaults to 255, if RGB only is provided.
         """
-        return self._color
+        return self._text_color
 
-    @color.setter
-    def color(self, value):
+    @text_color.setter
+    def text_color(self, value):
         # type: (Union[int, Tuple[int, ...]]) -> None
         if isinstance(value, int):
             value = (value, ) * 3 + (255, )
@@ -949,7 +945,7 @@ cdef class TextNode(Node):
                     raise ValueError('Expected value in range (0..255).')
         else:
             raise TypeError
-        self._color = value
+        self._text_color = value
 
     @property
     def align(self):
