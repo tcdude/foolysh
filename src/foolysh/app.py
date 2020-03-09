@@ -168,6 +168,19 @@ def _node_setup() -> AppNodes:
     return AppNodes(root, UIAnchors(uiroot, *uinodes))
 
 
+def _update_android():
+    display_mode = sdl2.SDL_DisplayMode()
+    sdl2.SDL_GetCurrentDisplayMode(0, display_mode)
+    screen_size = (display_mode.w, display_mode.h)
+    ddpi = ctypes.c_float()
+    sdl2.SDL_GetDisplayDPI(0, None, None, ctypes.byref(ddpi))
+    physical_size = screen_size[0] ** 2 + screen_size[1] ** 2
+    physical_size /= ddpi.value ** 2
+    if physical_size < 49:
+        global ISANDROID  # pylint: disable=global-statement
+        ISANDROID = True
+
+
 class App:
     """
         Base class that handles everything necessary to run an App.
@@ -210,6 +223,9 @@ class App:
         drag_button = self.__cfg.getint('base', 'drag_drop_button',
                                         fallback=sdl2.SDL_BUTTON_LEFT)
         self.__drag_drop = dragdrop.DragDrop(self, drag_threshold, drag_button)
+        sdl2.ext.init()
+        self.__stats.clean_exit = False
+        _update_android()
 
     @property
     def isandroid(self):
@@ -441,20 +457,16 @@ class App:
 
     def __init_sdl(self):
         """Initializes SDL2."""
-        sdl2.ext.init()
         sdl2.SDL_SetHint(sdl2.SDL_HINT_RENDER_SCALE_QUALITY, b'1')
         if self.isandroid:
-            display_mode = sdl2.SDL_DisplayMode()
-            sdl2.SDL_GetCurrentDisplayMode(0, display_mode)
-            screen_size = (display_mode.w, display_mode.h)
             sdl2.ext.Window.DEFAULTFLAGS = sdl2.SDL_WINDOW_FULLSCREEN
             self.__systems.window = sdl2.ext.Window(
                 self.__stats.window_title,
-                size=screen_size
+                size=self.screen_size
             )
         else:
             size_x, size_y = self.__cfg.get('base', 'window_size',
-                                            fallback='720x1280').split('x')
+                                            fallback='480x800').split('x')
             self.__systems.window = sdl2.ext.Window(
                 self.__stats.window_title,
                 size=(int(size_x), int(size_y)),
