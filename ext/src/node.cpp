@@ -1080,26 +1080,31 @@ void process_pos(SceneGraphDataHandler& sgdh, SmallList<size_t>& path) {
         double x = sgdh.pos_x[pid], y = sgdh.pos_y[pid];
         x -= (sgdh.origin_vec[pid] % 3) * hw;
         y -= (sgdh.origin_vec[pid] / 3) * hh;
-        if (dist_rel) {
-            x = dist_rel ? x * sx : x;
-            y = dist_rel ? y * sy : y;
-        }
-        if (sgdh.r_angle_vec[pid] != 0.0) {
-            const double rad = sgdh.r_angle_vec[pid] * -to_rad;
+        x = dist_rel ? x * sx : x;
+        y = dist_rel ? y * sy : y;
+
+        if (sgdh.r_angle_vec[parent] != 0.0 && parent != pid) {
+            const double rad = sgdh.r_angle_vec[parent] * -to_rad;
             const double sa = std::sin(rad), ca = std::cos(rad);
+            const double psx = sgdh.r_scale_x[parent];
+            const double psy = sgdh.r_scale_y[parent];
             double rot_cen_x, rot_cen_y;
-            if (sgdh.flag_vec[pid] & ROTATION_CENTER_SET) {
-                rot_cen_x = x + sgdh.rotation_center_x[pid] * sx;
-                rot_cen_y = y + sgdh.rotation_center_y[pid] * sy;
+            if (sgdh.flag_vec[parent] & ROTATION_CENTER_SET) {
+                rot_cen_x = rel_x + sgdh.rotation_center_x[parent] * psx;
+                rot_cen_y = rel_y + sgdh.rotation_center_y[parent] * psy;
             }
             else {
-                rot_cen_x = x + hw * sx;
-                rot_cen_y = y + hh * sy;
+                const double phw = sgdh.size_x[parent] / 2.0;
+                const double phh = sgdh.size_y[parent] / 2.0;
+                rot_cen_x = rel_x + phw * psx;
+                rot_cen_y = rel_y + phh * psy;
             }
-            const double tmp_x = ca * (x - rot_cen_x) - sa * (y - rot_cen_y);
-            const double tmp_y = sa * (x - rot_cen_x) + ca * (y - rot_cen_y);
-            x = tmp_x + rot_cen_x;
-            y = tmp_y + rot_cen_y;
+            const double tmp_x = ca * (rel_x - rot_cen_x)
+                                 - sa * (rel_y - rot_cen_y);
+            const double tmp_y = sa * (rel_x - rot_cen_x)
+                                 + ca * (rel_y - rot_cen_y);
+            x += tmp_x;
+            y += tmp_y;
         }
         sgdh.r_pos_x[pid] = rel_x + x;
         sgdh.r_pos_y[pid] = rel_y + y;
