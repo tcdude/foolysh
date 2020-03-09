@@ -220,7 +220,7 @@ cdef class Node:
         return self._query(aabb, depth_sorted)
 
     cdef list _query(self, AABB aabb, bint depth_sorted) except +:
-        cdef SmallList[unsigned long] r = deref(self.thisptr).query(
+        cdef SmallList[size_t] r = deref(self.thisptr).query(
             deref(aabb.thisptr),
             depth_sorted
         )

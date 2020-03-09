@@ -103,15 +103,15 @@ cdef extern from "src/node.hpp" namespace "foolysh::scene":
 
         Node attach_node()
         void reparent_to(Node&) except +
-        void reparent_to(const unsigned long) except +
+        void reparent_to(const size_t) except +
         bint traverse(bint local = False) except +
-        SmallList[unsigned long] query(AABB&, const bint) except +
+        SmallList[size_t] query(AABB&, const bint) except +
         void hide()
         void show()
         void propagate_dirty()
 
-        unsigned long get_id()
-        unsigned long get_parent_id()
+        size_t get_id()
+        size_t get_parent_id()
         void set_pos(const double)
         void set_pos(Node&, const double)
         void set_pos(const double, const double)
