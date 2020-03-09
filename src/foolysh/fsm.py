@@ -52,6 +52,10 @@ class FSM:
     .. warning::
         Only the last instantiated object of a class will be receiving enter and
         exit calls!!!
+
+    .. info::
+        If you don't want a subclass to be registered as a state, simply omit
+        creating the appropriate `enter_` / `exit_` methods.
     """
     __states: Dict[str, Tuple[Callable, Callable]] = {}
     __active_state: Optional[str] = None
@@ -61,9 +65,10 @@ class FSM:
         if name in FSM.__states:
             Warning('The state has already been registered! This could lead to '
                     'undefined behavior.')
-        enterm = f'enter_{name}'
-        exitm = f'exit_{name}'
-        FSM.__states[name] = getattr(self, enterm), getattr(self, exitm)
+        enterm = getattr(self, f'enter_{name}', False)
+        exitm = getattr(self, f'exit_{name}', False)
+        if enterm and exitm:
+            FSM.__states[name] = enterm, exitm
 
     @staticmethod
     def request(state_name: str) -> None:
