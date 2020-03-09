@@ -1,6 +1,10 @@
 """
-[WIP] Finite State Machine...
+Provides the FSM class, a rudimentary implementation of a Finite State Machine.
 """
+
+from typing import Callable, Dict, Optional, Tuple
+
+from .tools.common import to_snake_case
 
 __author__ = 'Tiziano Bettio'
 __license__ = 'MIT'
@@ -28,43 +32,54 @@ SOFTWARE."""
 
 class FSM:
     """
-    Rudimentary Finite State Machine to organize state changes.
-    Takes 1 - n objects from different classes that provide both a enter
-    and exit method, that manage setup/cleanup for their state.
-    Warning: There are no safeguards in place that prevent the app from crashing
-    if the code in either enter or exit raises an Error.
+    Rudimentary Finite State Machine to organize state changes. Use this class
+    to subclass from and provide both a `enter_` and `exit_[your_class_name]`
+    method, where the used class name is transformed from the recommended
+    PascalCase for class names to snake_case (i.e. MyClass would result in
+    my_class). If unsure about what the transformed name will be, run the
+    :func:`~foolysh.tools.common.to_snake_case` with your class name as
+    parameter to get the proper snake_case name to use.
+
+    The FSM class exposes the :meth:`FSM.request` method to change state. On a
+    state change the following is executed:
+
+        * The `exit_` method from the current state gets called.
+        * The `enter_` method from the requested state gets called.
+
+    The state name argument of the :meth:`FSM.request` method is the same
+    aforementioned snake_case converted name of your subclass.
+
+    .. warning::
+        Only the last instantiated object of a class will be receiving enter and
+        exit calls!!!
     """
+    __states: Dict[str, Tuple[Callable, Callable]] = {}
+    __active_state: Optional[str] = None
+
     def __init__(self):
-        self._states = {}
-        self._active_state = None
+        name = to_snake_case(type(self).__name__)
+        if name in FSM.__states:
+            Warning('The state has already been registered! This could lead to '
+                    'undefined behavior.')
+        enterm = f'enter_{name}'
+        exitm = f'exit_{name}'
+        FSM.__states[name] = getattr(self, enterm), getattr(self, exitm)
 
-    def add_state(self, obj):
-        """
-        Adds a new state to the FSM. If an object of the same class already is
-        present, it will be overwritten!
-
-        :object obj: The class instance containing the enter and exit methods.
-        """
-        if not hasattr(obj, 'enter') or not hasattr(obj, 'exit'):
-            raise ValueError('Argument obj must contain "enter" and "exit" '
-                             'methods.')
-        if not (callable(obj.enter) and callable(obj.exit)):
-            raise ValueError('Argument obj must contain "enter" and "exit" '
-                             'methods.')
-        k = type(obj).__name__.lower()
-        self._states[k] = obj
-
-    def request(self, state_name):
+    @staticmethod
+    def request(state_name: str) -> None:
         """
         Request the transition to a registered State.
         """
-        state_name_lower = state_name.lower()
-        if self._active_state == state_name_lower:
+        if state_name not in FSM.__states:
+            raise ValueError(f'Unknown state "{state_name}".')
+        if FSM.__active_state == state_name:
             return
-        if state_name_lower not in self._states:
-            raise ValueError(f'No state with state with name "{state_name}" '
-                             f'registered.')
-        if self._active_state is not None:
-            self._states[self._active_state].exit()
-        self._states[state_name_lower].enter()
-        self._active_state = state_name_lower
+        if FSM.__active_state is not None:
+            FSM.__states[FSM.__active_state][1]()
+        FSM.__states[state_name][0]()
+        FSM.__active_state = state_name
+
+    @property
+    def active_state(self) -> str:
+        """The currently active state."""
+        return FSM.__active_state

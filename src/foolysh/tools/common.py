@@ -90,7 +90,7 @@ def valid_color(color: COLOR) -> COLOR:
 
 def to_snake_case(expr: str) -> str:
     """
-    Converts a CamelCase string into a snake_case one.
+    Converts a PascalCase string into a snake_case one.
 
     Args:
         expr: ``str`` -> the string to convert.
