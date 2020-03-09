@@ -3,12 +3,13 @@ Unittests for foolysh.tools
 """
 
 import math
+import time
 
-# noinspection PyPackageRequirements
 import pytest
 
 from foolysh.tools import vec2
 from foolysh.tools import aabb
+from foolysh.tools import clock
 from foolysh.tools import quadtree
 
 __author__ = 'Tiziano Bettio'
@@ -83,12 +84,24 @@ def test_quadtree():
     obj_d = 3
     assert qt.insert(obj_a, pos_a) is True
     assert qt.insert(obj_b, pos_b) is True
-    # assert qt.insert(obj_c, pos_c) is False
     assert qt.insert(obj_d, pos_d) is True
-    # assert qt.item_count == 3
     result = qt.query(pos_d)
     assert len(result) == 3
     assert obj_d in result
     result = qt.query(aabb.AABB(-0.5, -0.5, 0.49, 0.49))
     assert len(result) == 2
     assert obj_a in result
+
+
+def test_clock():
+    clk = clock.Clock()
+    clk.tick()
+    start = time.perf_counter()
+    time.sleep(0.1)
+    clk.tick()
+    stop = time.perf_counter()
+    assert pytest.approx(clk.get_dt(), stop - start)
+    time.sleep(0.1)
+    clk.tick()
+    stop = time.perf_counter()
+    assert pytest.approx(clk.get_time(), stop - start)
