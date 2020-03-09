@@ -60,7 +60,7 @@ class FSM:
     __states: Dict[str, Tuple[Callable, Callable]] = {}
     __active_state: Optional[str] = None
 
-    def __init__(self):
+    def __init__(self, *unused_args, **unused_kwargs):
         name = to_snake_case(type(self).__name__)
         if name in FSM.__states:
             Warning('The state has already been registered! This could lead to '
