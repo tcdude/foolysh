@@ -1,5 +1,5 @@
 """
-Unittests for foolysh.fsm
+Unittests for the foolysh.fsm module.
 """
 
 from foolysh import fsm
@@ -28,43 +28,57 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE."""
 
 
-class MyStateA(fsm.FSM):
+class App(fsm.FSM):
+    """A mock up of the App class that usually inherits from FSM."""
+
+
+class MyStateA(App):
+    """A class representing a possible state."""
     def __init__(self):
         super().__init__()
-        self.enter = 0
-        self.exit = 0
+        self.enter_a = 0
+        self.exit_a = 0
 
     def enter_my_state_a(self):
-        self.enter += 1
+        """Enter method that gets called when this state is requested."""
+        self.enter_a += 1
 
     def exit_my_state_a(self):
-        self.exit += 1
+        """Exit method that gets called when this state is left."""
+        self.exit_a += 1
 
 
-class MyStateB(fsm.FSM):
+class MyStateB(App):
+    """A class representing a possible state."""
     def __init__(self):
         super().__init__()
-        self.enter = 0
-        self.exit = 0
+        self.enter_b = 0
+        self.exit_b = 0
 
     def enter_my_state_b(self):
-        self.enter += 1
+        """Enter method that gets called when this state is requested."""
+        self.enter_b += 1
 
     def exit_my_state_b(self):
-        self.exit += 1
+        """Exit method that gets called when this state is left."""
+        self.exit_b += 1
+
+
+class MyApp(MyStateA, MyStateB):
+    """Inherit from all states."""
 
 
 def test_fsm():
-    a = MyStateA()
-    b = MyStateB()
-    a.request('my_state_a')
-    assert a.enter == 1
-    a.request('my_state_b')
-    assert a.exit == 1
-    assert b.enter == 1
-    b.request('my_state_b')
-    assert b.enter == 1
-    assert b.exit == 0
-    b.request('my_state_a')
-    assert b.exit == 1
-    assert a.enter == 2
+    """Test whether state changes work as expected."""
+    myapp = MyApp()
+    myapp.request('my_state_a')
+    assert myapp.enter_a == 1
+    myapp.request('my_state_b')
+    assert myapp.exit_a == 1
+    assert myapp.enter_b == 1
+    myapp.request('my_state_b')
+    assert myapp.enter_b == 1
+    assert myapp.exit_b == 0
+    myapp.request('my_state_a')
+    assert myapp.exit_b == 1
+    assert myapp.enter_a == 2

@@ -32,59 +32,58 @@ SOFTWARE."""
 
 class FSM:
     """
-    Rudimentary Finite State Machine to organize state changes. Use this class
-    to subclass from and provide both a `enter_` and `exit_[your_class_name]`
-    method, where the used class name is transformed from the recommended
-    PascalCase for class names to snake_case (i.e. MyClass would result in
-    my_class). If unsure about what the transformed name will be, run the
+    Rudimentary Finite State Machine to organize state changes. If both a
+    `enter_[my_class_name]` and `exit_[my_class_name]` are provided in a
+    subclass of FSM, it will become a state that can be activated through the
+    :method:`self.request` method. `[my_class_name]` is a snake_case
+    representation of the name of the subclass. It assumes PascalCase for class
+    names (i.e. `MyClass` -> `my_class`). Use
     :func:`~foolysh.tools.common.to_snake_case` with your class name as
-    parameter to get the proper snake_case name to use.
+    parameter to determine the proper state name.
 
-    The FSM class exposes the :meth:`FSM.request` method to change state. On a
-    state change the following is executed:
+    When :meth:`FSM.request` is called the following actions are performed:
 
-        * The `exit_` method from the current state gets called.
+        * The `exit_` method from the current state gets called, if a state has
+            been previously been activated.
         * The `enter_` method from the requested state gets called.
 
-    The state name argument of the :meth:`FSM.request` method is the same
-    aforementioned snake_case converted name of your subclass.
-
-    .. warning::
-        Only the last instantiated object of a class will be receiving enter and
-        exit calls!!!
-
     .. info::
-        If you don't want a subclass to be registered as a state, simply omit
-        creating the appropriate `enter_` / `exit_` methods.
+        Only provide `enter_` / `exit_` methods for subclasses that should be
+        callable states.
     """
     __states: Dict[str, Tuple[Callable, Callable]] = {}
     __active_state: Optional[str] = None
 
-    def __init__(self, *unused_args, **unused_kwargs):
-        name = to_snake_case(type(self).__name__)
-        if name in FSM.__states:
-            Warning('The state has already been registered! This could lead to '
-                    'undefined behavior.')
-        enterm = getattr(self, f'enter_{name}', False)
-        exitm = getattr(self, f'exit_{name}', False)
-        if enterm and exitm:
-            FSM.__states[name] = enterm, exitm
+    def __setup_fsm(self):
+        mro = [i.__name__ for i in self.__class__.__mro__]
+        mro = mro[:mro.index('FSM')]
+        for i in mro:
+            name = to_snake_case(i)
+            enterm = getattr(self, f'enter_{name}', False)
+            exitm = getattr(self, f'exit_{name}', False)
+            if enterm and exitm:
+                self.__states[name] = enterm, exitm
+            else:
+                Warning(f'Class "{i}" does not expose enter and exit methods. '
+                        f'State not registered!')
 
-    @staticmethod
-    def request(state_name: str) -> None:
+    def request(self, state_name: str) -> None:
         """
-        Request the transition to a registered State.
+        Performs the transition to a registered State. Raises a ValueError if
+        the provided `state_name` is not registered.
         """
-        if state_name not in FSM.__states:
+        if not self.__states:
+            self.__setup_fsm()
+        if state_name not in self.__states:
             raise ValueError(f'Unknown state "{state_name}".')
-        if FSM.__active_state == state_name:
+        if self.__active_state == state_name:
             return
-        if FSM.__active_state is not None:
-            FSM.__states[FSM.__active_state][1]()
-        FSM.__states[state_name][0]()
-        FSM.__active_state = state_name
+        if self.__active_state is not None:
+            self.__states[self.__active_state][1]()
+        self.__states[state_name][0]()
+        self.__active_state = state_name
 
     @property
     def active_state(self) -> str:
         """The currently active state."""
-        return FSM.__active_state
+        return self.__active_state

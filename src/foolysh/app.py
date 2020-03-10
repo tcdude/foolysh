@@ -15,6 +15,7 @@ from .tools import config
 from . import animation
 from . import eventhandler
 from . import render
+from .fsm import FSM
 from .scene import node
 from . import taskmanager
 from . import tools
@@ -181,18 +182,25 @@ def _update_android():
         ISANDROID = True
 
 
-class App:
+class App(FSM):
     """
-        Base class that handles everything necessary to run an App.
+        Class that handles everything necessary to run an App. It derives from
+        :class:`~foolysh.fsm.FSM` to provide rudimentary state management for
+        subclasses.
 
-        :param window_title: Optional str -> Window Title
+        Args:
+            window_title: Optional str -> Window Title
+            config_file: Optional str -> Path to the optional config file
 
         Example Usage:
 
+        >>> import sdl2
         >>> class MyApp(App):
         ...    def __init__(self):
-        ...         super(MyApp, self).__init__('My App Title')
-        ...
+        ...         super().__init__(window_title='My App Title')
+        ...         self.event_handler.listen('quit', sdl2.SDL_QUIT,
+        ...                                   self.quit, blocking=False)
+
         >>> MyApp().run()  # Opens the App and runs, until the App is closed.
         """
 
