@@ -164,7 +164,7 @@ class DragDrop:
             d_max = None
             for k in self._drag_nodes:
                 d_node = self._drag_nodes[k]
-                if d_node.hidden:
+                if d_node.node.hidden:
                     continue
                 if d_node.node.aabb.overlap(mouse_aabb):
                     d_depth = d_node.node.relative_depth
