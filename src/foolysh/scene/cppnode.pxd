@@ -106,6 +106,7 @@ cdef extern from "src/node.hpp" namespace "foolysh::scene":
         void reparent_to(const size_t) except +
         bint traverse(bint local = False) except +
         SmallList[size_t] query(AABB&, const bint) except +
+        bint hidden()
         void hide()
         void show()
         void propagate_dirty()

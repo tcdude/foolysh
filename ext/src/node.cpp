@@ -284,6 +284,26 @@ query(AABB& aabb, const bool depth_sorted) {
 }
 
 /**
+ * Whether the Node is currently hidden in the scene.
+ **/
+bool Node::
+hidden() {
+    if (sgdh.flag_vec[node_id] & HIDDEN) {
+        return true;
+    }
+    size_t nid = node_id;
+    size_t parent = sgdh.parent_vec[node_id];
+    while (parent != nid) {
+        if (sgdh.flag_vec[nid] & HIDDEN) {
+            return true;
+        }
+        nid = parent;
+        parent = sgdh.parent_vec[nid];
+    }
+    return false;
+}
+
+/**
  * Hide the Node.
  **/
 void Node::

@@ -242,6 +242,11 @@ cdef class Node:
         deref(self.thisptr).show()
 
     @property
+    def hidden(self):
+        """Whether the Node is currently hidden in the scene."""
+        return deref(self.thisptr).hidden()
+
+    @property
     def pos(self):
         """
         :class:`foolysh.tools.vec2.Vec2` position of this Node, relative

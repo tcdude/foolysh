@@ -192,6 +192,8 @@ class UIHandler:
                                 key=lambda x: self._nodes[x[0]].relative_depth,
                                 reverse=True)
         for node_id, event_t in sort_callbacks:
+            if self._nodes[node_id].hidden:
+                continue
             nd_bb = self._nodes[node_id].aabb
             exc = False
             if click and event_t in (EventType.CLICK, EventType.INPUT):

@@ -182,6 +182,7 @@ public:
     void reparent_to(const size_t parent);
     bool traverse(const bool local = false);
     SmallList<size_t> query(AABB& aabb, const bool depth_sorted = true);
+    bool hidden();
     void hide();
     void show();
     void propagate_dirty();
