@@ -54,14 +54,18 @@ class Label(frame.Frame):
 
     def _place_txt_node(self, txt_node: "foolysh.scene.node.TextNode") -> None:
         if txt_node.size != (0, 0):
+            x = (-self.size[0] / 2) * (self.origin.value % 3)
+            y = (-self.size[1] / 2) * (self.origin.value // 3)
             if txt_node.align == 'left':
-                x = self.border_thickness + self.corner_radius + self._margin
+                x += self.border_thickness + self.corner_radius + self._margin
             elif txt_node.align == 'center':
-                x = (self.size[0] - txt_node.size[0]) / 2
+                x += (self.size[0] - txt_node.size[0]) / 2
             else:
-                x = self.size[0] - self.border_thickness - self.corner_radius
+                x += self.size[0] - self.border_thickness - self.corner_radius
                 x -= txt_node.size[0] + self._margin
-            y = (self.size[1] - txt_node.size[1]) / 2
+            y += (self.size[1] - txt_node.size[1]) / 2
+            x *= self.relative_scale[0]
+            y *= self.relative_scale[1]
         else:
             x = y = 0
             self.ui_handler.need_render = True

@@ -116,13 +116,13 @@ class HWRenderer(sdl2.ext.TextureSpriteRenderSystem):
             self._texts[n_id] = nd.hashkey
         sprite = self._sprites[n_id].sprite
         rel_pos = nd.relative_pos
-        self._rect.x = x + int(w * rel_pos.x * self._zoom)
-        self._rect.y = y + int(w * rel_pos.y * self._zoom)
+        self._rect.x = x + int(w * rel_pos.x * self._zoom + 0.5)
+        self._rect.y = y + int(w * rel_pos.y * self._zoom + 0.5)
         self._rect.w, self._rect.h = sprite.size
         rot_center = nd.rotation_center
         center = rect.SDL_Point(
-            int(rot_center.x * w),
-            int(rot_center.y * w)
+            int(rot_center.x * w * scale_x * self._zoom + 0.5),
+            int(rot_center.y * w * scale_y * self._zoom + 0.5)
         )
         if self._rcopy(self.renderer, sprite.texture, None, self._rect,
                        nd.relative_angle, center, sprite.flip) == -1:
@@ -138,16 +138,16 @@ class HWRenderer(sdl2.ext.TextureSpriteRenderSystem):
             self._load_sprite(nd, image_scale, w)
         sprite = self._sprites[n_id].sprite
         rel_pos = nd.relative_pos
-        self._rect.x = x + int(w * rel_pos.x * self._zoom)
-        self._rect.y = y + int(w * rel_pos.y * self._zoom)
+        self._rect.x = x + int(w * rel_pos.x * self._zoom + 0.5)
+        self._rect.y = y + int(w * rel_pos.y * self._zoom + 0.5)
         self._rect.w, self._rect.h = (
             int(sprite.size[0] * scale_x + 0.5),
             int(sprite.size[1] * scale_y + 0.5)
         )
         rot_center = nd.rotation_center
         center = rect.SDL_Point(
-            int(rot_center.x * w),
-            int(rot_center.y * w)
+            int(rot_center.x * w * scale_x * self._zoom + 0.5),
+            int(rot_center.y * w * scale_y * self._zoom + 0.5)
         )
         if self._rcopy(self.renderer, sprite.texture, None, self._rect,
                        nd.relative_angle, center, sprite.flip) == -1:

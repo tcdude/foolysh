@@ -53,6 +53,8 @@ get_empty() {
     pos_y.push_back(0.0);
     r_pos_x.push_back(0.0);
     r_pos_y.push_back(0.0);
+    o_pos_x.push_back(0.0);
+    o_pos_y.push_back(0.0);
     scale_x.push_back(0.0);
     scale_y.push_back(0.0);
     r_scale_x.push_back(0.0);
@@ -94,6 +96,8 @@ reserve(const size_t size) {
     pos_y.reserve(size);
     r_pos_x.reserve(size);
     r_pos_y.reserve(size);
+    o_pos_x.reserve(size);
+    o_pos_y.reserve(size);
     scale_x.reserve(size);
     scale_y.reserve(size);
     r_scale_x.reserve(size);
@@ -124,6 +128,8 @@ Node(SceneGraphDataHandler& sgdh) : sgdh(sgdh) {
     sgdh.pos_y[node_id] = 0.0;
     sgdh.r_pos_x[node_id] = 0.0;
     sgdh.r_pos_y[node_id] = 0.0;
+    sgdh.o_pos_x[node_id] = 0.0;
+    sgdh.o_pos_y[node_id] = 0.0;
     sgdh.scale_x[node_id] = 1.0;
     sgdh.scale_y[node_id] = 1.0;
     sgdh.size_x[node_id] = 0.0;
@@ -998,6 +1004,7 @@ bool scene_traverse(SceneGraphDataHandler& sgdh, const size_t start_node) {
     process_angle(sgdh, nodes);
     process_depth(sgdh, nodes);
     process_scale(sgdh, nodes);
+    process_origin(sgdh, nodes);
     process_pos(sgdh, nodes);
     if (clear_dirty_flag(sgdh, nodes) && !was_dirty) {
         was_dirty = true;
@@ -1018,6 +1025,7 @@ void minimal_clean(SceneGraphDataHandler &sgdh, const size_t node_id) {
     process_angle(sgdh, path);
     process_depth(sgdh, path);
     process_scale(sgdh, path);
+    process_origin(sgdh, path);
     process_pos(sgdh, path);
     clear_dirty_flag(sgdh, path);
 }
@@ -1086,17 +1094,60 @@ void process_scale(SceneGraphDataHandler& sgdh, SmallList<size_t>& path) {
 /**
  * Process all positions of nodes in path.
  **/
+void process_origin(SceneGraphDataHandler& sgdh, SmallList<size_t>& path) {
+    for (size_t i = 0; i < path.size(); ++i) {
+        const size_t pid = path[i];
+        const bool dist_rel = (sgdh.flag_vec[pid] & DISTANCE_RELATIVE) > 0;
+        const double sx = sgdh.r_scale_x[pid];
+        const double sy = sgdh.r_scale_y[pid];
+        const double hw = sgdh.size_x[pid] * sx / 2.0;
+        const double hh = sgdh.size_y[pid] * sy / 2.0;
+        double x = sgdh.pos_x[pid] * (dist_rel ? sx : 1.0);
+        double y = sgdh.pos_y[pid] * (dist_rel ? sx : 1.0);
+        double ox = x - sgdh.origin_vec[pid] % 3 * hw;
+        double oy = y - sgdh.origin_vec[pid] / 3 * hh;
+
+        const double rad = sgdh.r_angle_vec[pid] * -to_rad;
+        if (rad != 0.0) {
+            const double sa = std::sin(rad), ca = std::cos(rad);
+            double rot_cen_x, rot_cen_y;
+            if (sgdh.flag_vec[pid] & ROTATION_CENTER_SET) {
+                rot_cen_x = x + sgdh.rotation_center_x[pid] * sx;
+                rot_cen_y = y + sgdh.rotation_center_y[pid] * sy;
+            }
+            else {
+                rot_cen_x = x + hw;
+                rot_cen_y = y + hh;
+            }
+            x = ca * (x - rot_cen_x) - sa * (y - rot_cen_y) + rot_cen_x;
+            y = sa * (x - rot_cen_x) + ca * (y - rot_cen_y) + rot_cen_y;
+            ox = ca * (ox - rot_cen_x) - sa * (oy - rot_cen_y) + rot_cen_x;
+            oy = sa * (ox - rot_cen_x) + ca * (oy - rot_cen_y) + rot_cen_y;
+        }
+        sgdh.o_pos_x[pid] = x - ox;
+        sgdh.o_pos_y[pid] = y - oy;
+    }
+}
+
+/**
+ * Process all positions of nodes in path.
+ **/
 void process_pos(SceneGraphDataHandler& sgdh, SmallList<size_t>& path) {
     for (size_t i = 0; i < path.size(); ++i) {
         const size_t pid = path[i];
         const size_t parent = sgdh.parent_vec[pid];
-        const double rel_x = parent == pid ? 0.0 : sgdh.r_pos_x[parent];
-        const double rel_y = parent == pid ? 0.0 : sgdh.r_pos_y[parent];
-        const double hw = sgdh.size_x[pid] / 2.0, hh = sgdh.size_y[pid] / 2.0;
-        const bool dist_rel = (sgdh.flag_vec[pid] & DISTANCE_RELATIVE) > 0;
+        const double rel_x = (parent == pid
+                                ? 0.0
+                                : sgdh.r_pos_x[parent] + sgdh.o_pos_x[parent]);
+        const double rel_y = (parent == pid
+                                ? 0.0
+                                : sgdh.r_pos_y[parent] + sgdh.o_pos_y[parent]);
         const double sx = sgdh.r_scale_x[pid];
         const double sy = sgdh.r_scale_y[pid];
+        const double hw = sgdh.size_x[pid] * sx / 2.0;
+        const double hh = sgdh.size_y[pid] * sy / 2.0;
 
+        const bool dist_rel = (sgdh.flag_vec[pid] & DISTANCE_RELATIVE) > 0;
         double x = sgdh.pos_x[pid], y = sgdh.pos_y[pid];
         x -= (sgdh.origin_vec[pid] % 3) * hw;
         y -= (sgdh.origin_vec[pid] / 3) * hh;

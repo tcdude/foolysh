@@ -132,6 +132,10 @@ class Frame(uinode.UINode):
             self._im_node.add_image(self._sdfstr(i))
         super()._update()
 
+    def _on_origin_change(self):
+        super()._on_origin_change()
+        self._im_node.origin = self.origin
+
     # Properties
 
     @property

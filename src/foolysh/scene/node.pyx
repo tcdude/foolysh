@@ -177,6 +177,9 @@ cdef class Node:
         self._attach_node(np)
         return np
 
+    def _on_origin_change(self):
+        pass
+
     cdef void _attach_node(self, Node np):
         deref(np.thisptr).reparent_to(deref(self.thisptr))
 
@@ -638,6 +641,7 @@ cdef class Node:
     def origin(self, v):
         if isinstance(v, Origin):
             self._set_origin(v.value)
+            self._on_origin_change()
         else:
             raise TypeError
 

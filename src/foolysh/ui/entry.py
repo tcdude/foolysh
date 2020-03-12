@@ -195,3 +195,8 @@ class Entry(label.Label):
             y = (self.size[1] - self._cursor.size[1]) / 2
             self._cursor.pos = x, y
         super()._update()
+
+    def _on_origin_change(self):
+        super()._on_origin_change()
+        self._cursor.origin = self.origin
+        self._hint_text.origin = self.origin

@@ -128,6 +128,11 @@ class Button(uinode.UINode):
     def _update(self):  # pylint: disable=useless-super-delegation
         super()._update()
 
+    def _on_origin_change(self):
+        super()._on_origin_change()
+        for i in self._labels:
+            i.origin = self.origin
+
     def _register_state_cb(self):
         self.ui_handler.add_node(self)
         self.ui_handler.register_event(self, uihandler.EventType.DOWN,

@@ -118,6 +118,9 @@ struct DepthSort {
 
 /**
  * Holds all data vectors for one scene graph with index 0 being the root.
+ * Prefix meanings:
+ *   r_ = relative = top left point (as used/needed in SDL).
+ *   o_ = origin = local origin of the Node with rotation and scale applied.
  *
  * Flags: 1 = dirty, 2 = rotation_center set, 4 = scaled_position, 8 = hidden,
  *        16 = free
@@ -128,6 +131,8 @@ struct SceneGraphDataHandler {
     std::vector<double> pos_y;
     std::vector<double> r_pos_x;
     std::vector<double> r_pos_y;
+    std::vector<double> o_pos_x;
+    std::vector<double> o_pos_y;
     std::vector<double> scale_x;
     std::vector<double> scale_y;
     std::vector<double> r_scale_x;
@@ -161,6 +166,7 @@ void dirty_path(SceneGraphDataHandler& sgdh, const size_t node_id,
 void process_angle(SceneGraphDataHandler& sgdh, SmallList<size_t>& path);
 void process_depth(SceneGraphDataHandler& sgdh, SmallList<size_t>& path);
 void process_scale(SceneGraphDataHandler& sgdh, SmallList<size_t>& path);
+void process_origin(SceneGraphDataHandler& sgdh, SmallList<size_t>& path);
 void process_pos(SceneGraphDataHandler& sgdh, SmallList<size_t>& path);
 bool clear_dirty_flag(SceneGraphDataHandler& sgdh, SmallList<size_t>& path);
 
