@@ -25,6 +25,7 @@
 #define TASKMGR_HPP
 
 #include <map>
+#include <vector>
 #include <string>
 #include <memory>
 
@@ -60,6 +61,7 @@ namespace tools {
 
     private:
         std::map<std::string, Task> _tasks;
+        std::vector<std::string> _delete_list;
         callback _cb;
         std::unique_ptr<Clock> _clock;
     };

@@ -149,12 +149,14 @@ cdef class TaskManager:
     """
     cdef unique_ptr[_TaskManager] thisptr
     cdef dict _tasks
+    cdef list _remove
 
     def __cinit__(self, *args, **kwargs):
         self.thisptr.reset(new _TaskManager())
         cdef callback _cb = _run_callback
         deref(self.thisptr).set_callback(_cb)
         self._tasks = {}
+        self._remove = []
 
     def __call__(self):
         self.execute()
@@ -211,13 +213,15 @@ cdef class TaskManager:
         if name not in self._tasks:
             raise ValueError(f'No task named "{name}"')
         deref(self.thisptr).remove_task(name.encode('UTF-8'))
-        self._tasks.pop(name)  # remove cyclic reference
+        self._remove.append(name)
 
     cpdef void execute(self):
         """
         Execute the TaskManager. This ticks the TaskManagers' clock forward and
         calls all scheduled/overdue tasks.
         """
+        while len(self._remove) > 0:
+            self._tasks.pop(self._remove.pop())
         deref(self.thisptr).execute()
 
     cpdef void set_delay(self, name, const double delay):

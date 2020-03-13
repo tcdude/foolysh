@@ -62,7 +62,7 @@ add_task(std::string name, const double delay, const bool with_dt, void* func,
  */
 void TaskManager::
 remove_task(std::string name) {
-    _tasks.erase(name);
+    _delete_list.emplace_back(name);
 }
 
 /**
@@ -70,6 +70,10 @@ remove_task(std::string name) {
  */
 void TaskManager::
 execute() {
+    for (auto name : _delete_list) {
+        _tasks.erase(name);
+    }
+    _delete_list.clear();
     _clock->tick();
     const double dt = _clock->get_dt();
     for (auto it = _tasks.begin(); it != _tasks.end(); ++it) {
