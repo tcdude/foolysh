@@ -10,7 +10,6 @@ from typing import Tuple
 from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageFont
-from PIL import UnidentifiedImageError
 from sdl2.ext import SpriteFactory
 from sdl2.ext import TextureSprite
 from sdl2 import endian
@@ -246,9 +245,9 @@ class SpriteLoader:
                 continue
             try:
                 _ = Image.open(os.path.join(self.asset_dir, k))
-            except UnidentifiedImageError:
-                continue
             except IsADirectoryError:
+                continue
+            except IOError:
                 continue
             self._assets[k] = Asset(k, self)
 
