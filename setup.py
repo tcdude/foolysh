@@ -1,11 +1,17 @@
 """Setup for foolysh."""
 
 import os
+import sys
+import glob
 import platform
 from setuptools import setup
 from setuptools import find_namespace_packages
 from distutils.extension import Extension  # pylint: disable=wrong-import-order
-from Cython.Build import cythonize
+try:
+    from Cython.Build import cythonize
+    USE_CYTHON = True
+except ImportError:
+    USE_CYTHON = False
 
 __author__ = 'Tiziano Bettio'
 __license__ = 'MIT'
@@ -32,6 +38,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
+if '--no-cython' in sys.argv:
+    USE_CYTHON = False
 
 with open(os.path.join(os.path.dirname(__file__), 'VERSION'), 'r') as f:
     VERSION = f.read().strip()
@@ -44,15 +52,28 @@ if platform.system() == 'Linux':
     EXTRA_LINK_ARGS.append('-std=c++11')
 
 
+EXT = '.pyx' if USE_CYTHON else '.cpp'
 EXTENSION = [
     Extension(
-        '*',
-        ['src/foolysh/**/*.pyx'],
+        i[4:-4].replace('/', '.'),
+        [i],
         include_dirs=['ext'],
         extra_compile_args=EXTRA_COMPILE_ARGS,
-        extra_link_args=EXTRA_LINK_ARGS
+        extra_link_args=EXTRA_LINK_ARGS,
+        language='c++'
     )
+    for i in glob.glob('src/foolysh/**/*' + EXT, recursive=True)
 ]
+
+
+
+def ext_modules():
+    if USE_CYTHON:
+        return cythonize(EXTENSION,
+                         compiler_directives={'language_level': 3,
+                                              'embedsignature': True},
+                         annotate=False)
+    return EXTENSION
 
 
 setup(
@@ -67,9 +88,6 @@ setup(
         'LICENSE.md',
     ]},
     install_requires=['plyer', 'Pillow', 'PySDL2>=0.9.6', 'numpy>=1.18'],
-    setup_requires=['Cython'],
-    ext_modules=cythonize(
-        EXTENSION,
-        compiler_directives={'language_level': 3, 'embedsignature': True},
-        annotate=False),
+    # setup_requires=['Cython'],
+    ext_modules=ext_modules(),
 )

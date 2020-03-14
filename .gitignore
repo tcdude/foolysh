@@ -6,7 +6,7 @@ venv
 **.md#
 **.apk
 **/foolysh/**/*.c
-**/foolysh/**/*.cpp
+# **/foolysh/**/*.cpp
 **/foolysh/**/*.html
 .vscode/
 update_docs.sh
