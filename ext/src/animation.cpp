@@ -698,7 +698,7 @@ get_copy() {
     }
     ptr_ad.depth.active = ad.depth.active;
     ptr_ad.depth.has_start = ad.depth.has_start;
-    return ptr;
+    return std::move(ptr);
 }
 
 /**
@@ -1089,7 +1089,7 @@ get_copy() {
     }
     ptr_ad.depth.active = ad.depth.active;
     ptr_ad.depth.has_start = ad.depth.has_start;
-    return ptr;
+    return std::move(ptr);
 }
 
 /**
