@@ -28,8 +28,8 @@
 namespace foolysh {
 namespace tools {
     struct ClockStatus{
-        std::chrono::time_point<std::chrono::steady_clock> start;
-        std::chrono::time_point<std::chrono::steady_clock> current;
+        std::chrono::time_point<std::chrono::high_resolution_clock> start;
+        std::chrono::time_point<std::chrono::high_resolution_clock> current;
         std::chrono::duration<double> delta_time;
         bool init = false;
     };
@@ -41,7 +41,7 @@ namespace tools {
         double get_time();
     private:
         ClockStatus _clock_stat;
-        std::chrono::steady_clock _clock;
+        std::chrono::high_resolution_clock _clock;
     };
 
 }  // namespace tools
