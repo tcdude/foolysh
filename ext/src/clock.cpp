@@ -29,34 +29,37 @@ namespace tools {
 
 void Clock::
 tick() {
-    using namespace std::chrono;
-    long current = duration_cast<microseconds>(
-        steady_clock::now().time_since_epoch()).count();
+    using std::chrono::duration;
+    using std::chrono::time_point;
+    auto current = _clock.now();
 
-    if (_clock_stat.start > 0) {
-        _clock_stat.delta_time = (double)(current - _clock_stat.current) * 1e-6;
+    if (_clock_stat.init) {
+        _clock_stat.delta_time = current - _clock_stat.current;
         _clock_stat.current = current;
     }
     else {
-        _clock_stat.start = _clock_stat.current = current;
-        _clock_stat.delta_time = 0.0;
+        _clock_stat.start = current;
+        _clock_stat.current = current;
+        _clock_stat.delta_time = std::chrono::duration<double>::zero();
     }
 }
 
 double Clock::
 get_dt() {
-    if (_clock_stat.start < 0) {
+    if (!_clock_stat.init) {
         tick();
     }
-    return _clock_stat.delta_time;
+    return _clock_stat.delta_time.count();
 }
 
 double Clock::
 get_time() {
-    if (_clock_stat.start < 0) {
+    using std::chrono::duration;
+    if (!_clock_stat.init) {
         tick();
     }
-    return (double)(_clock_stat.current - _clock_stat.start) * 1e-9;
+    duration<double> total = _clock_stat.current - _clock_stat.start;
+    return total.count();
 }
 
 
