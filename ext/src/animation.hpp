@@ -108,7 +108,8 @@ namespace animation {
             }
         }
 
-        throw std::runtime_error("Unknown blend_type");
+        // throw std::runtime_error("Unknown blend_type");
+        std::abort();
     }
 
     /**

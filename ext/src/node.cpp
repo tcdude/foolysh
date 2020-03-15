@@ -28,7 +28,7 @@
 #include "common.hpp"
 
 #include <cmath>
-#include <stdexcept>
+// #include <stdexcept>
 
 namespace foolysh {
 namespace scene {
@@ -1042,7 +1042,8 @@ void dirty_path(SceneGraphDataHandler &sgdh, const size_t node_id,
             break;
         }
         if (sgdh.flag_vec[base_node] & FREE) {
-            throw std::runtime_error("Encountered a removed Node.");
+            // throw std::runtime_error("Encountered a removed Node.");
+            std::abort();
         }
         base_node = sgdh.parent_vec[base_node];
         path.push_back(base_node);
