@@ -50,8 +50,8 @@ EXTRA_LINK_ARGS = []
 if platform.system() == 'Linux':
     EXTRA_COMPILE_ARGS.append('-std=c++11')
     EXTRA_LINK_ARGS.append('-std=c++11')
-    EXTRA_COMPILE_ARGS.append('--enable-libstdcxx-time')
-    EXTRA_LINK_ARGS.append('--enable-libstdcxx-time')
+    # EXTRA_COMPILE_ARGS.append('--enable-libstdcxx-time')
+    # EXTRA_LINK_ARGS.append('--enable-libstdcxx-time')
 
 
 EXT = '.pyx' if USE_CYTHON else '.cpp'
