@@ -114,6 +114,9 @@ struct DepthSort {
     bool operator<(DepthSort& other) {
         return depth < other.depth;
     }
+    const bool operator<(DepthSort& other) const {
+        return depth < other.depth;
+    }
 };
 
 /**

@@ -35,7 +35,7 @@ def test_pos_interval():
     nd = node.Node()
     b = vec2.Vec2(0)
     e = vec2.Vec2(1)
-    ival = animation.PosInterval(nd, 1.0, b, e).play()
+    animation.PosInterval(nd, 1.0, b, e).play()
     aam = animation.AnimationManager()
     assert nd.traverse() is True
     assert nd.pos == b
@@ -53,7 +53,7 @@ def test_scale_interval():
     b = 1.0, 2.0
     e = 2.0, 1.0
     nd.scale = b
-    ival = animation.ScaleInterval(nd, 1.0, b, e).play()
+    animation.ScaleInterval(nd, 1.0, b, e).play()
     aam = animation.AnimationManager()
     assert nd.traverse() is True
     assert nd.scale == b
@@ -70,7 +70,7 @@ def test_rotation_interval():
     nd = node.Node()
     b = 0.0
     e = 180.0
-    ival = animation.RotationInterval(nd, 1.0, b, e).play()
+    animation.RotationInterval(nd, 1.0, b, e).play()
     aam = animation.AnimationManager()
     assert nd.traverse() is True
     assert nd.angle == b
@@ -87,7 +87,7 @@ def test_rot_center_interval():
     nd = node.Node()
     b = vec2.Vec2(0)
     e = vec2.Vec2(1)
-    ival = animation.RotationCenterInterval(nd, 1.0, b, e).play()
+    animation.RotationCenterInterval(nd, 1.0, b, e).play()
     aam = animation.AnimationManager()
     assert nd.traverse() is True
     assert nd.rotation_center == b
@@ -104,7 +104,7 @@ def test_depth_interval():
     nd = node.Node()
     b = 1
     e = 11
-    ival = animation.DepthInterval(nd, 1.0, b, e).play()
+    animation.DepthInterval(nd, 1.0, b, e).play()
     aam = animation.AnimationManager()
     assert nd.traverse() is True
     assert nd.depth == b
@@ -145,7 +145,7 @@ def test_pos_animation():
     nd = node.Node()
     b = vec2.Vec2(0)
     e = vec2.Vec2(1, 0)
-    ival = animation.PosAnimation(nd, 1.0, b, e).play()
+    animation.PosAnimation(nd, 1.0, b, e).play()
     aam = animation.AnimationManager()
     assert nd.traverse() is True
     assert nd.pos == b
@@ -163,7 +163,7 @@ def test_scale_animation():
     b = 1.0, 2.0
     e = 2.0, 1.0
     nd.scale = b
-    ival = animation.ScaleAnimation(nd, 1.0, b, e).play()
+    animation.ScaleAnimation(nd, 1.0, b, e).play()
     aam = animation.AnimationManager()
     assert nd.traverse() is True
     assert nd.scale == b
@@ -180,7 +180,7 @@ def test_rotation_animation():
     nd = node.Node()
     b = 0.0
     e = 180.0
-    ival = animation.RotationAnimation(nd, 180.0, b, e).play()
+    animation.RotationAnimation(nd, 180.0, b, e).play()
     aam = animation.AnimationManager()
     assert nd.traverse() is True
     assert nd.angle == b
@@ -197,7 +197,7 @@ def test_rot_center_animation():
     nd = node.Node()
     b = vec2.Vec2(0)
     e = vec2.Vec2(1, 0)
-    ival = animation.RotationCenterAnimation(nd, 1.0, b, e).play()
+    animation.RotationCenterAnimation(nd, 1.0, b, e).play()
     aam = animation.AnimationManager()
     assert nd.traverse() is True
     assert nd.rotation_center == b
@@ -214,7 +214,7 @@ def test_depth_animation():
     nd = node.Node()
     b = 1
     e = 11
-    ival = animation.DepthAnimation(nd, 10, b, e).play()
+    animation.DepthAnimation(nd, 10, b, e).play()
     aam = animation.AnimationManager()
     assert nd.traverse() is True
     assert nd.depth == b
