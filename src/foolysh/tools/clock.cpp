@@ -3,7 +3,6 @@
 /* BEGIN: Cython Metadata
 {
     "distutils": {
-        "depends": [],
         "extra_compile_args": [
             "-std=c++11"
         ],
@@ -630,13 +629,6 @@ static CYTHON_INLINE float __PYX_NAN() {
 #define __PYX_HAVE__foolysh__tools__clock
 #define __PYX_HAVE_API__foolysh__tools__clock
 /* Early includes */
-#include "src/clock.cpp"
-#include "src/clock.hpp"
-#include "ios"
-#include "new"
-#include "stdexcept"
-#include "typeinfo"
-#include <memory>
 #ifdef _OPENMP
 #include <omp.h>
 #endif /* _OPENMP */
@@ -852,7 +844,7 @@ static const char *__pyx_f[] = {
 /*--- Type declarations ---*/
 struct __pyx_obj_7foolysh_5tools_5clock_Clock;
 
-/* "foolysh/tools/clock.pyx":36
+/* "foolysh/tools/clock.pyx":32
  * 
  * 
  * cdef class Clock:             # <<<<<<<<<<<<<<
@@ -862,7 +854,10 @@ struct __pyx_obj_7foolysh_5tools_5clock_Clock;
 struct __pyx_obj_7foolysh_5tools_5clock_Clock {
   PyObject_HEAD
   struct __pyx_vtabstruct_7foolysh_5tools_5clock_Clock *__pyx_vtab;
-  std::unique_ptr<foolysh::tools::Clock>  thisptr;
+  double _current;
+  double _dt;
+  double _start;
+  double _time;
 };
 
 
@@ -1070,6 +1065,27 @@ static void __Pyx_WriteUnraisable(const char *name, int clineno,
                                   int lineno, const char *filename,
                                   int full_traceback, int nogil);
 
+/* GetModuleGlobalName.proto */
+#if CYTHON_USE_DICT_VERSIONS
+#define __Pyx_GetModuleGlobalName(var, name)  {\
+    static PY_UINT64_T __pyx_dict_version = 0;\
+    static PyObject *__pyx_dict_cached_value = NULL;\
+    (var) = (likely(__pyx_dict_version == __PYX_GET_DICT_VERSION(__pyx_d))) ?\
+        (likely(__pyx_dict_cached_value) ? __Pyx_NewRef(__pyx_dict_cached_value) : __Pyx_GetBuiltinName(name)) :\
+        __Pyx__GetModuleGlobalName(name, &__pyx_dict_version, &__pyx_dict_cached_value);\
+}
+#define __Pyx_GetModuleGlobalNameUncached(var, name)  {\
+    PY_UINT64_T __pyx_dict_version;\
+    PyObject *__pyx_dict_cached_value;\
+    (var) = __Pyx__GetModuleGlobalName(name, &__pyx_dict_version, &__pyx_dict_cached_value);\
+}
+static PyObject *__Pyx__GetModuleGlobalName(PyObject *name, PY_UINT64_T *dict_version, PyObject **dict_cached_value);
+#else
+#define __Pyx_GetModuleGlobalName(var, name)  (var) = __Pyx__GetModuleGlobalName(name)
+#define __Pyx_GetModuleGlobalNameUncached(var, name)  (var) = __Pyx__GetModuleGlobalName(name)
+static CYTHON_INLINE PyObject *__Pyx__GetModuleGlobalName(PyObject *name);
+#endif
+
 /* RaiseException.proto */
 static void __Pyx_Raise(PyObject *type, PyObject *value, PyObject *tb, PyObject *cause);
 
@@ -1092,6 +1108,9 @@ static int __Pyx_SetVtable(PyObject *dict, void *vtable);
 
 /* SetupReduce.proto */
 static int __Pyx_setup_reduce(PyObject* type_obj);
+
+/* Import.proto */
+static PyObject *__Pyx_Import(PyObject *name, PyObject *from_list, int level);
 
 /* CLineInTraceback.proto */
 #ifdef CYTHON_CLINE_IN_TRACEBACK
@@ -1118,51 +1137,6 @@ static void __pyx_insert_code_object(int code_line, PyCodeObject* code_object);
 /* AddTraceback.proto */
 static void __Pyx_AddTraceback(const char *funcname, int c_line,
                                int py_line, const char *filename);
-
-/* None.proto */
-#include <new>
-
-/* CppExceptionConversion.proto */
-#ifndef __Pyx_CppExn2PyErr
-#include <new>
-#include <typeinfo>
-#include <stdexcept>
-#include <ios>
-static void __Pyx_CppExn2PyErr() {
-  try {
-    if (PyErr_Occurred())
-      ; // let the latest Python exn pass through and ignore the current one
-    else
-      throw;
-  } catch (const std::bad_alloc& exn) {
-    PyErr_SetString(PyExc_MemoryError, exn.what());
-  } catch (const std::bad_cast& exn) {
-    PyErr_SetString(PyExc_TypeError, exn.what());
-  } catch (const std::bad_typeid& exn) {
-    PyErr_SetString(PyExc_TypeError, exn.what());
-  } catch (const std::domain_error& exn) {
-    PyErr_SetString(PyExc_ValueError, exn.what());
-  } catch (const std::invalid_argument& exn) {
-    PyErr_SetString(PyExc_ValueError, exn.what());
-  } catch (const std::ios_base::failure& exn) {
-    PyErr_SetString(PyExc_IOError, exn.what());
-  } catch (const std::out_of_range& exn) {
-    PyErr_SetString(PyExc_IndexError, exn.what());
-  } catch (const std::overflow_error& exn) {
-    PyErr_SetString(PyExc_OverflowError, exn.what());
-  } catch (const std::range_error& exn) {
-    PyErr_SetString(PyExc_ArithmeticError, exn.what());
-  } catch (const std::underflow_error& exn) {
-    PyErr_SetString(PyExc_ArithmeticError, exn.what());
-  } catch (const std::exception& exn) {
-    PyErr_SetString(PyExc_RuntimeError, exn.what());
-  }
-  catch (...)
-  {
-    PyErr_SetString(PyExc_RuntimeError, "Unknown exception");
-  }
-}
-#endif
 
 /* CIntToPy.proto */
 static CYTHON_INLINE PyObject* __Pyx_PyInt_From_long(long value);
@@ -1196,12 +1170,6 @@ static double __pyx_f_7foolysh_5tools_5clock_5Clock_get_dt(struct __pyx_obj_7foo
 static double __pyx_f_7foolysh_5tools_5clock_5Clock_get_time(struct __pyx_obj_7foolysh_5tools_5clock_Clock *__pyx_v_self, int __pyx_skip_dispatch); /* proto*/
 static void __pyx_f_7foolysh_5tools_5clock_5Clock_tick(struct __pyx_obj_7foolysh_5tools_5clock_Clock *__pyx_v_self, int __pyx_skip_dispatch); /* proto*/
 
-/* Module declarations from 'foolysh.tools.cppclock' */
-
-/* Module declarations from 'libcpp' */
-
-/* Module declarations from 'libcpp.memory' */
-
 /* Module declarations from 'foolysh.tools.clock' */
 static PyTypeObject *__pyx_ptype_7foolysh_5tools_5clock_Clock = 0;
 #define __Pyx_MODULE_NAME "foolysh.tools.clock"
@@ -1216,9 +1184,11 @@ static const char __pyx_k_main[] = "__main__";
 static const char __pyx_k_name[] = "__name__";
 static const char __pyx_k_test[] = "__test__";
 static const char __pyx_k_tick[] = "tick";
+static const char __pyx_k_time[] = "time";
 static const char __pyx_k_Clock[] = "Clock";
 static const char __pyx_k_author[] = "__author__";
 static const char __pyx_k_get_dt[] = "get_dt";
+static const char __pyx_k_import[] = "__import__";
 static const char __pyx_k_reduce[] = "__reduce__";
 static const char __pyx_k_license[] = "__license__";
 static const char __pyx_k_version[] = "__version__";
@@ -1229,6 +1199,7 @@ static const char __pyx_k_TypeError[] = "TypeError";
 static const char __pyx_k_copyright[] = "__copyright__";
 static const char __pyx_k_reduce_ex[] = "__reduce_ex__";
 static const char __pyx_k_pyx_vtable[] = "__pyx_vtable__";
+static const char __pyx_k_perf_counter[] = "perf_counter";
 static const char __pyx_k_reduce_cython[] = "__reduce_cython__";
 static const char __pyx_k_Tiziano_Bettio[] = "Tiziano Bettio";
 static const char __pyx_k_setstate_cython[] = "__setstate_cython__";
@@ -1248,10 +1219,12 @@ static PyObject *__pyx_n_s_copyright;
 static PyObject *__pyx_n_s_get_dt;
 static PyObject *__pyx_n_s_get_time;
 static PyObject *__pyx_n_s_getstate;
+static PyObject *__pyx_n_s_import;
 static PyObject *__pyx_n_s_license;
 static PyObject *__pyx_n_s_main;
 static PyObject *__pyx_n_s_name;
 static PyObject *__pyx_kp_s_no_default___reduce___due_to_non;
+static PyObject *__pyx_n_s_perf_counter;
 static PyObject *__pyx_n_s_pyx_vtable;
 static PyObject *__pyx_n_s_reduce;
 static PyObject *__pyx_n_s_reduce_cython;
@@ -1260,6 +1233,7 @@ static PyObject *__pyx_n_s_setstate;
 static PyObject *__pyx_n_s_setstate_cython;
 static PyObject *__pyx_n_s_test;
 static PyObject *__pyx_n_s_tick;
+static PyObject *__pyx_n_s_time;
 static PyObject *__pyx_n_s_version;
 static int __pyx_pf_7foolysh_5tools_5clock_5Clock___cinit__(struct __pyx_obj_7foolysh_5tools_5clock_Clock *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_args, CYTHON_UNUSED PyObject *__pyx_v_kwargs); /* proto */
 static PyObject *__pyx_pf_7foolysh_5tools_5clock_5Clock_2get_dt(struct __pyx_obj_7foolysh_5tools_5clock_Clock *__pyx_v_self); /* proto */
@@ -1272,12 +1246,12 @@ static PyObject *__pyx_tuple_;
 static PyObject *__pyx_tuple__2;
 /* Late includes */
 
-/* "foolysh/tools/clock.pyx":48
- *     cdef unique_ptr[_Clock] thisptr
+/* "foolysh/tools/clock.pyx":44
+ *     cdef double _current, _dt, _start, _time
  * 
  *     def __cinit__(self, *args, **kwargs):             # <<<<<<<<<<<<<<
- *         self.thisptr.reset(new _Clock())
- * 
+ *         self._current = 0.0
+ *         self._dt = 0.0
  */
 
 /* Python wrapper */
@@ -1303,45 +1277,60 @@ static int __pyx_pw_7foolysh_5tools_5clock_5Clock_1__cinit__(PyObject *__pyx_v_s
 static int __pyx_pf_7foolysh_5tools_5clock_5Clock___cinit__(struct __pyx_obj_7foolysh_5tools_5clock_Clock *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_args, CYTHON_UNUSED PyObject *__pyx_v_kwargs) {
   int __pyx_r;
   __Pyx_RefNannyDeclarations
-  foolysh::tools::Clock *__pyx_t_1;
   __Pyx_RefNannySetupContext("__cinit__", 0);
 
-  /* "foolysh/tools/clock.pyx":49
+  /* "foolysh/tools/clock.pyx":45
  * 
  *     def __cinit__(self, *args, **kwargs):
- *         self.thisptr.reset(new _Clock())             # <<<<<<<<<<<<<<
+ *         self._current = 0.0             # <<<<<<<<<<<<<<
+ *         self._dt = 0.0
+ *         self._start = 0.0
+ */
+  __pyx_v_self->_current = 0.0;
+
+  /* "foolysh/tools/clock.pyx":46
+ *     def __cinit__(self, *args, **kwargs):
+ *         self._current = 0.0
+ *         self._dt = 0.0             # <<<<<<<<<<<<<<
+ *         self._start = 0.0
+ *         self._time = 0.0
+ */
+  __pyx_v_self->_dt = 0.0;
+
+  /* "foolysh/tools/clock.pyx":47
+ *         self._current = 0.0
+ *         self._dt = 0.0
+ *         self._start = 0.0             # <<<<<<<<<<<<<<
+ *         self._time = 0.0
+ * 
+ */
+  __pyx_v_self->_start = 0.0;
+
+  /* "foolysh/tools/clock.pyx":48
+ *         self._dt = 0.0
+ *         self._start = 0.0
+ *         self._time = 0.0             # <<<<<<<<<<<<<<
  * 
  *     cpdef double get_dt(self):
  */
-  try {
-    __pyx_t_1 = new foolysh::tools::Clock();
-  } catch(...) {
-    __Pyx_CppExn2PyErr();
-    __PYX_ERR(1, 49, __pyx_L1_error)
-  }
-  __pyx_v_self->thisptr.reset(__pyx_t_1);
+  __pyx_v_self->_time = 0.0;
 
-  /* "foolysh/tools/clock.pyx":48
- *     cdef unique_ptr[_Clock] thisptr
+  /* "foolysh/tools/clock.pyx":44
+ *     cdef double _current, _dt, _start, _time
  * 
  *     def __cinit__(self, *args, **kwargs):             # <<<<<<<<<<<<<<
- *         self.thisptr.reset(new _Clock())
- * 
+ *         self._current = 0.0
+ *         self._dt = 0.0
  */
 
   /* function exit code */
   __pyx_r = 0;
-  goto __pyx_L0;
-  __pyx_L1_error:;
-  __Pyx_AddTraceback("foolysh.tools.clock.Clock.__cinit__", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __pyx_r = -1;
-  __pyx_L0:;
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "foolysh/tools/clock.pyx":51
- *         self.thisptr.reset(new _Clock())
+/* "foolysh/tools/clock.pyx":50
+ *         self._time = 0.0
  * 
  *     cpdef double get_dt(self):             # <<<<<<<<<<<<<<
  *         """
@@ -1357,6 +1346,7 @@ static double __pyx_f_7foolysh_5tools_5clock_5Clock_get_dt(struct __pyx_obj_7foo
   PyObject *__pyx_t_3 = NULL;
   PyObject *__pyx_t_4 = NULL;
   double __pyx_t_5;
+  int __pyx_t_6;
   __Pyx_RefNannySetupContext("get_dt", 0);
   /* Check if called by wrapper */
   if (unlikely(__pyx_skip_dispatch)) ;
@@ -1367,7 +1357,7 @@ static double __pyx_f_7foolysh_5tools_5clock_5Clock_get_dt(struct __pyx_obj_7foo
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_type_dict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_get_dt); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 51, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_get_dt); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 50, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_7foolysh_5tools_5clock_5Clock_3get_dt)) {
         __Pyx_INCREF(__pyx_t_1);
@@ -1383,10 +1373,10 @@ static double __pyx_f_7foolysh_5tools_5clock_5Clock_get_dt(struct __pyx_obj_7foo
         }
         __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
         __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 51, __pyx_L1_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 50, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        __pyx_t_5 = __pyx_PyFloat_AsDouble(__pyx_t_2); if (unlikely((__pyx_t_5 == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 51, __pyx_L1_error)
+        __pyx_t_5 = __pyx_PyFloat_AsDouble(__pyx_t_2); if (unlikely((__pyx_t_5 == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 50, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         __pyx_r = __pyx_t_5;
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -1405,18 +1395,46 @@ static double __pyx_f_7foolysh_5tools_5clock_5Clock_get_dt(struct __pyx_obj_7foo
     #endif
   }
 
-  /* "foolysh/tools/clock.pyx":57
+  /* "foolysh/tools/clock.pyx":56
  *             :meth:`~Clock.tick`.
  *         """
- *         return deref(self.thisptr).get_dt()             # <<<<<<<<<<<<<<
+ *         if self._start == 0.0:             # <<<<<<<<<<<<<<
+ *             self.tick()
+ *         return self._dt
+ */
+  __pyx_t_6 = ((__pyx_v_self->_start == 0.0) != 0);
+  if (__pyx_t_6) {
+
+    /* "foolysh/tools/clock.pyx":57
+ *         """
+ *         if self._start == 0.0:
+ *             self.tick()             # <<<<<<<<<<<<<<
+ *         return self._dt
+ * 
+ */
+    ((struct __pyx_vtabstruct_7foolysh_5tools_5clock_Clock *)__pyx_v_self->__pyx_vtab)->tick(__pyx_v_self, 0);
+
+    /* "foolysh/tools/clock.pyx":56
+ *             :meth:`~Clock.tick`.
+ *         """
+ *         if self._start == 0.0:             # <<<<<<<<<<<<<<
+ *             self.tick()
+ *         return self._dt
+ */
+  }
+
+  /* "foolysh/tools/clock.pyx":58
+ *         if self._start == 0.0:
+ *             self.tick()
+ *         return self._dt             # <<<<<<<<<<<<<<
  * 
  *     cpdef double get_time(self):
  */
-  __pyx_r = (*__pyx_v_self->thisptr).get_dt();
+  __pyx_r = __pyx_v_self->_dt;
   goto __pyx_L0;
 
-  /* "foolysh/tools/clock.pyx":51
- *         self.thisptr.reset(new _Clock())
+  /* "foolysh/tools/clock.pyx":50
+ *         self._time = 0.0
  * 
  *     cpdef double get_dt(self):             # <<<<<<<<<<<<<<
  *         """
@@ -1456,7 +1474,7 @@ static PyObject *__pyx_pf_7foolysh_5tools_5clock_5Clock_2get_dt(struct __pyx_obj
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("get_dt", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_f_7foolysh_5tools_5clock_5Clock_get_dt(__pyx_v_self, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 51, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_f_7foolysh_5tools_5clock_5Clock_get_dt(__pyx_v_self, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 50, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -1473,8 +1491,8 @@ static PyObject *__pyx_pf_7foolysh_5tools_5clock_5Clock_2get_dt(struct __pyx_obj
   return __pyx_r;
 }
 
-/* "foolysh/tools/clock.pyx":59
- *         return deref(self.thisptr).get_dt()
+/* "foolysh/tools/clock.pyx":60
+ *         return self._dt
  * 
  *     cpdef double get_time(self):             # <<<<<<<<<<<<<<
  *         """
@@ -1490,6 +1508,7 @@ static double __pyx_f_7foolysh_5tools_5clock_5Clock_get_time(struct __pyx_obj_7f
   PyObject *__pyx_t_3 = NULL;
   PyObject *__pyx_t_4 = NULL;
   double __pyx_t_5;
+  int __pyx_t_6;
   __Pyx_RefNannySetupContext("get_time", 0);
   /* Check if called by wrapper */
   if (unlikely(__pyx_skip_dispatch)) ;
@@ -1500,7 +1519,7 @@ static double __pyx_f_7foolysh_5tools_5clock_5Clock_get_time(struct __pyx_obj_7f
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_type_dict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_get_time); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 59, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_get_time); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 60, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_7foolysh_5tools_5clock_5Clock_5get_time)) {
         __Pyx_INCREF(__pyx_t_1);
@@ -1516,10 +1535,10 @@ static double __pyx_f_7foolysh_5tools_5clock_5Clock_get_time(struct __pyx_obj_7f
         }
         __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
         __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 59, __pyx_L1_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 60, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        __pyx_t_5 = __pyx_PyFloat_AsDouble(__pyx_t_2); if (unlikely((__pyx_t_5 == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 59, __pyx_L1_error)
+        __pyx_t_5 = __pyx_PyFloat_AsDouble(__pyx_t_2); if (unlikely((__pyx_t_5 == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 60, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         __pyx_r = __pyx_t_5;
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -1538,18 +1557,46 @@ static double __pyx_f_7foolysh_5tools_5clock_5Clock_get_time(struct __pyx_obj_7f
     #endif
   }
 
-  /* "foolysh/tools/clock.pyx":65
+  /* "foolysh/tools/clock.pyx":66
  *             :meth:`~Clock.tick`.
  *         """
- *         return deref(self.thisptr).get_time()             # <<<<<<<<<<<<<<
+ *         if self._start == 0.0:             # <<<<<<<<<<<<<<
+ *             self.tick()
+ *         return self._time
+ */
+  __pyx_t_6 = ((__pyx_v_self->_start == 0.0) != 0);
+  if (__pyx_t_6) {
+
+    /* "foolysh/tools/clock.pyx":67
+ *         """
+ *         if self._start == 0.0:
+ *             self.tick()             # <<<<<<<<<<<<<<
+ *         return self._time
+ * 
+ */
+    ((struct __pyx_vtabstruct_7foolysh_5tools_5clock_Clock *)__pyx_v_self->__pyx_vtab)->tick(__pyx_v_self, 0);
+
+    /* "foolysh/tools/clock.pyx":66
+ *             :meth:`~Clock.tick`.
+ *         """
+ *         if self._start == 0.0:             # <<<<<<<<<<<<<<
+ *             self.tick()
+ *         return self._time
+ */
+  }
+
+  /* "foolysh/tools/clock.pyx":68
+ *         if self._start == 0.0:
+ *             self.tick()
+ *         return self._time             # <<<<<<<<<<<<<<
  * 
  *     cpdef void tick(self):
  */
-  __pyx_r = (*__pyx_v_self->thisptr).get_time();
+  __pyx_r = __pyx_v_self->_time;
   goto __pyx_L0;
 
-  /* "foolysh/tools/clock.pyx":59
- *         return deref(self.thisptr).get_dt()
+  /* "foolysh/tools/clock.pyx":60
+ *         return self._dt
  * 
  *     cpdef double get_time(self):             # <<<<<<<<<<<<<<
  *         """
@@ -1589,7 +1636,7 @@ static PyObject *__pyx_pf_7foolysh_5tools_5clock_5Clock_4get_time(struct __pyx_o
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("get_time", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_f_7foolysh_5tools_5clock_5Clock_get_time(__pyx_v_self, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 59, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_f_7foolysh_5tools_5clock_5Clock_get_time(__pyx_v_self, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 60, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -1606,8 +1653,8 @@ static PyObject *__pyx_pf_7foolysh_5tools_5clock_5Clock_4get_time(struct __pyx_o
   return __pyx_r;
 }
 
-/* "foolysh/tools/clock.pyx":67
- *         return deref(self.thisptr).get_time()
+/* "foolysh/tools/clock.pyx":70
+ *         return self._time
  * 
  *     cpdef void tick(self):             # <<<<<<<<<<<<<<
  *         """
@@ -1616,11 +1663,14 @@ static PyObject *__pyx_pf_7foolysh_5tools_5clock_5Clock_4get_time(struct __pyx_o
 
 static PyObject *__pyx_pw_7foolysh_5tools_5clock_5Clock_7tick(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
 static void __pyx_f_7foolysh_5tools_5clock_5Clock_tick(struct __pyx_obj_7foolysh_5tools_5clock_Clock *__pyx_v_self, int __pyx_skip_dispatch) {
+  PyObject *__pyx_v_current = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   PyObject *__pyx_t_2 = NULL;
   PyObject *__pyx_t_3 = NULL;
   PyObject *__pyx_t_4 = NULL;
+  int __pyx_t_5;
+  double __pyx_t_6;
   __Pyx_RefNannySetupContext("tick", 0);
   /* Check if called by wrapper */
   if (unlikely(__pyx_skip_dispatch)) ;
@@ -1631,7 +1681,7 @@ static void __pyx_f_7foolysh_5tools_5clock_5Clock_tick(struct __pyx_obj_7foolysh
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_type_dict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_tick); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 67, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_tick); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 70, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_7foolysh_5tools_5clock_5Clock_7tick)) {
         __Pyx_INCREF(__pyx_t_1);
@@ -1647,7 +1697,7 @@ static void __pyx_f_7foolysh_5tools_5clock_5Clock_tick(struct __pyx_obj_7foolysh
         }
         __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
         __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 67, __pyx_L1_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 70, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -1667,15 +1717,107 @@ static void __pyx_f_7foolysh_5tools_5clock_5Clock_tick(struct __pyx_obj_7foolysh
     #endif
   }
 
-  /* "foolysh/tools/clock.pyx":76
+  /* "foolysh/tools/clock.pyx":79
  *             this method has been overridden to prevent direct access.
  *         """
- *         deref(self.thisptr).tick()             # <<<<<<<<<<<<<<
+ *         current = time.perf_counter()             # <<<<<<<<<<<<<<
+ *         if self._start == 0.0:
+ *             self._start = self._current = current
  */
-  (*__pyx_v_self->thisptr).tick();
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_time); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 79, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_perf_counter); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 79, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = NULL;
+  if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
+    __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_3);
+    if (likely(__pyx_t_2)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
+      __Pyx_INCREF(__pyx_t_2);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_3, function);
+    }
+  }
+  __pyx_t_1 = (__pyx_t_2) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_2) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 79, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_v_current = __pyx_t_1;
+  __pyx_t_1 = 0;
 
-  /* "foolysh/tools/clock.pyx":67
- *         return deref(self.thisptr).get_time()
+  /* "foolysh/tools/clock.pyx":80
+ *         """
+ *         current = time.perf_counter()
+ *         if self._start == 0.0:             # <<<<<<<<<<<<<<
+ *             self._start = self._current = current
+ *         self._time = current - self._start
+ */
+  __pyx_t_5 = ((__pyx_v_self->_start == 0.0) != 0);
+  if (__pyx_t_5) {
+
+    /* "foolysh/tools/clock.pyx":81
+ *         current = time.perf_counter()
+ *         if self._start == 0.0:
+ *             self._start = self._current = current             # <<<<<<<<<<<<<<
+ *         self._time = current - self._start
+ *         self._dt = current - self._current
+ */
+    __pyx_t_6 = __pyx_PyFloat_AsDouble(__pyx_v_current); if (unlikely((__pyx_t_6 == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 81, __pyx_L1_error)
+    __pyx_v_self->_start = __pyx_t_6;
+    __pyx_v_self->_current = __pyx_t_6;
+
+    /* "foolysh/tools/clock.pyx":80
+ *         """
+ *         current = time.perf_counter()
+ *         if self._start == 0.0:             # <<<<<<<<<<<<<<
+ *             self._start = self._current = current
+ *         self._time = current - self._start
+ */
+  }
+
+  /* "foolysh/tools/clock.pyx":82
+ *         if self._start == 0.0:
+ *             self._start = self._current = current
+ *         self._time = current - self._start             # <<<<<<<<<<<<<<
+ *         self._dt = current - self._current
+ *         self._current = current
+ */
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->_start); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 82, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_3 = PyNumber_Subtract(__pyx_v_current, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 82, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_6 = __pyx_PyFloat_AsDouble(__pyx_t_3); if (unlikely((__pyx_t_6 == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 82, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_v_self->_time = __pyx_t_6;
+
+  /* "foolysh/tools/clock.pyx":83
+ *             self._start = self._current = current
+ *         self._time = current - self._start
+ *         self._dt = current - self._current             # <<<<<<<<<<<<<<
+ *         self._current = current
+ */
+  __pyx_t_3 = PyFloat_FromDouble(__pyx_v_self->_current); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 83, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_1 = PyNumber_Subtract(__pyx_v_current, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 83, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_6 = __pyx_PyFloat_AsDouble(__pyx_t_1); if (unlikely((__pyx_t_6 == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 83, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_v_self->_dt = __pyx_t_6;
+
+  /* "foolysh/tools/clock.pyx":84
+ *         self._time = current - self._start
+ *         self._dt = current - self._current
+ *         self._current = current             # <<<<<<<<<<<<<<
+ */
+  __pyx_t_6 = __pyx_PyFloat_AsDouble(__pyx_v_current); if (unlikely((__pyx_t_6 == (double)-1) && PyErr_Occurred())) __PYX_ERR(1, 84, __pyx_L1_error)
+  __pyx_v_self->_current = __pyx_t_6;
+
+  /* "foolysh/tools/clock.pyx":70
+ *         return self._time
  * 
  *     cpdef void tick(self):             # <<<<<<<<<<<<<<
  *         """
@@ -1691,6 +1833,7 @@ static void __pyx_f_7foolysh_5tools_5clock_5Clock_tick(struct __pyx_obj_7foolysh
   __Pyx_XDECREF(__pyx_t_4);
   __Pyx_WriteUnraisable("foolysh.tools.clock.Clock.tick", __pyx_clineno, __pyx_lineno, __pyx_filename, 1, 0);
   __pyx_L0:;
+  __Pyx_XDECREF(__pyx_v_current);
   __Pyx_RefNannyFinishContext();
 }
 
@@ -1714,7 +1857,7 @@ static PyObject *__pyx_pf_7foolysh_5tools_5clock_5Clock_6tick(struct __pyx_obj_7
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("tick", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_void_to_None(__pyx_f_7foolysh_5tools_5clock_5Clock_tick(__pyx_v_self, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 67, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_void_to_None(__pyx_f_7foolysh_5tools_5clock_5Clock_tick(__pyx_v_self, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 70, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -1852,7 +1995,6 @@ static PyObject *__pyx_tp_new_7foolysh_5tools_5clock_Clock(PyTypeObject *t, PyOb
   if (unlikely(!o)) return 0;
   p = ((struct __pyx_obj_7foolysh_5tools_5clock_Clock *)o);
   p->__pyx_vtab = __pyx_vtabptr_7foolysh_5tools_5clock_Clock;
-  new((void*)&(p->thisptr)) std::unique_ptr<foolysh::tools::Clock> ();
   if (unlikely(__pyx_pw_7foolysh_5tools_5clock_5Clock_1__cinit__(o, a, k) < 0)) goto bad;
   return o;
   bad:
@@ -1861,13 +2003,11 @@ static PyObject *__pyx_tp_new_7foolysh_5tools_5clock_Clock(PyTypeObject *t, PyOb
 }
 
 static void __pyx_tp_dealloc_7foolysh_5tools_5clock_Clock(PyObject *o) {
-  struct __pyx_obj_7foolysh_5tools_5clock_Clock *p = (struct __pyx_obj_7foolysh_5tools_5clock_Clock *)o;
   #if CYTHON_USE_TP_FINALIZE
   if (unlikely(PyType_HasFeature(Py_TYPE(o), Py_TPFLAGS_HAVE_FINALIZE) && Py_TYPE(o)->tp_finalize) && (!PyType_IS_GC(Py_TYPE(o)) || !_PyGC_FINALIZED(o))) {
     if (PyObject_CallFinalizerFromDealloc(o)) return;
   }
   #endif
-  __Pyx_call_destructor(p->thisptr);
   (*Py_TYPE(o)->tp_free)(o);
 }
 
@@ -2007,10 +2147,12 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_get_dt, __pyx_k_get_dt, sizeof(__pyx_k_get_dt), 0, 0, 1, 1},
   {&__pyx_n_s_get_time, __pyx_k_get_time, sizeof(__pyx_k_get_time), 0, 0, 1, 1},
   {&__pyx_n_s_getstate, __pyx_k_getstate, sizeof(__pyx_k_getstate), 0, 0, 1, 1},
+  {&__pyx_n_s_import, __pyx_k_import, sizeof(__pyx_k_import), 0, 0, 1, 1},
   {&__pyx_n_s_license, __pyx_k_license, sizeof(__pyx_k_license), 0, 0, 1, 1},
   {&__pyx_n_s_main, __pyx_k_main, sizeof(__pyx_k_main), 0, 0, 1, 1},
   {&__pyx_n_s_name, __pyx_k_name, sizeof(__pyx_k_name), 0, 0, 1, 1},
   {&__pyx_kp_s_no_default___reduce___due_to_non, __pyx_k_no_default___reduce___due_to_non, sizeof(__pyx_k_no_default___reduce___due_to_non), 0, 0, 1, 0},
+  {&__pyx_n_s_perf_counter, __pyx_k_perf_counter, sizeof(__pyx_k_perf_counter), 0, 0, 1, 1},
   {&__pyx_n_s_pyx_vtable, __pyx_k_pyx_vtable, sizeof(__pyx_k_pyx_vtable), 0, 0, 1, 1},
   {&__pyx_n_s_reduce, __pyx_k_reduce, sizeof(__pyx_k_reduce), 0, 0, 1, 1},
   {&__pyx_n_s_reduce_cython, __pyx_k_reduce_cython, sizeof(__pyx_k_reduce_cython), 0, 0, 1, 1},
@@ -2019,6 +2161,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_setstate_cython, __pyx_k_setstate_cython, sizeof(__pyx_k_setstate_cython), 0, 0, 1, 1},
   {&__pyx_n_s_test, __pyx_k_test, sizeof(__pyx_k_test), 0, 0, 1, 1},
   {&__pyx_n_s_tick, __pyx_k_tick, sizeof(__pyx_k_tick), 0, 0, 1, 1},
+  {&__pyx_n_s_time, __pyx_k_time, sizeof(__pyx_k_time), 0, 0, 1, 1},
   {&__pyx_n_s_version, __pyx_k_version, sizeof(__pyx_k_version), 0, 0, 1, 1},
   {0, 0, 0, 0, 0, 0, 0}
 };
@@ -2105,16 +2248,16 @@ static int __Pyx_modinit_type_init_code(void) {
   __pyx_vtable_7foolysh_5tools_5clock_Clock.get_dt = (double (*)(struct __pyx_obj_7foolysh_5tools_5clock_Clock *, int __pyx_skip_dispatch))__pyx_f_7foolysh_5tools_5clock_5Clock_get_dt;
   __pyx_vtable_7foolysh_5tools_5clock_Clock.get_time = (double (*)(struct __pyx_obj_7foolysh_5tools_5clock_Clock *, int __pyx_skip_dispatch))__pyx_f_7foolysh_5tools_5clock_5Clock_get_time;
   __pyx_vtable_7foolysh_5tools_5clock_Clock.tick = (void (*)(struct __pyx_obj_7foolysh_5tools_5clock_Clock *, int __pyx_skip_dispatch))__pyx_f_7foolysh_5tools_5clock_5Clock_tick;
-  if (PyType_Ready(&__pyx_type_7foolysh_5tools_5clock_Clock) < 0) __PYX_ERR(1, 36, __pyx_L1_error)
+  if (PyType_Ready(&__pyx_type_7foolysh_5tools_5clock_Clock) < 0) __PYX_ERR(1, 32, __pyx_L1_error)
   #if PY_VERSION_HEX < 0x030800B1
   __pyx_type_7foolysh_5tools_5clock_Clock.tp_print = 0;
   #endif
   if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_type_7foolysh_5tools_5clock_Clock.tp_dictoffset && __pyx_type_7foolysh_5tools_5clock_Clock.tp_getattro == PyObject_GenericGetAttr)) {
     __pyx_type_7foolysh_5tools_5clock_Clock.tp_getattro = __Pyx_PyObject_GenericGetAttr;
   }
-  if (__Pyx_SetVtable(__pyx_type_7foolysh_5tools_5clock_Clock.tp_dict, __pyx_vtabptr_7foolysh_5tools_5clock_Clock) < 0) __PYX_ERR(1, 36, __pyx_L1_error)
-  if (PyObject_SetAttr(__pyx_m, __pyx_n_s_Clock, (PyObject *)&__pyx_type_7foolysh_5tools_5clock_Clock) < 0) __PYX_ERR(1, 36, __pyx_L1_error)
-  if (__Pyx_setup_reduce((PyObject*)&__pyx_type_7foolysh_5tools_5clock_Clock) < 0) __PYX_ERR(1, 36, __pyx_L1_error)
+  if (__Pyx_SetVtable(__pyx_type_7foolysh_5tools_5clock_Clock.tp_dict, __pyx_vtabptr_7foolysh_5tools_5clock_Clock) < 0) __PYX_ERR(1, 32, __pyx_L1_error)
+  if (PyObject_SetAttr(__pyx_m, __pyx_n_s_Clock, (PyObject *)&__pyx_type_7foolysh_5tools_5clock_Clock) < 0) __PYX_ERR(1, 32, __pyx_L1_error)
+  if (__Pyx_setup_reduce((PyObject*)&__pyx_type_7foolysh_5tools_5clock_Clock) < 0) __PYX_ERR(1, 32, __pyx_L1_error)
   __pyx_ptype_7foolysh_5tools_5clock_Clock = &__pyx_type_7foolysh_5tools_5clock_Clock;
   __Pyx_RefNannyFinishContext();
   return 0;
@@ -2344,41 +2487,53 @@ if (!__Pyx_RefNanny) {
   if (__Pyx_patch_abc() < 0) __PYX_ERR(1, 1, __pyx_L1_error)
   #endif
 
-  /* "foolysh/tools/clock.pyx":12
- * from libcpp.memory cimport unique_ptr
+  /* "foolysh/tools/clock.pyx":6
+ * """
+ * 
+ * import time             # <<<<<<<<<<<<<<
+ * 
+ * __author__ = 'Tiziano Bettio'
+ */
+  __pyx_t_1 = __Pyx_Import(__pyx_n_s_time, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 6, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_time, __pyx_t_1) < 0) __PYX_ERR(1, 6, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+  /* "foolysh/tools/clock.pyx":8
+ * import time
  * 
  * __author__ = 'Tiziano Bettio'             # <<<<<<<<<<<<<<
  * __license__ = 'MIT'
  * __version__ = '0.1'
  */
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_author, __pyx_kp_u_Tiziano_Bettio) < 0) __PYX_ERR(1, 12, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_author, __pyx_kp_u_Tiziano_Bettio) < 0) __PYX_ERR(1, 8, __pyx_L1_error)
 
-  /* "foolysh/tools/clock.pyx":13
+  /* "foolysh/tools/clock.pyx":9
  * 
  * __author__ = 'Tiziano Bettio'
  * __license__ = 'MIT'             # <<<<<<<<<<<<<<
  * __version__ = '0.1'
  * __copyright__ = """Copyright (c) 2020 Tiziano Bettio
  */
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_license, __pyx_n_u_MIT) < 0) __PYX_ERR(1, 13, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_license, __pyx_n_u_MIT) < 0) __PYX_ERR(1, 9, __pyx_L1_error)
 
-  /* "foolysh/tools/clock.pyx":14
+  /* "foolysh/tools/clock.pyx":10
  * __author__ = 'Tiziano Bettio'
  * __license__ = 'MIT'
  * __version__ = '0.1'             # <<<<<<<<<<<<<<
  * __copyright__ = """Copyright (c) 2020 Tiziano Bettio
  * 
  */
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_version, __pyx_kp_u_0_1) < 0) __PYX_ERR(1, 14, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_version, __pyx_kp_u_0_1) < 0) __PYX_ERR(1, 10, __pyx_L1_error)
 
-  /* "foolysh/tools/clock.pyx":15
+  /* "foolysh/tools/clock.pyx":11
  * __license__ = 'MIT'
  * __version__ = '0.1'
  * __copyright__ = """Copyright (c) 2020 Tiziano Bettio             # <<<<<<<<<<<<<<
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  */
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_copyright, __pyx_kp_u_Copyright_c_2020_Tiziano_Bettio) < 0) __PYX_ERR(1, 15, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_copyright, __pyx_kp_u_Copyright_c_2020_Tiziano_Bettio) < 0) __PYX_ERR(1, 11, __pyx_L1_error)
 
   /* "foolysh/tools/clock.pyx":1
  * # distutils: language = c++             # <<<<<<<<<<<<<<
@@ -2836,6 +2991,41 @@ static void __Pyx_WriteUnraisable(const char *name, CYTHON_UNUSED int clineno,
 #endif
 }
 
+/* GetModuleGlobalName */
+#if CYTHON_USE_DICT_VERSIONS
+static PyObject *__Pyx__GetModuleGlobalName(PyObject *name, PY_UINT64_T *dict_version, PyObject **dict_cached_value)
+#else
+static CYTHON_INLINE PyObject *__Pyx__GetModuleGlobalName(PyObject *name)
+#endif
+{
+    PyObject *result;
+#if !CYTHON_AVOID_BORROWED_REFS
+#if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030500A1
+    result = _PyDict_GetItem_KnownHash(__pyx_d, name, ((PyASCIIObject *) name)->hash);
+    __PYX_UPDATE_DICT_CACHE(__pyx_d, result, *dict_cached_value, *dict_version)
+    if (likely(result)) {
+        return __Pyx_NewRef(result);
+    } else if (unlikely(PyErr_Occurred())) {
+        return NULL;
+    }
+#else
+    result = PyDict_GetItem(__pyx_d, name);
+    __PYX_UPDATE_DICT_CACHE(__pyx_d, result, *dict_cached_value, *dict_version)
+    if (likely(result)) {
+        return __Pyx_NewRef(result);
+    }
+#endif
+#else
+    result = PyObject_GetItem(__pyx_d, name);
+    __PYX_UPDATE_DICT_CACHE(__pyx_d, result, *dict_cached_value, *dict_version)
+    if (likely(result)) {
+        return __Pyx_NewRef(result);
+    }
+    PyErr_Clear();
+#endif
+    return __Pyx_GetBuiltinName(name);
+}
+
 /* RaiseException */
 #if PY_MAJOR_VERSION < 3
 static void __Pyx_Raise(PyObject *type, PyObject *value, PyObject *tb,
@@ -3137,6 +3327,71 @@ GOOD:
     Py_XDECREF(setstate);
     Py_XDECREF(setstate_cython);
     return ret;
+}
+
+/* Import */
+static PyObject *__Pyx_Import(PyObject *name, PyObject *from_list, int level) {
+    PyObject *empty_list = 0;
+    PyObject *module = 0;
+    PyObject *global_dict = 0;
+    PyObject *empty_dict = 0;
+    PyObject *list;
+    #if PY_MAJOR_VERSION < 3
+    PyObject *py_import;
+    py_import = __Pyx_PyObject_GetAttrStr(__pyx_b, __pyx_n_s_import);
+    if (!py_import)
+        goto bad;
+    #endif
+    if (from_list)
+        list = from_list;
+    else {
+        empty_list = PyList_New(0);
+        if (!empty_list)
+            goto bad;
+        list = empty_list;
+    }
+    global_dict = PyModule_GetDict(__pyx_m);
+    if (!global_dict)
+        goto bad;
+    empty_dict = PyDict_New();
+    if (!empty_dict)
+        goto bad;
+    {
+        #if PY_MAJOR_VERSION >= 3
+        if (level == -1) {
+            if (strchr(__Pyx_MODULE_NAME, '.')) {
+                module = PyImport_ImportModuleLevelObject(
+                    name, global_dict, empty_dict, list, 1);
+                if (!module) {
+                    if (!PyErr_ExceptionMatches(PyExc_ImportError))
+                        goto bad;
+                    PyErr_Clear();
+                }
+            }
+            level = 0;
+        }
+        #endif
+        if (!module) {
+            #if PY_MAJOR_VERSION < 3
+            PyObject *py_level = PyInt_FromLong(level);
+            if (!py_level)
+                goto bad;
+            module = PyObject_CallFunctionObjArgs(py_import,
+                name, global_dict, empty_dict, list, py_level, (PyObject *)NULL);
+            Py_DECREF(py_level);
+            #else
+            module = PyImport_ImportModuleLevelObject(
+                name, global_dict, empty_dict, list, level);
+            #endif
+        }
+    }
+bad:
+    #if PY_MAJOR_VERSION < 3
+    Py_XDECREF(py_import);
+    #endif
+    Py_XDECREF(empty_list);
+    Py_XDECREF(empty_dict);
+    return module;
 }
 
 /* CLineInTraceback */

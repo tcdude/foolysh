@@ -3,11 +3,7 @@
 Simple clock measuring at the highest resolution possible.
 """
 
-from .cppclock cimport Clock as _Clock
-
-from cython.operator cimport dereference as deref
-
-from libcpp.memory cimport unique_ptr
+import time
 
 __author__ = 'Tiziano Bettio'
 __license__ = 'MIT'
@@ -43,10 +39,13 @@ cdef class Clock:
         only the methods :meth:`~Clock.get_dt` and :meth:`~Clock.get_time`
         should be used by the user.
     """
-    cdef unique_ptr[_Clock] thisptr
+    cdef double _current, _dt, _start, _time
 
     def __cinit__(self, *args, **kwargs):
-        self.thisptr.reset(new _Clock())
+        self._current = 0.0
+        self._dt = 0.0
+        self._start = 0.0
+        self._time = 0.0
 
     cpdef double get_dt(self):
         """
@@ -54,7 +53,9 @@ cdef class Clock:
             ``float`` delta time in seconds between the last two calls to
             :meth:`~Clock.tick`.
         """
-        return deref(self.thisptr).get_dt()
+        if self._start == 0.0:
+            self.tick()
+        return self._dt
 
     cpdef double get_time(self):
         """
@@ -62,7 +63,9 @@ cdef class Clock:
             ``float`` time in seconds since the first call to
             :meth:`~Clock.tick`.
         """
-        return deref(self.thisptr).get_time()
+        if self._start == 0.0:
+            self.tick()
+        return self._time
 
     cpdef void tick(self):
         """
@@ -73,4 +76,9 @@ cdef class Clock:
             instance from the one provided in :class:`~foolysh.app.App`, where
             this method has been overridden to prevent direct access.
         """
-        deref(self.thisptr).tick()
+        current = time.perf_counter()
+        if self._start == 0.0:
+            self._start = self._current = current
+        self._time = current - self._start
+        self._dt = current - self._current
+        self._current = current
