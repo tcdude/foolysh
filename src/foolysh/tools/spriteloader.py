@@ -287,13 +287,16 @@ class SpriteLoader:
                 fnt = self._font_cache[font_k]
                 if multiline:
                     im_sz = fnt.getsize_multiline(text, spacing=spacing)
+                    pos = 0, 0
                 else:
+                    pos = fnt.getoffset(text)
+                    pos = -pos[0], -pos[1]
                     im_sz = fnt.getsize(text)
-                    im_sz = im_sz[0], max(sum(fnt.getmetrics()), im_sz[1])
+                    im_sz = im_sz[0] + pos[0], im_sz[1] + pos[1]
                 img = Image.new('RGBA', im_sz)
                 draw = ImageDraw.Draw(img)
                 func = draw.multiline_text if multiline else draw.text
-                func((0, 0), text=text, fill=color, font=fnt, spacing=spacing,
+                func(pos, text=text, fill=color, font=fnt, spacing=spacing,
                      align=align)
                 try:
                     img.tobytes()
