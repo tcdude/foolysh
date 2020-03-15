@@ -42,7 +42,7 @@ cdef extern from "src/taskmgr.hpp" namespace "foolysh::tools":
         void set_callback(callback)
         void add_task(string, const double, const bool, void*, void*, void*)
         void remove_task(string)
-        void execute()
+        void execute(const double dt)
         void set_delay(string, const double)
         void pause(string)
         void resume(string)

@@ -405,9 +405,9 @@ class App(FSM):
                     self.__update_ui_anchors(new_res)
                 else:
                     self.__stats.resolution_change = False
-                self.__systems.event_handler()
                 self.__update_mouse()
                 self.__update_keyboard()
+                self.__systems.event_handler()
                 if self.__systems.ui_handler(self.__stats.mouse_pos,
                                              self.__stats.mouse_down,
                                              self.__stats.mouse_up,
@@ -416,7 +416,7 @@ class App(FSM):
                     self.renderer.set_dirty()
                 self.__systems.animation_manager.animate(
                     self.__stats.clock.get_dt())
-                self.__systems.task_manager()
+                self.__systems.task_manager(self.__stats.clock.get_dt())
                 self.__systems.renderer.render()
                 frame_clock.tick()
                 sleep_time = max(0.0, FRAME_TIME - frame_clock.get_dt())

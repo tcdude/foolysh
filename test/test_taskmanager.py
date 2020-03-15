@@ -4,6 +4,7 @@ Unittests for foolysh.taskmanager
 import time
 
 from foolysh import taskmanager
+from foolysh.tools import clock
 
 __author__ = 'Tiziano Bettio'
 __license__ = 'MIT'
@@ -29,6 +30,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE."""
 
 
+CLK = clock.Clock()
+CLK.tick()
+
+
 def test_taskmanager():
     def callback_no_dt(arg_a, arg_b, _=None, kwarg_a='blah'):
         assert arg_a == 'a'
@@ -47,7 +52,7 @@ def test_taskmanager():
         {'kwarg_a': 'kwa'}
     )
     tm.add_task('test_task_dt', 0, True, callback_dt)
-    tm()
+    tm(0)
 
 
 def test_timing():
@@ -64,8 +69,10 @@ def test_timing():
         (cb_counter, )
     )
     start_time = time.perf_counter()
+    CLK.tick()
     while time.perf_counter() - start_time < 1:
-        tm()
+        CLK.tick()
+        tm(CLK.get_dt())
     assert sum(cb_counter) == 49
 
 
@@ -82,14 +89,14 @@ def test_pause_resume():
         False,
         (cb_counter, )
     )
-    tm()
+    tm(0)
     assert sum(cb_counter) == 1
     task.pause()
-    tm()
+    tm(0)
     assert task.ispaused is True
     assert sum(cb_counter) == 1
     task.resume()
-    tm()
+    tm(0)
     assert task.ispaused is False
     assert sum(cb_counter) == 2
 
@@ -99,7 +106,8 @@ def test_delay_change():
         assert time.perf_counter() - t > 0.5
 
     tm = taskmanager.TaskManager()
-    tm()
+    CLK.tick()
+    tm(CLK.get_dt())
     task = tm.add_task(
         'delay_change',
         0,
@@ -108,9 +116,11 @@ def test_delay_change():
         (time.perf_counter(), )
     )
     task.delay = 0.5
-    tm()
+    CLK.tick()
+    tm(CLK.get_dt())
     time.sleep(0.5)
-    tm()
+    CLK.tick()
+    tm(CLK.get_dt())
 
 
 def test_subscriptable():

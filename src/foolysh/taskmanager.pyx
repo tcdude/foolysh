@@ -158,8 +158,8 @@ cdef class TaskManager:
         self._tasks = {}
         self._remove = []
 
-    def __call__(self):
-        self.execute()
+    def __call__(self, dt):
+        self.execute(dt)
 
     cpdef Task add_task(
         self,
@@ -215,14 +215,14 @@ cdef class TaskManager:
         deref(self.thisptr).remove_task(name.encode('UTF-8'))
         self._remove.append(name)
 
-    cpdef void execute(self):
+    cpdef void execute(self, const double dt):
         """
         Execute the TaskManager. This ticks the TaskManagers' clock forward and
         calls all scheduled/overdue tasks.
         """
         while len(self._remove) > 0:
             self._tasks.pop(self._remove.pop())
-        deref(self.thisptr).execute()
+        deref(self.thisptr).execute(dt)
 
     cpdef void set_delay(self, name, const double delay):
         """

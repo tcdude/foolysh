@@ -69,13 +69,13 @@ remove_task(std::string name) {
  * To be called every frame.
  */
 void TaskManager::
-execute() {
+execute(const double dt) {
     for (auto name : _delete_list) {
         _tasks.erase(name);
     }
     _delete_list.clear();
-    _clock->tick();
-    const double dt = _clock->get_dt();
+    // _clock->tick();
+    // const double dt = _clock->get_dt();
     for (auto it = _tasks.begin(); it != _tasks.end(); ++it) {
         auto& t = _tasks[it->first];
         if (!t.running) {

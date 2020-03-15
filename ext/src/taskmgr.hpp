@@ -52,7 +52,7 @@ namespace tools {
         void add_task(std::string name, const double delay, const bool with_dt,
                       void* func, void* args, void* kwargs);
         void remove_task(std::string);
-        void execute();
+        void execute(const double dt);
         void set_delay(std::string name, const double delay);
         void pause(std::string name);
         void resume(std::string name);
