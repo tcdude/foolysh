@@ -405,9 +405,9 @@ class App(FSM):
                     self.__update_ui_anchors(new_res)
                 else:
                     self.__stats.resolution_change = False
+                self.__systems.event_handler()
                 self.__update_mouse()
                 self.__update_keyboard()
-                self.__systems.event_handler()
                 if self.__systems.ui_handler(self.__stats.mouse_pos,
                                              self.__stats.mouse_down,
                                              self.__stats.mouse_up,
