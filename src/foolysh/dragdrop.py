@@ -156,6 +156,7 @@ class DragDrop:
         """
         Drag event callback.
         """
+        self._last_mouse = self._app.mouse_pos
         if self._active == -1 and (self._watch_button is None or \
              event.button.button == self._watch_button):
             mouse_pos = self._app.mouse_pos + self._app.renderer.view_pos
