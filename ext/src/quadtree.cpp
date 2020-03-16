@@ -28,7 +28,7 @@
 #include "quadtree.hpp"
 
 #include <algorithm>
-// #include <stdexcept>
+#include <stdexcept>
 #include <iostream>
 
 namespace foolysh {
@@ -177,8 +177,7 @@ _insert_element_node(AABB& aabb) {
         current_quadrant = current_quadrant.split(quadrant);
         ++depth;
     }
-    // throw std::logic_error("Could not find appropriate element node!");
-    std::abort();
+    throw std::logic_error("Could not find appropriate element node!");
 }
 
 /**
@@ -258,14 +257,12 @@ remove(const int id, AABB& aabb) {
         }
         else {
             if (node.count == 0) {
-                // throw std::logic_error("Unable to remove, leaf is empty");
-                std::abort();
+                throw std::logic_error("Unable to remove, leaf is empty");
             }
 
             if (_element_nodes[node.first_child].next == -1) {
                 if (_elements[_element_nodes[node.first_child].element].id != id) {
-                    // throw std::logic_error("Unable to remove, element not found");
-                    std::abort();
+                    throw std::logic_error("Unable to remove, element not found");
                 }
                 _elements.erase(_element_nodes[node.first_child].element);
                 _element_nodes.erase(node.first_child);

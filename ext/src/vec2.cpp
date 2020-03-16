@@ -28,7 +28,7 @@
 
 #include <iostream>
 #include <cmath>
-// #include <stdexcept>
+#include <stdexcept>
 
 #include "common.hpp"
 
@@ -121,8 +121,7 @@ normalized() {
         std::cout << "OK" << std::endl;
         return v;
     }
-    // throw std::underflow_error("Cannot normalize Vec2 of zero length.");
-    return Vec2();
+    throw std::underflow_error("Cannot normalize Vec2 of zero length.");
 }
 
 /**
@@ -198,8 +197,7 @@ operator[](const int idx) {
         _state = 0;
         return (idx == 0) ? _x : _y;
     }
-    // throw std::range_error("Index out of range");
-    std::abort();
+    throw std::range_error("Index out of range");
 }
 
 /**
@@ -345,8 +343,7 @@ operator/(const double rhs) {
     if (rhs) {
         return Vec2(_x / rhs, _y / rhs);
     }
-    // throw std::underflow_error("Division by zero.");
-    std::abort();
+    throw std::underflow_error("Division by zero.");
 }
 
 /**
@@ -368,8 +365,7 @@ operator/=(const double rhs) {
         _y /= rhs;
         return *this;
     }
-    // throw std::underflow_error("Division by zero.");
-    std::abort();
+    throw std::underflow_error("Division by zero.");
 }
 
 /**

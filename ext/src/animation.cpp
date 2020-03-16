@@ -20,8 +20,7 @@
  * SOFTWARE.
  */
 
-#include <cstdlib>
-// #include <stdexcept>
+#include <stdexcept>
 #include <algorithm>
 
 #include "animation.hpp"
@@ -46,7 +45,7 @@ AnimationData(){
  */
 void AnimationBase::
 reset() {
- // throw std::runtime_error("Cannot be called from AnimationBase class.");
+    throw std::runtime_error("Cannot be called from AnimationBase class.");
 }
 
 /**
@@ -62,8 +61,7 @@ step(const double dt, ActiveAnimationMap& aam) {
  */
 std::unique_ptr<AnimationBase> AnimationBase::
 get_copy() {
- // throw std::runtime_error("Cannot be called from AnimationBase class.");
- return nullptr;
+    throw std::runtime_error("Cannot be called from AnimationBase class.");
 }
 
 /**
@@ -72,7 +70,7 @@ get_copy() {
  */
 void AnimationBase::
 loop(const bool l) {
- // throw std::runtime_error("Invalid sub-type for loop().");
+    throw std::runtime_error("Invalid sub-type for loop().");
 }
 
 
@@ -512,8 +510,7 @@ node_id() {
 AnimationData& AnimationType::
 _get_animation_data(const int animation_id) {
     if (!AnimationData::_ad.active(animation_id)) {
-        // throw std::logic_error("Tried to access invalid AnimationData");
-        std::abort();
+        throw std::logic_error("Tried to access invalid AnimationData");
     }
     return *AnimationData::_ad[animation_id];
 }
@@ -784,9 +781,8 @@ reset() {
 
     if (ad.pos.active) {
         if (ad.pos_speed < 0.0) {
-            // throw std::logic_error("Position animation specified without "
-            //                       "speed");
-            std::abort();
+            throw std::logic_error("Position animation specified without "
+                                   "speed");
         }
         double tmp_d = (ad.pos.end - ad.pos.start).length() / ad.pos_speed;
         ad.dur_pos = tmp_d;
@@ -797,10 +793,8 @@ reset() {
 
     if (ad.center_pos.active) {
         if (ad.rotation_center_speed < 0.0) {
-            // throw std::logic_error("Rotation center animation specified "
-		    //                        "without speed");
-            std::abort();
-
+            throw std::logic_error("Rotation center animation specified "
+								   "without speed");
         }
         double tmp_d = (ad.center_pos.end - ad.center_pos.start).length()
                        / ad.rotation_center_speed;
@@ -812,9 +806,8 @@ reset() {
 
     if (ad.scale.active) {
         if (ad.scale_speed < 0.0) {
-            // throw std::logic_error("Scale animation specified without "
-            //                        "speed");
-            std::abort();
+            throw std::logic_error("Scale animation specified without "
+                                   "speed");
         }
         ad.dur_scalex = std::abs(
             ad.scale.end.sx - ad.scale.start.sx) / ad.scale_speed;
@@ -829,9 +822,8 @@ reset() {
 
     if (ad.angle.active) {
         if (ad.rotation_speed == 0.0) {
-            // throw std::logic_error("Rotation animation specified without "
-            //                        "speed");
-            std::abort();
+            throw std::logic_error("Rotation animation specified without "
+                                   "speed");
         }
         ad.dur_angle = std::abs(
             ad.angle.end - ad.angle.start) / ad.rotation_speed;
@@ -842,9 +834,8 @@ reset() {
 
     if (ad.depth.active) {
         if (ad.depth_speed < 0.0) {
-            // throw std::logic_error("Depth animation specified without "
-            //                       "speed");
-            std::abort();
+            throw std::logic_error("Depth animation specified without "
+                                   "speed");
         }
         ad.dur_depth = std::abs(
             ad.depth.end - ad.depth.start) / ad.depth_speed;
@@ -854,9 +845,8 @@ reset() {
     }
 
     if (ad.duration == -1.0) {
-        // throw std::logic_error("Tried to reset an animation w/o any modifier "
-        //                        "active");
-        std::abort();
+        throw std::logic_error("Tried to reset an animation w/o any modifier "
+                               "active");
     }
 }
 
@@ -1149,8 +1139,7 @@ append(std::unique_ptr<AnimationBase>& a) {
 void Sequence::
 reset() {
     if (!_v.size()) {
-        // throw std::runtime_error("Tried to reset empty Sequence.");
-        std::abort();
+        throw std::runtime_error("Tried to reset empty Sequence.");
     }
     _active = 0;
     _v[0]->reset();
@@ -1162,8 +1151,7 @@ reset() {
 double Sequence::
 step(const double dt, ActiveAnimationMap& aam) {
     if (!_v.size()) {
-        // throw std::runtime_error("Tried to step empty Sequence.");
-        std::abort();
+        throw std::runtime_error("Tried to step empty Sequence.");
     }
     double rdt = 1.0;
     while (rdt >= 0.0) {
@@ -1252,8 +1240,7 @@ new_sequence() {
 Interval& AnimationManager::
 get_interval(const int i_id) {
     if (_anims.find(i_id) == _anims.end()) {
-        // throw std::range_error("Specified id is not an active Interval");
-        std::abort();
+        throw std::range_error("Specified id is not an active Interval");
     }
     return (Interval&) *_anims[i_id];
 }
@@ -1264,8 +1251,7 @@ get_interval(const int i_id) {
 Animation& AnimationManager::
 get_animation(const int a_id) {
     if (_anims.find(a_id) == _anims.end()) {
-        // throw std::range_error("Specified id is not an active Animation");
-        std::abort();
+        throw std::range_error("Specified id is not an active Animation");
     }
     return (Animation&) *_anims[a_id];
 }
@@ -1276,8 +1262,7 @@ get_animation(const int a_id) {
 Sequence& AnimationManager::
 get_sequence(const int s_id) {
     if (_anims.find(s_id) == _anims.end()) {
-        // throw std::range_error("Specified id is not an active Sequence");
-        std::abort();
+        throw std::range_error("Specified id is not an active Sequence");
     }
     return (Sequence&) *_anims[s_id];
 }
@@ -1288,8 +1273,7 @@ get_sequence(const int s_id) {
 std::unique_ptr<AnimationBase>& AnimationManager::
 get_animation_base_ptr(const int i_id) {
     if (_anims.find(i_id) == _anims.end()) {
-        // throw std::range_error("Specified id is not an active Interval");
-        std::abort();
+        throw std::range_error("Specified id is not an active Interval");
     }
     return _anims[i_id];
 }
@@ -1300,8 +1284,7 @@ get_animation_base_ptr(const int i_id) {
 void AnimationManager::
 remove_interval(const int i_id) {
     if (_anims.find(i_id) == _anims.end()) {
-        // throw std::range_error("Specified id is not an active Interval");
-        std::abort();
+        throw std::range_error("Specified id is not an active Interval");
     }
     _anim_status.erase(i_id);
     _anims.erase(i_id);
@@ -1312,8 +1295,7 @@ remove_interval(const int i_id) {
  */void AnimationManager::
 remove_animation(const int a_id) {
     if (_anims.find(a_id) == _anims.end()) {
-        // throw std::range_error("Specified id is not an active Animation");
-        std::abort();
+        throw std::range_error("Specified id is not an active Animation");
     }
     _anim_status.erase(a_id);
     _anims.erase(a_id);
@@ -1325,8 +1307,7 @@ remove_animation(const int a_id) {
 void AnimationManager::
 remove_sequence(const int s_id) {
     if (_anims.find(s_id) == _anims.end()) {
-        // throw std::range_error("Specified id is not an active Sequence");
-        std::abort();
+        throw std::range_error("Specified id is not an active Sequence");
     }
     _anim_status.erase(s_id);
     _anims.erase(s_id);
@@ -1342,8 +1323,7 @@ play_interval(const int i_id) {
         _anim_status[i_id] = 2;
     }
     else {
-        // throw std::range_error("Specified id is not an active Interval");
-        std::abort();
+        throw std::range_error("Specified id is not an active Interval");
     }
 }
 
@@ -1357,8 +1337,7 @@ play_animation(const int a_id) {
         _anim_status[a_id] = 2;
     }
     else {
-        // throw std::range_error("Specified id is not an active Animation");
-        std::abort();
+        throw std::range_error("Specified id is not an active Animation");
     }
 }
 
@@ -1372,8 +1351,7 @@ play_sequence(const int s_id) {
         _anim_status[s_id] = 2;
     }
     else {
-        // throw std::range_error("Specified id is not an active Sequence");
-        std::abort();
+        throw std::range_error("Specified id is not an active Sequence");
     }
 }
 
@@ -1385,14 +1363,12 @@ pause_interval(const int i_id) {
     auto search = _anim_status.find(i_id);
     if (search != _anim_status.end()) {
         if (_anim_status[i_id] != 3) {
-            // throw std::logic_error("Unable to pause Interval, not playing");
-            std::abort();
+            throw std::logic_error("Unable to pause Interval, not playing");
         }
         _anim_status[i_id] = 1;
     }
     else {
-        // throw std::range_error("Specified id is not an active Interval");
-        std::abort();
+        throw std::range_error("Specified id is not an active Interval");
     }
 }
 
@@ -1404,14 +1380,12 @@ pause_animation(const int a_id) {
     auto search = _anim_status.find(a_id);
     if (search != _anim_status.end()) {
         if (_anim_status[a_id] != 3) {
-            // throw std::logic_error("Unable to pause Animation, not playing");
-            std::abort();
+            throw std::logic_error("Unable to pause Animation, not playing");
         }
         _anim_status[a_id] = 1;
     }
     else {
-        // throw std::range_error("Specified id is not an active Animation");
-        std::abort();
+        throw std::range_error("Specified id is not an active Animation");
     }
 }
 
@@ -1423,14 +1397,12 @@ pause_sequence(const int s_id) {
     auto search = _anim_status.find(s_id);
     if (search != _anim_status.end()) {
         if (_anim_status[s_id] != 3) {
-            // throw std::logic_error("Unable to pause Sequence, not playing");
-            std::abort();
+            throw std::logic_error("Unable to pause Sequence, not playing");
         }
         _anim_status[s_id] = 1;
     }
     else {
-        // throw std::range_error("Specified id is not an active Sequence");
-        std::abort();
+        throw std::range_error("Specified id is not an active Sequence");
     }
 }
 
@@ -1442,14 +1414,12 @@ resume_interval(const int i_id) {
     auto search = _anim_status.find(i_id);
     if (search != _anim_status.end()) {
         if (_anim_status[i_id] != 1) {
-            // throw std::logic_error("Unable to resume Interval, not paused");
-            std::abort();
+            throw std::logic_error("Unable to resume Interval, not paused");
         }
         _anim_status[i_id] = 3;
     }
     else {
-        // throw std::range_error("Specified id is not an active Interval");
-        std::abort();
+        throw std::range_error("Specified id is not an active Interval");
     }
 }
 
@@ -1461,14 +1431,12 @@ resume_animation(const int a_id) {
     auto search = _anim_status.find(a_id);
     if (search != _anim_status.end()) {
         if (_anim_status[a_id] != 1) {
-            // throw std::logic_error("Unable to resume Animation, not paused");
-            std::abort();
+            throw std::logic_error("Unable to resume Animation, not paused");
         }
         _anim_status[a_id] = 3;
     }
     else {
-        // throw std::range_error("Specified id is not an active Animation");
-        std::abort();
+        throw std::range_error("Specified id is not an active Animation");
     }
 }
 
@@ -1480,14 +1448,12 @@ resume_sequence(const int s_id) {
     auto search = _anim_status.find(s_id);
     if (search != _anim_status.end()) {
         if (_anim_status[s_id] != 1) {
-            // throw std::logic_error("Unable to resume Sequence, not paused");
-            std::abort();
+            throw std::logic_error("Unable to resume Sequence, not paused");
         }
         _anim_status[s_id] = 3;
     }
     else {
-        // throw std::range_error("Specified id is not an active Sequence");
-        std::abort();
+        throw std::range_error("Specified id is not an active Sequence");
     }
 }
 
@@ -1501,8 +1467,7 @@ stop_interval(const int i_id) {
         _anim_status[i_id] = 0;
     }
     else {
-        // throw std::range_error("Specified id is not an active Interval");
-        std::abort();
+        throw std::range_error("Specified id is not an active Interval");
     }
 }
 
@@ -1516,8 +1481,7 @@ stop_animation(const int a_id) {
         _anim_status[a_id] = 0;
     }
     else {
-        // throw std::range_error("Specified id is not an active Animation");
-        std::abort();
+        throw std::range_error("Specified id is not an active Animation");
     }
 }
 
@@ -1531,8 +1495,7 @@ stop_sequence(const int s_id) {
         _anim_status[s_id] = 0;
     }
     else {
-        // throw std::range_error("Specified id is not an active Sequence");
-        std::abort();
+        throw std::range_error("Specified id is not an active Sequence");
     }
 }
 
@@ -1543,9 +1506,8 @@ char AnimationManager::
 get_interval_status(const int i_id) {
 	auto search = _anim_status.find(i_id);
 	if (search == _anim_status.end()) {
-		// throw std::range_error("Specified id is not an active Interval/"
-		//                        "Animation.");
-        std::abort();
+		throw std::range_error("Specified id is not an active Interval/"
+							   "Animation.");
 	}
 	return _anim_status[i_id];
 }
@@ -1557,8 +1519,7 @@ char AnimationManager::
 get_animation_status(const int a_id) {
 	auto search = _anim_status.find(a_id);
 	if (search == _anim_status.end()) {
-		// throw std::range_error("Specified id is not an active Animation.");
-        std::abort();
+		throw std::range_error("Specified id is not an active Animation.");
 	}
 	return get_interval_status(a_id);
 }
@@ -1570,8 +1531,7 @@ char AnimationManager::
 get_sequence_status(const int s_id) {
 	auto search = _anim_status.find(s_id);
 	if (search == _anim_status.end()) {
-		// throw std::range_error("Specified id is not an active Sequence.");
-        std::abort();
+		throw std::range_error("Specified id is not an active Sequence.");
 	}
 	return _anim_status[s_id];
 }
@@ -1582,8 +1542,7 @@ get_sequence_status(const int s_id) {
 void AnimationManager::
 append(const int s_id, const int a_id) {
     if (s_id == a_id) {
-        // throw std::runtime_error("Cannot append sequence to itself.");
-        std::abort();
+        throw std::runtime_error("Cannot append sequence to itself.");
     }
     get_sequence(s_id).append(get_animation_base_ptr(a_id));
 }

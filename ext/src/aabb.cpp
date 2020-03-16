@@ -21,7 +21,7 @@
  */
 
 #include "aabb.hpp"
-// #include <stdexcept>
+#include <stdexcept>
 #include <iostream>
 
 namespace foolysh {
@@ -44,7 +44,7 @@ AABB() {
 AABB::
 AABB(double _x, double _y, double _hw, double _hh) {
     if (_hw < 0.0 && _hh < 0.0) {
-        // throw std::invalid_argument("invalid AABB: negative width or height");
+        throw std::invalid_argument("invalid AABB: negative width or height");
     }
     x = _x;
     y = _y;
@@ -106,8 +106,7 @@ split(Quadrant _q) {
 AABB AABB::
 split(double _x, double _y, Quadrant _q) {
     if (! inside(_x, _y)) {
-        // throw std::invalid_argument("invalid x/y: not inside AABB");
-        return AABB();
+        throw std::invalid_argument("invalid x/y: not inside AABB");
     }
     double cx, cy, w, h;
     switch (_q) {
@@ -140,8 +139,7 @@ split(double _x, double _y, Quadrant _q) {
             return AABB(cx, cy, w, h);
         }
     }
-    // throw std::range_error("Invalid Quadrant");
-    return AABB();
+    throw std::range_error("Invalid Quadrant");
 }
 
 /**
