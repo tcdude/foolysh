@@ -64,7 +64,8 @@ EXTENSION = [
         include_dirs=['ext'],
         extra_compile_args=EXTRA_COMPILE_ARGS,
         extra_link_args=EXTRA_LINK_ARGS,
-        language='c++'
+        language='c++',
+        libraries=['c++_shared']
     )
     for i in glob.glob('src/foolysh/**/*' + EXT, recursive=True)
 ]
