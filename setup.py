@@ -52,8 +52,8 @@ EXTRA_COMPILE_ARGS.append('-std=c++11')
 EXTRA_LINK_ARGS.append('-std=c++11')
 EXTRA_COMPILE_ARGS.append('-fexceptions')
 EXTRA_LINK_ARGS.append('-fexceptions')
-EXTRA_COMPILE_ARGS.append('-lstdc++_shared')
-EXTRA_LINK_ARGS.append('-lstdc++_shared')
+# EXTRA_COMPILE_ARGS.append('-lstdc++_shared')
+# EXTRA_LINK_ARGS.append('-lstdc++_shared')
 
 
 EXT = '.pyx' if USE_CYTHON else '.cpp'
