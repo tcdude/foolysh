@@ -47,11 +47,11 @@ with open(os.path.join(os.path.dirname(__file__), 'VERSION'), 'r') as f:
 
 EXTRA_COMPILE_ARGS = []
 EXTRA_LINK_ARGS = []
-if platform.system() == 'Linux':
-    EXTRA_COMPILE_ARGS.append('-std=c++11')
-    EXTRA_LINK_ARGS.append('-std=c++11')
-    EXTRA_COMPILE_ARGS.append('-fexceptions')
-    EXTRA_LINK_ARGS.append('-fexceptions')
+# if platform.system() == 'Linux':
+EXTRA_COMPILE_ARGS.append('-std=c++11')
+EXTRA_LINK_ARGS.append('-std=c++11')
+EXTRA_COMPILE_ARGS.append('-fexceptions')
+EXTRA_LINK_ARGS.append('-fexceptions')
 
 
 EXT = '.pyx' if USE_CYTHON else '.cpp'
