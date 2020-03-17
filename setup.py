@@ -47,14 +47,16 @@ with open(os.path.join(os.path.dirname(__file__), 'VERSION'), 'r') as f:
 
 EXTRA_COMPILE_ARGS = []
 EXTRA_LINK_ARGS = []
-# if platform.system() == 'Linux':
-EXTRA_COMPILE_ARGS.append('-std=c++11')
-EXTRA_LINK_ARGS.append('-std=c++11')
-EXTRA_COMPILE_ARGS.append('-fexceptions')
-EXTRA_LINK_ARGS.append('-fexceptions')
-# EXTRA_COMPILE_ARGS.append('-lstdc++_shared')
-# EXTRA_LINK_ARGS.append('-lstdc++_shared')
+LIBRARIES = []
 
+if platform.system() == 'Linux':
+    EXTRA_COMPILE_ARGS.append('-std=c++11')
+    EXTRA_LINK_ARGS.append('-std=c++11')
+
+if 'env' in globals():
+    EXTRA_COMPILE_ARGS.append('-fexceptions')
+    EXTRA_LINK_ARGS.append('-fexceptions')
+    LIBRARIES.append('c++_shared')
 
 EXT = '.pyx' if USE_CYTHON else '.cpp'
 EXTENSION = [
@@ -65,14 +67,14 @@ EXTENSION = [
         extra_compile_args=EXTRA_COMPILE_ARGS,
         extra_link_args=EXTRA_LINK_ARGS,
         language='c++',
-        libraries=['c++_shared']
+        libraries=LIBRARIES
     )
     for i in glob.glob('src/foolysh/**/*' + EXT, recursive=True)
 ]
 
 
-
 def ext_modules():
+    """Optionally cythonize."""
     if USE_CYTHON:
         return cythonize(EXTENSION,
                          compiler_directives={'language_level': 3,
@@ -93,6 +95,5 @@ setup(
         'LICENSE.md',
     ]},
     install_requires=['plyer', 'Pillow', 'PySDL2>=0.9.6', 'numpy>=1.18'],
-    # setup_requires=['Cython'],
     ext_modules=ext_modules(),
 )

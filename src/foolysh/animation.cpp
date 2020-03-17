@@ -5,10 +5,12 @@
     "distutils": {
         "depends": [],
         "extra_compile_args": [
-            "-std=c++11"
+            "-std=c++11",
+            "-fexceptions"
         ],
         "extra_link_args": [
-            "-std=c++11"
+            "-std=c++11",
+            "-fexceptions"
         ],
         "include_dirs": [
             "ext"
