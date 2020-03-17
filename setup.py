@@ -53,7 +53,7 @@ if platform.system() == 'Linux':
     EXTRA_COMPILE_ARGS.append('-std=c++11')
     EXTRA_LINK_ARGS.append('-std=c++11')
 
-if 'env' in globals():
+if 'ARCH' in os.environ and os.environ['ARCH'].startswith('arm'):
     EXTRA_COMPILE_ARGS.append('-fexceptions')
     EXTRA_LINK_ARGS.append('-fexceptions')
     LIBRARIES.append('c++_shared')
