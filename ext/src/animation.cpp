@@ -1153,10 +1153,10 @@ step(const double dt, ActiveAnimationMap& aam) {
     if (!_v.size()) {
         throw std::runtime_error("Tried to step empty Sequence.");
     }
-    double rdt = 1.0;
+    double rdt = dt;
     while (rdt >= 0.0) {
         ActiveAnimationMap tmp = aam;
-        rdt = _v[_active]->step(dt, aam);
+        rdt = _v[_active]->step(rdt, aam);
         if (rdt < 0.0) {
             break;
         }

@@ -5,7 +5,6 @@ Unittests for foolysh.animation
 from foolysh import animation
 from foolysh.scene import node
 from foolysh.tools import vec2
-from foolysh.tools import aabb
 
 __author__ = 'Tiziano Bettio'
 __license__ = 'MIT'
