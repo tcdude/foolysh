@@ -71,21 +71,26 @@ class HWRenderer(sdl2.ext.TextureSpriteRenderSystem):
         self._dirty = True
 
     def render(self):
+        unsized = node.unsized_nodes()
         if self._last_w_size != self._window.size:
             self._dirty = True
             self._update_base_scale()
+        w = min(self.window_size)
+        image_scale = self._base_scale * self._zoom
+        image_scale = image_scale, image_scale
+        for nd in unsized:
+            if isinstance(nd, node.TextNode) and not nd.text:
+                continue
+            self._load_sprite(nd, image_scale, w)
         if not self.root_node.traverse() and not self._dirty \
               and not self.uiroot.traverse():
             return
         if self._dirty:
             self._update_view_aabb()
 
-        w = min(self.window_size)
         x = int(self._view_pos.x * w * self._zoom)
         y = int(self._view_pos.y * w * self._zoom)
         self._renderer.clear()
-        image_scale = self._base_scale * self._zoom
-        image_scale = image_scale, image_scale
         for nd in self.root_node.query(self._view_aabb):
             if isinstance(nd, node.ImageNode):
                 self._render_image(nd, w, image_scale, x, y)

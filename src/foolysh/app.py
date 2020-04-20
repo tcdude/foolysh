@@ -17,6 +17,7 @@ from . import eventhandler
 from . import render
 from .fsm import FSM
 from .scene import node
+from . import scene
 from . import taskmanager
 from . import tools
 from .tools import vec2
@@ -494,6 +495,7 @@ class App(FSM):
             self.__cfg.get('base', 'asset_dir', fallback='assets/'),
             self.__cfg.get('base', 'cache_dir', fallback=None)
         )
+        scene.SPRITE_LOADER = self.__systems.sprite_loader
         self.__systems.renderer.root_node = self.__nodes.root
         self.__systems.renderer.uiroot = self.__nodes.ui.root
         self.__systems.renderer.asset_pixel_ratio = \

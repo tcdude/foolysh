@@ -275,38 +275,30 @@ class SpriteLoader:
         # type: (str, str, int, COLOR, str, int, bool) -> TextureSprite
         """Load """
         # pylint: disable=too-many-arguments
-        if font in self._assets:
-            k = f'{text}{font}{size}{color}{align}{spacing}{multiline}'
-            if k not in self._sprite_cache:
-                font_k = (font, size)
-                if font_k not in self._font_cache:
-                    self._font_cache[font_k] = ImageFont.truetype(
-                        os.path.join(self.asset_dir, font),
-                        size
-                    )
-                fnt = self._font_cache[font_k]
-                if multiline:
-                    im_sz = fnt.getsize_multiline(text, spacing=spacing)
-                    pos = 0, 0
-                else:
-                    pos = fnt.getoffset(text)
-                    pos = -pos[0], -pos[1]
-                    im_sz = fnt.getsize(text)
-                    im_sz = im_sz[0] + pos[0], im_sz[1] + pos[1]
-                img = Image.new('RGBA', im_sz)
-                draw = ImageDraw.Draw(img)
-                func = draw.multiline_text if multiline else draw.text
-                func(pos, text=text, fill=color, font=fnt, spacing=spacing,
-                     align=align)
-                try:
-                    img.tobytes()
-                except SystemError:
-                    print(f'went wrong with {k}')
-                self._sprite_cache[k] = _image2sprite(img, self.factory)
-            return self._sprite_cache[k]
-        raise ValueError(f'font must be a valid path relative to '
+        return self._cache_text(text, font, size, color, align, spacing,
+                                multiline)
+
+    def textsize(self, text, font, size, spacing, multiline):
+        """Returns the canvas size for the provided arguments."""
+        if not text:
+            return 0, 0
+        size, _ = self._compute_text_size_pos(text, font, size, spacing,
+                                              multiline)
+        return size
+
+    def imagesize(self, asset_path, scale=1.0):
+        """Return the image size for a given asset and scale."""
+        if asset_path.startswith('SDF:'):
+            kwargs, _ = parse_sdf_str(asset_path)
+            return kwargs['width'], kwargs['height']
+        if asset_path in self._assets:
+            k = self._assets[asset_path][scale]
+            if k in self._sprite_cache:
+                return self._sprite_cache[k].size
+            return Image.open(k).size
+        raise ValueError(f'asset_path must be a valid path relative to '
                          f'"{self.asset_dir}" without leading "/". Got '
-                         f'"{font}".')
+                         f'"{asset_path}".')
 
     def valid_asset(self, asset_path):
         """Verify that a given asset path is valid."""
@@ -316,6 +308,51 @@ class SpriteLoader:
         """Delete all cached files."""
         for asset in self._assets.values():
             asset.empty_cache()
+
+    def _compute_text_size_pos(self, text, font, size, spacing, multiline):
+        fnt = self._load_font(font, size)
+        if multiline:
+            im_sz = fnt.getsize_multiline(text, spacing=spacing)
+            pos = 0, 0
+        else:
+            left, top, right, bottom = fnt.getmask(text).getbbox()
+            pos = fnt.getoffset(text)
+            pos = -(left + pos[0]), -(top + pos[1])
+            im_sz = right - left, bottom - top
+        return im_sz, pos
+
+    def _cache_text(self, text, font, size, color, align, spacing, multiline):
+        # pylint: disable=too-many-arguments
+        k = f'{text}{font}{size}{color}{align}{spacing}{multiline}'
+        if k not in self._sprite_cache:
+            im_sz, pos = self._compute_text_size_pos(text, font, size, spacing,
+                                                     multiline)
+            fnt = self._load_font(font, size)
+            img = Image.new('RGBA', im_sz)
+            draw = ImageDraw.Draw(img)
+            func = draw.multiline_text if multiline else draw.text
+            func(pos, text=text, fill=color, font=fnt, spacing=spacing,
+                 align=align)
+            try:
+                img.tobytes()
+            except SystemError:
+                img = img.crop((0, 0, im_sz[0] - 1, im_sz[1] - 1))
+                print(f'Something went wrong with {k}')
+            self._sprite_cache[k] = _image2sprite(img, self.factory)
+        return self._sprite_cache[k]
+
+    def _load_font(self, font, size):
+        if font not in self._assets:
+            raise ValueError(f'font must be a valid path relative to '
+                             f'"{self.asset_dir}" without leading "/". Got '
+                             f'"{font}".')
+        font_k = font, size
+        if font_k not in self._font_cache:
+            self._font_cache[font_k] = ImageFont.truetype(
+                os.path.join(self.asset_dir, font),
+                size
+            )
+        return self._font_cache[font_k]
 
     def _load_sdf(self, sdf_str):
         """

@@ -43,6 +43,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE."""
 
 cdef dict _nodes = {}
+cdef list _need_size = []
+
+
+def unsized_nodes():
+    """
+    Returns a list of nodes that have no size but represent either an image or
+    text.
+
+    .. warning::
+        The list is cleared after each call to this function!
+    """
+    nodes = [_nodes[i] for i in _need_size if i in _nodes]
+    _need_size.clear()
+    return nodes
 
 
 cdef class SceneGraphDataHandler:
@@ -701,6 +715,8 @@ cdef class Node:
         if isinstance(v, tuple) and isinstance(v[0], (int, float)) \
              and isinstance(v[1], (int, float)):
             self._set_size(v[0], v[1])
+            if self.node_id in _need_size:
+                _need_size.pop(_need_size.index(self.node_id))
         else:
             raise TypeError
 
@@ -776,6 +792,7 @@ cdef class ImageNode(Node):
         self._current_index = -1
         if image is not None:
             self.add_image(image)
+        _need_size.append(self.node_id)
 
     @property
     def image(self):
@@ -871,6 +888,7 @@ cdef class TextNode(Node):
         self.align = align
         self.spacing = spacing
         self.multiline = multiline
+        _need_size.append(self.node_id)
 
     @property
     def hashkey(self):
@@ -891,6 +909,8 @@ cdef class TextNode(Node):
         if self._text != value:
             self._text = value
             self.propagate_dirty()
+            if self.node_id not in _need_size:
+                _need_size.append(self.node_id)
 
     @property
     def font(self):
