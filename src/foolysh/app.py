@@ -411,11 +411,12 @@ class App(FSM):
                 self.__update_mouse()
                 self.__update_keyboard()
                 self.__systems.event_handler()
+                backsp = self.__stats.backspace \
+                    or self.__systems.event_handler.backspace
                 if self.__systems.ui_handler(self.__stats.mouse_pos,
                                              self.__stats.mouse_down,
                                              self.__stats.mouse_up,
-                                             self.__stats.enter,
-                                             self.__stats.backspace):
+                                             self.__stats.enter, backsp):
                     self.renderer.set_dirty()
                 self.__systems.animation_manager.animate(
                     self.__stats.clock.get_dt())
