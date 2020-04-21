@@ -61,7 +61,7 @@ class HWRenderer(sdl2.ext.TextureSpriteRenderSystem):
         self._view_pos = vec2.Vec2(0.0, 0.0)
         self._view_aabb = aabb.AABB(0.0, 0.0, 0.0, 0.0)
         self._dirty = True
-        self._last_w_size = window.size
+        self._last_w_size = 0, 0  # window.size
         self._sprites = {}  # type: Dict[int, Sprite]
         self._texts = {}  # type: Dict[int, str]
         self._rcopy = render.SDL_RenderCopyEx
@@ -72,9 +72,11 @@ class HWRenderer(sdl2.ext.TextureSpriteRenderSystem):
 
     def render(self):
         unsized = node.unsized_nodes()
+        resize = False
         if self._last_w_size != self._window.size:
             self._dirty = True
             self._update_base_scale()
+            resize = True
         w = min(self.window_size)
         image_scale = self._base_scale * self._zoom
         image_scale = image_scale, image_scale
@@ -93,6 +95,8 @@ class HWRenderer(sdl2.ext.TextureSpriteRenderSystem):
         self._renderer.clear()
         for nd in self.root_node.query(self._view_aabb):
             if isinstance(nd, node.ImageNode):
+                if nd.tiled and resize:
+                    self._load_sprite(nd, image_scale, w)
                 self._render_image(nd, w, image_scale, x, y)
             elif isinstance(nd, node.TextNode):
                 self._render_text(nd, w, image_scale, x, y)
@@ -163,9 +167,12 @@ class HWRenderer(sdl2.ext.TextureSpriteRenderSystem):
             image_str = nd.image
             if image_str.find(':F:') > -1:  # Pass world unit to float SDF
                 image_str += f':w={w}'
+            res = None
+            if nd.tiled:
+                res = self._window.size
             self._sprites[nd.node_id] = Sprite(
                 scale,
-                self.sprite_loader.load_image(image_str, scale),
+                self.sprite_loader.load_image(image_str, scale, res),
                 nd.index,
                 nd.image
             )

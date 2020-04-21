@@ -785,11 +785,13 @@ cdef class ImageNode(Node):
     """
     cdef list _images
     cdef int _current_index
+    cdef bint _tiled
 
-    def __init__(self, name=None, image=None):
+    def __init__(self, name=None, image=None, tiled=False):
         super(ImageNode, self).__init__(name=name)
         self._images = []            # type: List[str]
         self._current_index = -1
+        self._tiled = tiled
         if image is not None:
             self.add_image(image)
         _need_size.append(self.node_id)
@@ -823,6 +825,19 @@ cdef class ImageNode(Node):
         if value != self._current_index:
             self._current_index = value
             self.propagate_dirty()
+
+    @property
+    def tiled(self):
+        # type: () -> bool
+        """Whether this is a tiled image that spans the screen."""
+        return self._tiled
+
+    @tiled.setter
+    def tiled(self, value):
+        # type: (bool) -> None
+        if not isinstance(value, bool):
+            raise TypeError
+        self._tiled = value
 
     def add_image(self, image):
         # type: (str) -> int

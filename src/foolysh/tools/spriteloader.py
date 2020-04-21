@@ -3,6 +3,7 @@ Provides the SpriteLoader class, that handles loading and caching of assets.
 """
 import pathlib
 import hashlib
+from math import ceil
 import os
 from typing import Optional
 from typing import Tuple
@@ -251,12 +252,23 @@ class SpriteLoader:
                 continue
             self._assets[k] = Asset(k, self)
 
-    def load_image(self, asset_path, scale=1.0):
-        # type: (str, Optional[SCALE]) -> TextureSprite
+    def load_image(self, asset_path, scale=1.0, res=None):
+        # type: (str, Optional[SCALE], Optional[Tuple[int, int]]) -> TextureSprite
         """
         Loads asset_path at specified scale or generates (if necessary) a SDF
         if `asset_path` starts with "SDF:" (SDF strings are case sensitive!).
         """
+        if res is not None:
+            impath = self._assets[asset_path][scale]
+            k = impath + str(res)
+            if k not in self._sprite_cache:
+                orig = Image.open(impath)
+                img = Image.new(orig.mode, res)
+                for i in range(ceil(res[0] / orig.size[0])):
+                    for j in range(ceil(res[1] / orig.size[1])):
+                        img.paste(orig, (i * orig.size[0], j * orig.size[1]))
+                self._sprite_cache[k] = _image2sprite(img, self.factory)
+            return self._sprite_cache[k]
         if asset_path.startswith('SDF:'):
             return self._load_sdf(asset_path)
         if asset_path in self._assets:
