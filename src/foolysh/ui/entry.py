@@ -175,7 +175,7 @@ class Entry(label.Label):
     def _blink(self, dt, frame_time):  # pylint: disable=unused-argument
         if self._hint_visible:
             return
-        if (frame_time / self._cursor_blink) % 2 >= 1:
+        if (frame_time / self._cursor_blink) % 2 >= 1 and self.focus:
             self._cursor.show()
         else:
             self._cursor.hide()
