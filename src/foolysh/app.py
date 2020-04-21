@@ -362,6 +362,8 @@ class App(FSM):
             self.__stats.enter = False
         state = sdl2.SDL_GetKeyboardState(None)
         st_bs = state[sdl2.SDL_SCANCODE_BACKSPACE]
+        state = sdl2.SDL_GetKeyboardState(None)
+        st_bs = st_bs or state[sdl2.SDL_SCANCODE_DELETE]
         if st_bs:
             self.__stats.backspace_down = True
         elif not st_bs and self.__stats.backspace_down:
