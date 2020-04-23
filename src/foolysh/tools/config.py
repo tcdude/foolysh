@@ -5,6 +5,7 @@ Provides the Config class to handle engine and user specific configuration.
 import configparser
 import pathlib
 import os
+from typing import Union
 
 from plyer import storagepath
 
@@ -78,20 +79,37 @@ def _find_config_file():
 
 
 class Config(configparser.ConfigParser):
-    def __init__(self, config_file=None, *args, **kwargs):
+    """
+    ConfigParser extended to allow for reloading and saving the configuration.
+
+    Args:
+        config_file: Either a valid path to an existing config file or `None` to
+            automatically search for one and create a blank default
+            configuration, if no valid configuration file could be found.
+        *args: Optional positional arguments passed on to the parent class.
+        **kwargs: Optional keyword arguments passed on to the parent class.
+    """
+    # pylint: disable=too-many-ancestors
+    def __init__(self, config_file: Union[None, str], *args, **kwargs):
         super(Config, self).__init__(*args, **kwargs)
         self._cfg_path = config_file or _find_config_file()
         self.read(self._cfg_path)
 
+    def reload(self):
+        """Reload the configuration from disk."""
+        self.read(self._cfg_path)
+
     def save(self):
+        """Write the configuration to disk."""
         try:
             self.write(open(self._cfg_path, 'w'))
             return True
-        except PermissionError as e:
-            if e.errno == 13:
+        except PermissionError as err:
+            if err.errno == 13:
                 return False
-            raise e
+            raise err
 
     @property
     def cfg_path(self):
+        """Return the path to the configuration file."""
         return self._cfg_path
