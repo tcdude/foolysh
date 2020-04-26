@@ -125,6 +125,16 @@ class Button(uinode.UINode):
         """
         self.__cb[uihandler.EventType.DOWN] = down_cb, args, kwargs
 
+    def change_text(self, text: str) -> None:
+        """
+        Change displayed text on button in all states.
+
+        Args:
+            text: The new text to display.
+        """
+        for lbl in self._labels:
+            lbl.text = text
+
     def _update(self):  # pylint: disable=useless-super-delegation
         super()._update()
 
