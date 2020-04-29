@@ -2,7 +2,7 @@
 Provides the FSM class, a rudimentary implementation of a Finite State Machine.
 """
 
-from typing import Callable, Dict, Optional, Tuple
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 from .tools.common import to_snake_case
 
@@ -51,18 +51,25 @@ class FSM:
         Only provide `enter_` / `exit_` methods for subclasses that should be
         callable states.
     """
-    __states: Dict[str, Tuple[Callable, Callable]] = {}
+    __states: Dict[str, Tuple[Callable, Callable]] = None
     __active_state: Optional[str] = None
+    __history: List[str] = None
+    __fsm_data: Dict[str, Any] = None
 
     def __setup_fsm(self):
         mro = [i.__name__ for i in self.__class__.__mro__]
         mro = mro[:mro.index('FSM')]
+        self.__states = {}
+        self.__history = []
+        self.__fsm_data = {}
+        self.__fsm_data['-global-'] = {}
         for i in mro:
             name = to_snake_case(i)
             enterm = getattr(self, f'enter_{name}', False)
             exitm = getattr(self, f'exit_{name}', False)
             if enterm and exitm:
                 self.__states[name] = enterm, exitm
+                self.__fsm_data[name] = None
             else:
                 Warning(f'Class "{i}" does not expose enter and exit methods. '
                         f'State not registered!')
@@ -80,10 +87,42 @@ class FSM:
             return
         if self.__active_state is not None:
             self.__states[self.__active_state][1]()
+            self.__history.append(self.__active_state)
         self.__states[state_name][0]()
         self.__active_state = state_name
+
+    def fsm_back(self) -> None:
+        """
+        Performs the transition to the last known state in the history. Does
+        nothing if the history is empty.
+        """
+        if not self.__history:
+            return
+        self.request(self.__history.pop())
 
     @property
     def active_state(self) -> str:
         """The currently active state."""
         return self.__active_state
+
+    @property
+    def previous_state(self) -> str:
+        """The previous state before the last transition, or ``None``."""
+        if self.__history:
+            return self.__history[-1]
+        return None
+
+    @property
+    def fsm_data(self) -> Any:
+        """The FSM data stored for the active state."""
+        if self.__active_state is None:
+            raise ValueError(f'No state set yet.')
+        return self.__fsm_data[self.__active_state]
+
+    @property
+    def fsm_global_data(self) -> Dict[str, Any]:
+        """
+        A data dict accessible from any state, potentially useful for passing
+        information between states.
+        """
+        return self.__fsm_data['-global-']
