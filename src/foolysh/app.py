@@ -422,6 +422,8 @@ class App(FSM):
                     self.__stats.clock.get_dt())
                 self.__systems.task_manager(self.__stats.clock.get_dt())
                 self.__systems.renderer.render()
+                if self.__stats.frames == 0:
+                    android.remove_presplash()
                 frame_clock.tick()
                 sleep_time = max(0.0, FRAME_TIME - frame_clock.get_dt())
                 if sleep_time:
@@ -486,7 +488,6 @@ class App(FSM):
                 flags=sdl2.SDL_WINDOW_RESIZABLE
             )
         self.__systems.window.show()
-        android.remove_presplash()
         self.__systems.renderer = render.HWRenderer(self.window)
         self.__systems.factory = sdl2.ext.SpriteFactory(
             sdl2.ext.TEXTURE,
