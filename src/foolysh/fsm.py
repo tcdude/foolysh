@@ -74,7 +74,7 @@ class FSM:
                 Warning(f'Class "{i}" does not expose enter and exit methods. '
                         f'State not registered!')
 
-    def request(self, state_name: str) -> None:
+    def request(self, state_name: str, back: bool = False) -> None:
         """
         Performs the transition to a registered State. Raises a ValueError if
         the provided `state_name` is not registered.
@@ -87,7 +87,8 @@ class FSM:
             return
         if self.__active_state is not None:
             self.__states[self.__active_state][1]()
-            self.__history.append(self.__active_state)
+            if not back:
+                self.__history.append(self.__active_state)
         self.__active_state = state_name
         self.__states[state_name][0]()
 
@@ -98,7 +99,7 @@ class FSM:
         """
         if not self.__history:
             return
-        self.request(self.__history.pop())
+        self.request(self.__history.pop(), True)
 
     @property
     def active_state(self) -> str:
