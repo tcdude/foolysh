@@ -118,6 +118,8 @@ class FSM:
         """The FSM data stored for the active state."""
         if self.__active_state is None:
             raise ValueError(f'No state set yet.')
+        if self.__fsm_data[self.__active_state] is None:
+            self.__fsm_data[self.__active_state] = {}
         return self.__fsm_data[self.__active_state]
 
     @property
