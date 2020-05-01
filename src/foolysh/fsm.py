@@ -88,8 +88,8 @@ class FSM:
         if self.__active_state is not None:
             self.__states[self.__active_state][1]()
             self.__history.append(self.__active_state)
-        self.__states[state_name][0]()
         self.__active_state = state_name
+        self.__states[state_name][0]()
 
     def fsm_back(self) -> None:
         """
