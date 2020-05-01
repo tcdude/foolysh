@@ -44,18 +44,29 @@ class Entry(label.Label):
         hint_text: Optional[``str``] -> Text displayed when the text entry field
             is empty, defaults to an empty string.
         hint_text_color: ``Optional[COLOR]`` -> color of the hint text.
+        masked: ``Optional[str]`` -> If set to a single character, text input.
+            will appear masked.
         **kwargs: See :class:`~foolysh.ui.label.Label` for available keyword
             arguments.
     """
+    # pylint: disable=too-many-instance-attributes
     def __init__(self, name: Optional[str] = 'Unnamed Entry',
                  blink_rate: Optional[float] = 0.5,
                  hint_text: Optional[str] = '',
                  hint_text_color: Optional[COLOR] = (160, 160, 160),
-                 **kwargs) -> None:
+                 masked: str = '', **kwargs) -> None:
         if 'font' not in kwargs:
             raise TypeError('Expected "font" in arguments.')
+        if len(masked) > 1:
+            raise ValueError('Expected single character for argument masked.')
         kwargs['name'] = name
         super().__init__(**kwargs)
+        if masked:
+            self._display_text = self.attach_text_node(**kwargs)
+            self.text_color = 0, 0, 0, 0  # Hide the labels text
+        else:
+            self._display_text = self._txt_node
+        self._mask = masked
         kwargs['text'] = hint_text
         kwargs['text_color'] = hint_text_color
         self._cursor = self.attach_image_node(f'{name}_Cursor')
@@ -160,7 +171,10 @@ class Entry(label.Label):
                 self._hint_visible = False
                 self._cursor.show()
             self.text += text
-
+        if self._mask:
+            self._display_text.text = self._mask * len(self.text)
+        else:
+            self._display_text.text = self.text
         self._other_event(uihandler.EventType.INPUT)
         self.dirty = True
         self.ui_handler.need_render = True
@@ -187,11 +201,13 @@ class Entry(label.Label):
             self._place_txt_node(self._hint_text)
         elif self._cursor.size != (0, 0):
             txtlen = len(self.text)
+            self._place_txt_node(self._display_text)
             if txtlen:
-                x = self._txt_node.size[0] + self._txt_node.size[0] / txtlen / 4
+                x = self._display_text.size[0] + self._display_text.size[0] \
+                    / txtlen / 4
             else:
                 x = 0
-            x = self._txt_node.x + x + self._margin
+            x = self._display_text.x + x + self._margin
             y = (self.size[1] - self._cursor.size[1]) / 2
             self._cursor.pos = x, y
         super()._update()
