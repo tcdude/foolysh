@@ -197,6 +197,9 @@ class Entry(label.Label):
         self.ui_handler.need_render = True
 
     def _update(self) -> None:
+        if self.text and self._hint_visible:
+            self._hint_visible = False
+            self._hint_text.hide()
         if self._hint_visible:
             self._place_txt_node(self._hint_text)
         elif self._cursor.size != (0, 0):
