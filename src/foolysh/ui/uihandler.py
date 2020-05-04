@@ -197,9 +197,12 @@ class UIHandler:
             nd_bb = self._nodes[node_id].aabb
             exc = False
             if click and event_t in (EventType.CLICK, EventType.INPUT):
-                exc, click, new_focus, same_focus = self.\
+                exc, click, tnew_focus, tsame_focus = self.\
                     _handle_click(node_id, nd_bb, mouse_pos, click, new_focus,
                                   event_t)
+                if tnew_focus or tsame_focus:
+                    new_focus = tnew_focus
+                    same_focus = tsame_focus
             elif down and event_t == EventType.DOWN:
                 exc, down = self._handle_down(node_id, nd_bb, mouse_pos, down)
             elif node_id == self._state.current_down and event_t == EventType.RESET:

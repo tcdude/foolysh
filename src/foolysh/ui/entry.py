@@ -187,8 +187,6 @@ class Entry(label.Label):
             self.ui_handler.need_render = True
 
     def _blink(self, dt, frame_time):  # pylint: disable=unused-argument
-        if self._hint_visible:
-            return
         if (frame_time / self._cursor_blink) % 2 >= 1 and self.focus:
             self._cursor.show()
         else:
@@ -200,8 +198,18 @@ class Entry(label.Label):
         if self.text and self._hint_visible:
             self._hint_visible = False
             self._hint_text.hide()
+        if len(self.text) != len(self._display_text.text):
+            if self._mask:
+                self._display_text.text = self._mask * len(self.text)
+            else:
+                self._display_text.text = self.text
+        if not self.text:
+            self._hint_visible = True
+            self._hint_text.show()
         if self._hint_visible:
             self._place_txt_node(self._hint_text)
+            y = (self.size[1] - self._cursor.size[1]) / 2
+            self._cursor.pos = self._hint_text.pos[0], y
         elif self._cursor.size != (0, 0):
             txtlen = len(self.text)
             self._place_txt_node(self._display_text)
