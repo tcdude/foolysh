@@ -35,12 +35,12 @@ cdef extern from "src/taskmgr.cpp" namespace "foolysh::tools":
     pass
 
 cdef extern from "src/taskmgr.hpp" namespace "foolysh::tools":
-    ctypedef void (*callback)(void*, void*, void*, const double, const bool)
+    ctypedef void (*callback)(void*, const string, const double, const bool)
 
     cdef cppclass TaskManager:
         TaskManager() except +
         void set_callback(callback)
-        void add_task(string, const double, const bool, void*, void*, void*)
+        void add_task(string, const double, const bool, void*)
         void remove_task(string)
         void execute(const double dt)
         void set_delay(string, const double)

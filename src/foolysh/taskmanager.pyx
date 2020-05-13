@@ -38,23 +38,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE."""
 
 
-cdef void _run_callback(
-    void* f,
-    void* a,
-    void* kw,
-    const double dt,
-    const bool with_dt
-):
-    """
-    Proxy function to actually call the Python callback from a task.
-    """
-    _a = <object> a
-    _kw = <object> kw
-    if with_dt:
-        _kw['dt'] = dt
-    (<object> f)(*_a, **_kw)
-
-
 cdef class Task:
     """
     Simulate a Task object for user convenience, providing direct access to a
@@ -72,6 +55,10 @@ cdef class Task:
         self._args = args
         self._kwargs = kwargs
         self._task_manager = task_manager
+
+    cdef tuple get_callback(self):
+        """Used to get a Tuple of callback, args and kwargs."""
+        return self._cb, self._args, self._kwargs
 
     @property
     def delay(self):
@@ -107,15 +94,15 @@ cdef class Task:
         """
         ``bool``
         """
-        return not self._task_manager.state(self._name)
+        return not self._task_manager.state(self._name.decode('UTF-8'))
 
     def pause(self):
         """Pauses the execution of :class:`~foolysh.taskmanager.Task`."""
-        self._task_manager.pause(self._name)
+        self._task_manager.pause(self._name.decode('UTF-8'))
 
     def resume(self):
         """Resumes the execution of :class:`~foolysh.taskmanager.Task`."""
-        self._task_manager.resume(self._name)
+        self._task_manager.resume(self._name.decode('UTF-8'))
 
     def __call__(self):
         """
@@ -153,7 +140,7 @@ cdef class TaskManager:
 
     def __cinit__(self, *args, **kwargs):
         self.thisptr.reset(new _TaskManager())
-        cdef callback _cb = _run_callback
+        cdef callback _cb = <callback> self._run_callback
         deref(self.thisptr).set_callback(_cb)
         self._tasks = {}
         self._remove = []
@@ -161,15 +148,23 @@ cdef class TaskManager:
     def __call__(self, dt):
         self.execute(dt)
 
-    cpdef Task add_task(
-        self,
-        name,
-        cb,
-        double delay=0.0,
-        bool with_dt=True,
-        args=None,
-        kwargs=None
-    ):
+    cdef void _run_callback(self, string name, const double dt,
+                            const bool with_dt):
+        """
+        Proxy function to actually call the Python callback from a task.
+        """
+        cdef Task task
+        task = self._tasks[name]
+        cb, a, kw = task.get_callback()
+        if with_dt:
+            kw['dt'] = dt
+        try:
+            cb(*a, **kw)
+        except Exception as err:
+            print(f'Error occurred while trying to execute task {name}: {err}')
+
+    cpdef Task add_task(self, name, cb, double delay=0.0, bool with_dt=True,
+                        args=None, kwargs=None):
         """
         Add a task to the :class:`TaskManager`.
 
@@ -191,17 +186,16 @@ cdef class TaskManager:
             args = tuple()
         if kwargs is None:
             kwargs = dict()
-        deref(self.thisptr).add_task(
-            name.encode('UTF-8'),
-            delay,
-            with_dt,
-            <void*> cb,
-            <void*> args,
-            <void*> kwargs
-        )
+        name = name.encode('UTF-8')
         t = Task.__new__(Task, name, cb, args, kwargs, self)
-        self._tasks[name] = t  # make sure references stay alive
+        self._tasks[name] = t
+        self._add_task(name, delay, with_dt)
         return t
+
+    cdef _add_task(self, string name, double delay, bool with_dt):
+        cdef void* pyobj
+        pyobj = <void*> self
+        deref(self.thisptr).add_task(name, delay, with_dt, pyobj)
 
     cpdef void remove_task(self, name):
         """
@@ -210,9 +204,10 @@ cdef class TaskManager:
         Args:
             name: ``str``
         """
+        name = name.encode('UTF-8')
         if name not in self._tasks:
             raise ValueError(f'No task named "{name}"')
-        deref(self.thisptr).remove_task(name.encode('UTF-8'))
+        deref(self.thisptr).remove_task(name)
         self._remove.append(name)
 
     cpdef void execute(self, const double dt):
@@ -232,9 +227,10 @@ cdef class TaskManager:
             name: ``str``
             delay: ``float`` new value of the delay.
         """
+        name = name.encode('UTF-8')
         if name not in self._tasks:
             raise ValueError(f'No task named "{name}"')
-        deref(self.thisptr).set_delay(name.encode('UTF-8'), delay)
+        deref(self.thisptr).set_delay(name, delay)
 
     cpdef void pause(self, name):
         """
@@ -243,9 +239,10 @@ cdef class TaskManager:
         Args:
             name: ``str``
         """
+        name = name.encode('UTF-8')
         if name not in self._tasks:
             raise ValueError(f'No task named "{name}"')
-        deref(self.thisptr).pause(name.encode('UTF-8'))
+        deref(self.thisptr).pause(name)
 
     cpdef void resume(self, name):
         """
@@ -254,9 +251,10 @@ cdef class TaskManager:
         Args:
             name: ``str``
         """
+        name = name.encode('UTF-8')
         if name not in self._tasks:
             raise ValueError(f'No task named "{name}"')
-        deref(self.thisptr).resume(name.encode('UTF-8'))
+        deref(self.thisptr).resume(name)
 
     cpdef bool state(self, name):
         """
@@ -268,9 +266,10 @@ cdef class TaskManager:
         Returns:
             ``bool`` ``True`` if the task is running, otherwise ``False``.
         """
+        name = name.encode('UTF-8')
         if name not in self._tasks:
             raise ValueError(f'No task named "{name}"')
-        return deref(self.thisptr).state(name.encode('UTF-8'))
+        return deref(self.thisptr).state(name)
 
     cpdef double get_delay(self, name):
         """
@@ -282,11 +281,13 @@ cdef class TaskManager:
         Returns:
             ``float`` delay in seconds.
         """
+        name = name.encode('UTF-8')
         if name not in self._tasks:
             raise ValueError(f'No task named "{name}"')
-        return deref(self.thisptr).get_delay(name.encode('UTF-8'))
+        return deref(self.thisptr).get_delay(name)
 
     def __getitem__(self, item):
+        item = item.encode('UTF-8')
         if item in self._tasks:
             return self._tasks[item]
         raise IndexError

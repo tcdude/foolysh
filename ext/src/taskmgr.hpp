@@ -33,24 +33,20 @@ namespace foolysh {
 namespace tools {
 
     struct Task {
-        void* func;
-        void* args;
-        void* kwargs;
+        void* pyobj = nullptr;
         bool with_dt, running = true;
         double delay, remaining;
     };
 
-    class Clock;
-
-    typedef void (*callback)(void* func, void* args, void* kwargs,
+    typedef void (*callback)(void* pyobj, const std::string taskname,
                              const double dt, const bool with_dt);
 
     class TaskManager {
     public:
-        TaskManager();
+        TaskManager() {};
         void set_callback(callback cb);
         void add_task(std::string name, const double delay, const bool with_dt,
-                      void* func, void* args, void* kwargs);
+                      void* pyobj);
         void remove_task(std::string);
         void execute(const double dt);
         void set_delay(std::string name, const double delay);
@@ -63,7 +59,6 @@ namespace tools {
         std::map<std::string, Task> _tasks;
         std::vector<std::string> _delete_list;
         callback _cb;
-        std::unique_ptr<Clock> _clock;
     };
 
 }  // namespace tools

@@ -21,17 +21,9 @@
  */
 
 #include "taskmgr.hpp"
-#include "clock.hpp"
 
 namespace foolysh {
 namespace tools {
-
-/**
- */
-TaskManager::
-TaskManager() {
-    _clock.reset(new Clock());
-}
 
 /**
  * Set the callback function from Python
@@ -45,12 +37,10 @@ set_callback(callback cb) {
  * Add a new task with unique ``name``.
  */
 void TaskManager::
-add_task(std::string name, const double delay, const bool with_dt, void* func,
-         void* args, void* kwargs) {
+add_task(std::string name, const double delay, const bool with_dt,
+         void* pyobj) {
     Task t;
-    t.func = func;
-    t.args = args;
-    t.kwargs = kwargs;
+    t.pyobj = pyobj;
     t.delay = delay;
     t.remaining = delay;
     t.with_dt = with_dt;
@@ -86,7 +76,7 @@ execute(const double dt) {
         }
         if (t.remaining <= 0.0) {
             const double _dt = (t.delay > 0) ? t.delay - t.remaining : dt;
-            _cb(t.func, t.args, t.kwargs, _dt, t.with_dt);
+            _cb(t.pyobj, it->first, _dt, t.with_dt);
             t.remaining = t.delay;
         }
     }

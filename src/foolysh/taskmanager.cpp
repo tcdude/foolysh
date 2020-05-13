@@ -860,12 +860,12 @@ struct __pyx_obj_7foolysh_11taskmanager_Task;
 struct __pyx_obj_7foolysh_11taskmanager_TaskManager;
 struct __pyx_opt_args_7foolysh_11taskmanager_11TaskManager_add_task;
 
-/* "foolysh/taskmanager.pyx":164
- *         self.execute(dt)
+/* "foolysh/taskmanager.pyx":166
+ *             print(f'Error occurred while trying to execute task {name}: {err}')
  * 
- *     cpdef Task add_task(             # <<<<<<<<<<<<<<
- *         self,
- *         name,
+ *     cpdef Task add_task(self, name, cb, double delay=0.0, bool with_dt=True,             # <<<<<<<<<<<<<<
+ *                         args=None, kwargs=None):
+ *         """
  */
 struct __pyx_opt_args_7foolysh_11taskmanager_11TaskManager_add_task {
   int __pyx_n;
@@ -875,7 +875,7 @@ struct __pyx_opt_args_7foolysh_11taskmanager_11TaskManager_add_task {
   PyObject *kwargs;
 };
 
-/* "foolysh/taskmanager.pyx":58
+/* "foolysh/taskmanager.pyx":41
  * 
  * 
  * cdef class Task:             # <<<<<<<<<<<<<<
@@ -884,6 +884,7 @@ struct __pyx_opt_args_7foolysh_11taskmanager_11TaskManager_add_task {
  */
 struct __pyx_obj_7foolysh_11taskmanager_Task {
   PyObject_HEAD
+  struct __pyx_vtabstruct_7foolysh_11taskmanager_Task *__pyx_vtab;
   PyObject *_name;
   PyObject *_cb;
   PyObject *_args;
@@ -892,7 +893,7 @@ struct __pyx_obj_7foolysh_11taskmanager_Task {
 };
 
 
-/* "foolysh/taskmanager.pyx":133
+/* "foolysh/taskmanager.pyx":120
  * 
  * 
  * cdef class TaskManager:             # <<<<<<<<<<<<<<
@@ -909,8 +910,32 @@ struct __pyx_obj_7foolysh_11taskmanager_TaskManager {
 
 
 
+/* "foolysh/taskmanager.pyx":41
+ * 
+ * 
+ * cdef class Task:             # <<<<<<<<<<<<<<
+ *     """
+ *     Simulate a Task object for user convenience, providing direct access to a
+ */
+
+struct __pyx_vtabstruct_7foolysh_11taskmanager_Task {
+  PyObject *(*get_callback)(struct __pyx_obj_7foolysh_11taskmanager_Task *);
+};
+static struct __pyx_vtabstruct_7foolysh_11taskmanager_Task *__pyx_vtabptr_7foolysh_11taskmanager_Task;
+
+
+/* "foolysh/taskmanager.pyx":120
+ * 
+ * 
+ * cdef class TaskManager:             # <<<<<<<<<<<<<<
+ *     """
+ *     Provides a simple manager for regular execution of arbitrary user defined
+ */
+
 struct __pyx_vtabstruct_7foolysh_11taskmanager_TaskManager {
+  void (*_run_callback)(struct __pyx_obj_7foolysh_11taskmanager_TaskManager *, std::string, double const , bool const );
   struct __pyx_obj_7foolysh_11taskmanager_Task *(*add_task)(struct __pyx_obj_7foolysh_11taskmanager_TaskManager *, PyObject *, PyObject *, int __pyx_skip_dispatch, struct __pyx_opt_args_7foolysh_11taskmanager_11TaskManager_add_task *__pyx_optional_args);
+  PyObject *(*_add_task)(struct __pyx_obj_7foolysh_11taskmanager_TaskManager *, std::string, double, bool);
   void (*remove_task)(struct __pyx_obj_7foolysh_11taskmanager_TaskManager *, PyObject *, int __pyx_skip_dispatch);
   void (*execute)(struct __pyx_obj_7foolysh_11taskmanager_TaskManager *, double const , int __pyx_skip_dispatch);
   void (*set_delay)(struct __pyx_obj_7foolysh_11taskmanager_TaskManager *, PyObject *, double const , int __pyx_skip_dispatch);
@@ -995,6 +1020,21 @@ static CYTHON_INLINE PyObject* __Pyx_PyObject_GetAttrStr(PyObject* obj, PyObject
 /* GetBuiltinName.proto */
 static PyObject *__Pyx_GetBuiltinName(PyObject *name);
 
+/* RaiseArgTupleInvalid.proto */
+static void __Pyx_RaiseArgtupleInvalid(const char* func_name, int exact,
+    Py_ssize_t num_min, Py_ssize_t num_max, Py_ssize_t num_found);
+
+/* RaiseDoubleKeywords.proto */
+static void __Pyx_RaiseDoubleKeywordsError(const char* func_name, PyObject* kw_name);
+
+/* ParseKeywords.proto */
+static int __Pyx_ParseOptionalKeywords(PyObject *kwds, PyObject **argnames[],\
+    PyObject *kwds2, PyObject *values[], Py_ssize_t num_pos_args,\
+    const char* function_name);
+
+/* ExtTypeTest.proto */
+static CYTHON_INLINE int __Pyx_TypeTest(PyObject *obj, PyTypeObject *type);
+
 /* PyObjectCall.proto */
 #if CYTHON_COMPILING_IN_CPYTHON
 static CYTHON_INLINE PyObject* __Pyx_PyObject_Call(PyObject *func, PyObject *arg, PyObject *kw);
@@ -1038,28 +1078,49 @@ static CYTHON_INLINE void __Pyx_ErrFetchInState(PyThreadState *tstate, PyObject 
 #define __Pyx_ErrFetch(type, value, tb)  PyErr_Fetch(type, value, tb)
 #endif
 
-/* WriteUnraisableException.proto */
-static void __Pyx_WriteUnraisable(const char *name, int clineno,
-                                  int lineno, const char *filename,
-                                  int full_traceback, int nogil);
-
-/* RaiseArgTupleInvalid.proto */
-static void __Pyx_RaiseArgtupleInvalid(const char* func_name, int exact,
-    Py_ssize_t num_min, Py_ssize_t num_max, Py_ssize_t num_found);
-
-/* RaiseDoubleKeywords.proto */
-static void __Pyx_RaiseDoubleKeywordsError(const char* func_name, PyObject* kw_name);
-
-/* ParseKeywords.proto */
-static int __Pyx_ParseOptionalKeywords(PyObject *kwds, PyObject **argnames[],\
-    PyObject *kwds2, PyObject *values[], Py_ssize_t num_pos_args,\
-    const char* function_name);
-
-/* ExtTypeTest.proto */
-static CYTHON_INLINE int __Pyx_TypeTest(PyObject *obj, PyTypeObject *type);
-
 /* RaiseException.proto */
 static void __Pyx_Raise(PyObject *type, PyObject *value, PyObject *tb, PyObject *cause);
+
+/* PyCFunctionFastCall.proto */
+#if CYTHON_FAST_PYCCALL
+static CYTHON_INLINE PyObject *__Pyx_PyCFunction_FastCall(PyObject *func, PyObject **args, Py_ssize_t nargs);
+#else
+#define __Pyx_PyCFunction_FastCall(func, args, nargs)  (assert(0), NULL)
+#endif
+
+/* PyFunctionFastCall.proto */
+#if CYTHON_FAST_PYCALL
+#define __Pyx_PyFunction_FastCall(func, args, nargs)\
+    __Pyx_PyFunction_FastCallDict((func), (args), (nargs), NULL)
+#if 1 || PY_VERSION_HEX < 0x030600B1
+static PyObject *__Pyx_PyFunction_FastCallDict(PyObject *func, PyObject **args, Py_ssize_t nargs, PyObject *kwargs);
+#else
+#define __Pyx_PyFunction_FastCallDict(func, args, nargs, kwargs) _PyFunction_FastCallDict(func, args, nargs, kwargs)
+#endif
+#define __Pyx_BUILD_ASSERT_EXPR(cond)\
+    (sizeof(char [1 - 2*!(cond)]) - 1)
+#ifndef Py_MEMBER_SIZE
+#define Py_MEMBER_SIZE(type, member) sizeof(((type *)0)->member)
+#endif
+  static size_t __pyx_pyframe_localsplus_offset = 0;
+  #include "frameobject.h"
+  #define __Pxy_PyFrame_Initialize_Offsets()\
+    ((void)__Pyx_BUILD_ASSERT_EXPR(sizeof(PyFrameObject) == offsetof(PyFrameObject, f_localsplus) + Py_MEMBER_SIZE(PyFrameObject, f_localsplus)),\
+     (void)(__pyx_pyframe_localsplus_offset = ((size_t)PyFrame_Type.tp_basicsize) - Py_MEMBER_SIZE(PyFrameObject, f_localsplus)))
+  #define __Pyx_PyFrame_GetLocalsplus(frame)\
+    (assert(__pyx_pyframe_localsplus_offset), (PyObject **)(((char *)(frame)) + __pyx_pyframe_localsplus_offset))
+#endif
+
+/* PyObjectCall2Args.proto */
+static CYTHON_UNUSED PyObject* __Pyx_PyObject_Call2Args(PyObject* function, PyObject* arg1, PyObject* arg2);
+
+/* PyObjectCallMethO.proto */
+#if CYTHON_COMPILING_IN_CPYTHON
+static CYTHON_INLINE PyObject* __Pyx_PyObject_CallMethO(PyObject *func, PyObject *arg);
+#endif
+
+/* PyObjectCallOneArg.proto */
+static CYTHON_INLINE PyObject* __Pyx_PyObject_CallOneArg(PyObject *func, PyObject *arg);
 
 /* KeywordStringCheck.proto */
 static int __Pyx_CheckKeywordStrings(PyObject *kwdict, const char* function_name, int kw_allowed);
@@ -1100,34 +1161,6 @@ static PyObject* __Pyx_PyObject_Format(PyObject* s, PyObject* f);
 static PyObject* __Pyx_PyUnicode_Join(PyObject* value_tuple, Py_ssize_t value_count, Py_ssize_t result_ulength,
                                       Py_UCS4 max_char);
 
-/* PyFunctionFastCall.proto */
-#if CYTHON_FAST_PYCALL
-#define __Pyx_PyFunction_FastCall(func, args, nargs)\
-    __Pyx_PyFunction_FastCallDict((func), (args), (nargs), NULL)
-#if 1 || PY_VERSION_HEX < 0x030600B1
-static PyObject *__Pyx_PyFunction_FastCallDict(PyObject *func, PyObject **args, Py_ssize_t nargs, PyObject *kwargs);
-#else
-#define __Pyx_PyFunction_FastCallDict(func, args, nargs, kwargs) _PyFunction_FastCallDict(func, args, nargs, kwargs)
-#endif
-#define __Pyx_BUILD_ASSERT_EXPR(cond)\
-    (sizeof(char [1 - 2*!(cond)]) - 1)
-#ifndef Py_MEMBER_SIZE
-#define Py_MEMBER_SIZE(type, member) sizeof(((type *)0)->member)
-#endif
-  static size_t __pyx_pyframe_localsplus_offset = 0;
-  #include "frameobject.h"
-  #define __Pxy_PyFrame_Initialize_Offsets()\
-    ((void)__Pyx_BUILD_ASSERT_EXPR(sizeof(PyFrameObject) == offsetof(PyFrameObject, f_localsplus) + Py_MEMBER_SIZE(PyFrameObject, f_localsplus)),\
-     (void)(__pyx_pyframe_localsplus_offset = ((size_t)PyFrame_Type.tp_basicsize) - Py_MEMBER_SIZE(PyFrameObject, f_localsplus)))
-  #define __Pyx_PyFrame_GetLocalsplus(frame)\
-    (assert(__pyx_pyframe_localsplus_offset), (PyObject **)(((char *)(frame)) + __pyx_pyframe_localsplus_offset))
-#endif
-
-/* PyObjectCallMethO.proto */
-#if CYTHON_COMPILING_IN_CPYTHON
-static CYTHON_INLINE PyObject* __Pyx_PyObject_CallMethO(PyObject *func, PyObject *arg);
-#endif
-
 /* PyObjectCallNoArg.proto */
 #if CYTHON_COMPILING_IN_CPYTHON
 static CYTHON_INLINE PyObject* __Pyx_PyObject_CallNoArg(PyObject *func);
@@ -1135,15 +1168,70 @@ static CYTHON_INLINE PyObject* __Pyx_PyObject_CallNoArg(PyObject *func);
 #define __Pyx_PyObject_CallNoArg(func) __Pyx_PyObject_Call(func, __pyx_empty_tuple, NULL)
 #endif
 
-/* PyCFunctionFastCall.proto */
-#if CYTHON_FAST_PYCCALL
-static CYTHON_INLINE PyObject *__Pyx_PyCFunction_FastCall(PyObject *func, PyObject **args, Py_ssize_t nargs);
+/* DictGetItem.proto */
+#if PY_MAJOR_VERSION >= 3 && !CYTHON_COMPILING_IN_PYPY
+static PyObject *__Pyx_PyDict_GetItem(PyObject *d, PyObject* key);
+#define __Pyx_PyObject_Dict_GetItem(obj, name)\
+    (likely(PyDict_CheckExact(obj)) ?\
+     __Pyx_PyDict_GetItem(obj, name) : PyObject_GetItem(obj, name))
 #else
-#define __Pyx_PyCFunction_FastCall(func, args, nargs)  (assert(0), NULL)
+#define __Pyx_PyDict_GetItem(d, key) PyObject_GetItem(d, key)
+#define __Pyx_PyObject_Dict_GetItem(obj, name)  PyObject_GetItem(obj, name)
 #endif
 
-/* PyObjectCallOneArg.proto */
-static CYTHON_INLINE PyObject* __Pyx_PyObject_CallOneArg(PyObject *func, PyObject *arg);
+/* RaiseTooManyValuesToUnpack.proto */
+static CYTHON_INLINE void __Pyx_RaiseTooManyValuesError(Py_ssize_t expected);
+
+/* RaiseNeedMoreValuesToUnpack.proto */
+static CYTHON_INLINE void __Pyx_RaiseNeedMoreValuesError(Py_ssize_t index);
+
+/* RaiseNoneIterError.proto */
+static CYTHON_INLINE void __Pyx_RaiseNoneNotIterableError(void);
+
+/* GetTopmostException.proto */
+#if CYTHON_USE_EXC_INFO_STACK
+static _PyErr_StackItem * __Pyx_PyErr_GetTopmostException(PyThreadState *tstate);
+#endif
+
+/* SaveResetException.proto */
+#if CYTHON_FAST_THREAD_STATE
+#define __Pyx_ExceptionSave(type, value, tb)  __Pyx__ExceptionSave(__pyx_tstate, type, value, tb)
+static CYTHON_INLINE void __Pyx__ExceptionSave(PyThreadState *tstate, PyObject **type, PyObject **value, PyObject **tb);
+#define __Pyx_ExceptionReset(type, value, tb)  __Pyx__ExceptionReset(__pyx_tstate, type, value, tb)
+static CYTHON_INLINE void __Pyx__ExceptionReset(PyThreadState *tstate, PyObject *type, PyObject *value, PyObject *tb);
+#else
+#define __Pyx_ExceptionSave(type, value, tb)   PyErr_GetExcInfo(type, value, tb)
+#define __Pyx_ExceptionReset(type, value, tb)  PyErr_SetExcInfo(type, value, tb)
+#endif
+
+/* PyErrExceptionMatches.proto */
+#if CYTHON_FAST_THREAD_STATE
+#define __Pyx_PyErr_ExceptionMatches(err) __Pyx_PyErr_ExceptionMatchesInState(__pyx_tstate, err)
+static CYTHON_INLINE int __Pyx_PyErr_ExceptionMatchesInState(PyThreadState* tstate, PyObject* err);
+#else
+#define __Pyx_PyErr_ExceptionMatches(err)  PyErr_ExceptionMatches(err)
+#endif
+
+/* GetException.proto */
+#if CYTHON_FAST_THREAD_STATE
+#define __Pyx_GetException(type, value, tb)  __Pyx__GetException(__pyx_tstate, type, value, tb)
+static int __Pyx__GetException(PyThreadState *tstate, PyObject **type, PyObject **value, PyObject **tb);
+#else
+static int __Pyx_GetException(PyObject **type, PyObject **value, PyObject **tb);
+#endif
+
+/* SwapException.proto */
+#if CYTHON_FAST_THREAD_STATE
+#define __Pyx_ExceptionSwap(type, value, tb)  __Pyx__ExceptionSwap(__pyx_tstate, type, value, tb)
+static CYTHON_INLINE void __Pyx__ExceptionSwap(PyThreadState *tstate, PyObject **type, PyObject **value, PyObject **tb);
+#else
+static CYTHON_INLINE void __Pyx_ExceptionSwap(PyObject **type, PyObject **value, PyObject **tb);
+#endif
+
+/* WriteUnraisableException.proto */
+static void __Pyx_WriteUnraisable(const char *name, int clineno,
+                                  int lineno, const char *filename,
+                                  int full_traceback, int nogil);
 
 /* PyDictVersioning.proto */
 #if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_TYPE_SLOTS
@@ -1170,9 +1258,6 @@ static CYTHON_INLINE int __Pyx_object_dict_version_matches(PyObject* obj, PY_UIN
 #define __PYX_UPDATE_DICT_CACHE(dict, value, cache_var, version_var)
 #define __PYX_PY_DICT_LOOKUP_IF_MODIFIED(VAR, DICT, LOOKUP)  (VAR) = (LOOKUP);
 #endif
-
-/* PyObjectCall2Args.proto */
-static CYTHON_UNUSED PyObject* __Pyx_PyObject_Call2Args(PyObject* function, PyObject* arg1, PyObject* arg2);
 
 /* PyDictContains.proto */
 static CYTHON_INLINE int __Pyx_PyDict_ContainsTF(PyObject* item, PyObject* dict, int eq) {
@@ -1262,17 +1347,6 @@ static PyObject* __Pyx__CallUnboundCMethod0(__Pyx_CachedCFunction* cfunc, PyObje
 #define __Pyx_CallUnboundCMethod0(cfunc, self)  __Pyx__CallUnboundCMethod0(cfunc, self)
 #endif
 
-/* DictGetItem.proto */
-#if PY_MAJOR_VERSION >= 3 && !CYTHON_COMPILING_IN_PYPY
-static PyObject *__Pyx_PyDict_GetItem(PyObject *d, PyObject* key);
-#define __Pyx_PyObject_Dict_GetItem(obj, name)\
-    (likely(PyDict_CheckExact(obj)) ?\
-     __Pyx_PyDict_GetItem(obj, name) : PyObject_GetItem(obj, name))
-#else
-#define __Pyx_PyDict_GetItem(d, key) PyObject_GetItem(d, key)
-#define __Pyx_PyObject_Dict_GetItem(obj, name)  PyObject_GetItem(obj, name)
-#endif
-
 /* BuildPyUnicode.proto */
 static PyObject* __Pyx_PyUnicode_BuildFromAscii(Py_ssize_t ulength, char* chars, int clength,
                                                 int prepend_sign, char padding_char);
@@ -1294,11 +1368,11 @@ static PyObject* __Pyx_PyObject_GenericGetAttr(PyObject* obj, PyObject* attr_nam
 #define __Pyx_PyObject_GenericGetAttr PyObject_GenericGetAttr
 #endif
 
-/* SetupReduce.proto */
-static int __Pyx_setup_reduce(PyObject* type_obj);
-
 /* SetVTable.proto */
 static int __Pyx_SetVtable(PyObject *dict, void *vtable);
+
+/* SetupReduce.proto */
+static int __Pyx_setup_reduce(PyObject* type_obj);
 
 /* CLineInTraceback.proto */
 #ifdef CYTHON_CLINE_IN_TRACEBACK
@@ -1399,7 +1473,10 @@ static int __Pyx_check_binary_version(void);
 /* InitStrings.proto */
 static int __Pyx_InitStrings(__Pyx_StringTabEntry *t);
 
+static PyObject *__pyx_f_7foolysh_11taskmanager_4Task_get_callback(struct __pyx_obj_7foolysh_11taskmanager_Task *__pyx_v_self); /* proto*/
+static void __pyx_f_7foolysh_11taskmanager_11TaskManager__run_callback(struct __pyx_obj_7foolysh_11taskmanager_TaskManager *__pyx_v_self, std::string __pyx_v_name, double const __pyx_v_dt, bool const __pyx_v_with_dt); /* proto*/
 static struct __pyx_obj_7foolysh_11taskmanager_Task *__pyx_f_7foolysh_11taskmanager_11TaskManager_add_task(struct __pyx_obj_7foolysh_11taskmanager_TaskManager *__pyx_v_self, PyObject *__pyx_v_name, PyObject *__pyx_v_cb, int __pyx_skip_dispatch, struct __pyx_opt_args_7foolysh_11taskmanager_11TaskManager_add_task *__pyx_optional_args); /* proto*/
+static PyObject *__pyx_f_7foolysh_11taskmanager_11TaskManager__add_task(struct __pyx_obj_7foolysh_11taskmanager_TaskManager *__pyx_v_self, std::string __pyx_v_name, double __pyx_v_delay, bool __pyx_v_with_dt); /* proto*/
 static void __pyx_f_7foolysh_11taskmanager_11TaskManager_remove_task(struct __pyx_obj_7foolysh_11taskmanager_TaskManager *__pyx_v_self, PyObject *__pyx_v_name, int __pyx_skip_dispatch); /* proto*/
 static void __pyx_f_7foolysh_11taskmanager_11TaskManager_execute(struct __pyx_obj_7foolysh_11taskmanager_TaskManager *__pyx_v_self, double const __pyx_v_dt, int __pyx_skip_dispatch); /* proto*/
 static void __pyx_f_7foolysh_11taskmanager_11TaskManager_set_delay(struct __pyx_obj_7foolysh_11taskmanager_TaskManager *__pyx_v_self, PyObject *__pyx_v_name, double const __pyx_v_delay, int __pyx_skip_dispatch); /* proto*/
@@ -1423,7 +1500,11 @@ static double __pyx_f_7foolysh_11taskmanager_11TaskManager_get_delay(struct __py
 /* Module declarations from 'foolysh.taskmanager' */
 static PyTypeObject *__pyx_ptype_7foolysh_11taskmanager_Task = 0;
 static PyTypeObject *__pyx_ptype_7foolysh_11taskmanager_TaskManager = 0;
-static void __pyx_f_7foolysh_11taskmanager__run_callback(void *, void *, void *, double const , bool const ); /*proto*/
+static CYTHON_INLINE PyObject *__pyx_convert_PyObject_string_to_py_std__in_string(std::string const &); /*proto*/
+static CYTHON_INLINE PyObject *__pyx_convert_PyUnicode_string_to_py_std__in_string(std::string const &); /*proto*/
+static CYTHON_INLINE PyObject *__pyx_convert_PyStr_string_to_py_std__in_string(std::string const &); /*proto*/
+static CYTHON_INLINE PyObject *__pyx_convert_PyBytes_string_to_py_std__in_string(std::string const &); /*proto*/
+static CYTHON_INLINE PyObject *__pyx_convert_PyByteArray_string_to_py_std__in_string(std::string const &); /*proto*/
 static std::string __pyx_convert_string_from_py_std__in_string(PyObject *); /*proto*/
 #define __Pyx_MODULE_NAME "foolysh.taskmanager"
 extern int __pyx_module_is_main_foolysh__taskmanager;
@@ -1432,12 +1513,14 @@ int __pyx_module_is_main_foolysh__taskmanager = 0;
 /* Implementation of 'foolysh.taskmanager' */
 static PyObject *__pyx_builtin_ValueError;
 static PyObject *__pyx_builtin_TypeError;
+static PyObject *__pyx_builtin_print;
 static PyObject *__pyx_builtin_IndexError;
 static const char __pyx_k_4f[] = ".4f";
 static const char __pyx_k__2[] = "(";
 static const char __pyx_k__3[] = ", ";
 static const char __pyx_k__4[] = ")";
-static const char __pyx_k__7[] = "\"";
+static const char __pyx_k__7[] = ": ";
+static const char __pyx_k__8[] = "\"";
 static const char __pyx_k_cb[] = "cb";
 static const char __pyx_k_dt[] = "dt";
 static const char __pyx_k_0_1[] = "0.1";
@@ -1452,8 +1535,10 @@ static const char __pyx_k_test[] = "__test__";
 static const char __pyx_k_UTF_8[] = "UTF-8";
 static const char __pyx_k_delay[] = "delay";
 static const char __pyx_k_pause[] = "pause";
+static const char __pyx_k_print[] = "print";
 static const char __pyx_k_state[] = "state";
 static const char __pyx_k_author[] = "__author__";
+static const char __pyx_k_decode[] = "decode";
 static const char __pyx_k_encode[] = "encode";
 static const char __pyx_k_kwargs[] = "kwargs";
 static const char __pyx_k_name_2[] = "__name__";
@@ -1485,10 +1570,12 @@ static const char __pyx_k_setstate_cython[] = "__setstate_cython__";
 static const char __pyx_k_cline_in_traceback[] = "cline_in_traceback";
 static const char __pyx_k_Copyright_c_2020_Tiziano_Bettio[] = "Copyright (c) 2020 Tiziano Bettio\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.";
 static const char __pyx_k_Provides_a_simplistic_Task_Mana[] = "\nProvides a simplistic Task Manager to execute either every frame or in a\nspecified interval.\n";
+static const char __pyx_k_Error_occurred_while_trying_to_e[] = "Error occurred while trying to execute task ";
 static const char __pyx_k_no_default___reduce___due_to_non[] = "no default __reduce__ due to non-trivial __cinit__";
 static PyObject *__pyx_kp_u_0_1;
 static PyObject *__pyx_kp_u_4f;
 static PyObject *__pyx_kp_u_Copyright_c_2020_Tiziano_Bettio;
+static PyObject *__pyx_kp_u_Error_occurred_while_trying_to_e;
 static PyObject *__pyx_n_s_IndexError;
 static PyObject *__pyx_n_u_MIT;
 static PyObject *__pyx_kp_u_No_task_named;
@@ -1502,12 +1589,14 @@ static PyObject *__pyx_kp_u__2;
 static PyObject *__pyx_kp_u__3;
 static PyObject *__pyx_kp_u__4;
 static PyObject *__pyx_kp_u__7;
+static PyObject *__pyx_kp_u__8;
 static PyObject *__pyx_n_s_add_task;
 static PyObject *__pyx_n_s_args;
 static PyObject *__pyx_n_s_author;
 static PyObject *__pyx_n_s_cb;
 static PyObject *__pyx_n_s_cline_in_traceback;
 static PyObject *__pyx_n_s_copyright;
+static PyObject *__pyx_n_s_decode;
 static PyObject *__pyx_n_s_delay;
 static PyObject *__pyx_kp_u_delay_must_be_0;
 static PyObject *__pyx_n_s_dt;
@@ -1524,6 +1613,7 @@ static PyObject *__pyx_n_s_name_2;
 static PyObject *__pyx_kp_s_no_default___reduce___due_to_non;
 static PyObject *__pyx_n_s_pause;
 static PyObject *__pyx_n_s_pop;
+static PyObject *__pyx_n_s_print;
 static PyObject *__pyx_n_s_pyx_vtable;
 static PyObject *__pyx_n_s_reduce;
 static PyObject *__pyx_n_s_reduce_cython;
@@ -1574,131 +1664,11 @@ static PyObject *__pyx_int_0;
 static PyObject *__pyx_tuple_;
 static PyObject *__pyx_tuple__5;
 static PyObject *__pyx_tuple__6;
-static PyObject *__pyx_tuple__8;
 static PyObject *__pyx_tuple__9;
+static PyObject *__pyx_tuple__10;
 /* Late includes */
 
-/* "foolysh/taskmanager.pyx":41
- * 
- * 
- * cdef void _run_callback(             # <<<<<<<<<<<<<<
- *     void* f,
- *     void* a,
- */
-
-static void __pyx_f_7foolysh_11taskmanager__run_callback(void *__pyx_v_f, void *__pyx_v_a, void *__pyx_v_kw, double const __pyx_v_dt, bool const __pyx_v_with_dt) {
-  PyObject *__pyx_v__a = NULL;
-  PyObject *__pyx_v__kw = NULL;
-  __Pyx_RefNannyDeclarations
-  PyObject *__pyx_t_1 = NULL;
-  int __pyx_t_2;
-  PyObject *__pyx_t_3 = NULL;
-  PyObject *__pyx_t_4 = NULL;
-  __Pyx_RefNannySetupContext("_run_callback", 0);
-
-  /* "foolysh/taskmanager.pyx":51
- *     Proxy function to actually call the Python callback from a task.
- *     """
- *     _a = <object> a             # <<<<<<<<<<<<<<
- *     _kw = <object> kw
- *     if with_dt:
- */
-  __pyx_t_1 = ((PyObject *)__pyx_v_a);
-  __Pyx_INCREF(__pyx_t_1);
-  __pyx_v__a = __pyx_t_1;
-  __pyx_t_1 = 0;
-
-  /* "foolysh/taskmanager.pyx":52
- *     """
- *     _a = <object> a
- *     _kw = <object> kw             # <<<<<<<<<<<<<<
- *     if with_dt:
- *         _kw['dt'] = dt
- */
-  __pyx_t_1 = ((PyObject *)__pyx_v_kw);
-  __Pyx_INCREF(__pyx_t_1);
-  __pyx_v__kw = __pyx_t_1;
-  __pyx_t_1 = 0;
-
-  /* "foolysh/taskmanager.pyx":53
- *     _a = <object> a
- *     _kw = <object> kw
- *     if with_dt:             # <<<<<<<<<<<<<<
- *         _kw['dt'] = dt
- *     (<object> f)(*_a, **_kw)
- */
-  __pyx_t_2 = (__pyx_v_with_dt != 0);
-  if (__pyx_t_2) {
-
-    /* "foolysh/taskmanager.pyx":54
- *     _kw = <object> kw
- *     if with_dt:
- *         _kw['dt'] = dt             # <<<<<<<<<<<<<<
- *     (<object> f)(*_a, **_kw)
- * 
- */
-    __pyx_t_1 = PyFloat_FromDouble(__pyx_v_dt); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 54, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    if (unlikely(PyObject_SetItem(__pyx_v__kw, __pyx_n_u_dt, __pyx_t_1) < 0)) __PYX_ERR(0, 54, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-
-    /* "foolysh/taskmanager.pyx":53
- *     _a = <object> a
- *     _kw = <object> kw
- *     if with_dt:             # <<<<<<<<<<<<<<
- *         _kw['dt'] = dt
- *     (<object> f)(*_a, **_kw)
- */
-  }
-
-  /* "foolysh/taskmanager.pyx":55
- *     if with_dt:
- *         _kw['dt'] = dt
- *     (<object> f)(*_a, **_kw)             # <<<<<<<<<<<<<<
- * 
- * 
- */
-  __pyx_t_1 = __Pyx_PySequence_Tuple(__pyx_v__a); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 55, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  if (unlikely(__pyx_v__kw == Py_None)) {
-    PyErr_SetString(PyExc_TypeError, "argument after ** must be a mapping, not NoneType");
-    __PYX_ERR(0, 55, __pyx_L1_error)
-  }
-  if (likely(PyDict_CheckExact(__pyx_v__kw))) {
-    __pyx_t_3 = PyDict_Copy(__pyx_v__kw); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 55, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-  } else {
-    __pyx_t_3 = PyObject_CallFunctionObjArgs((PyObject*)&PyDict_Type, __pyx_v__kw, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 55, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-  }
-  __pyx_t_4 = __Pyx_PyObject_Call(((PyObject *)__pyx_v_f), __pyx_t_1, __pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 55, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-
-  /* "foolysh/taskmanager.pyx":41
- * 
- * 
- * cdef void _run_callback(             # <<<<<<<<<<<<<<
- *     void* f,
- *     void* a,
- */
-
-  /* function exit code */
-  goto __pyx_L0;
-  __pyx_L1_error:;
-  __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_XDECREF(__pyx_t_3);
-  __Pyx_XDECREF(__pyx_t_4);
-  __Pyx_WriteUnraisable("foolysh.taskmanager._run_callback", __pyx_clineno, __pyx_lineno, __pyx_filename, 1, 0);
-  __pyx_L0:;
-  __Pyx_XDECREF(__pyx_v__a);
-  __Pyx_XDECREF(__pyx_v__kw);
-  __Pyx_RefNannyFinishContext();
-}
-
-/* "foolysh/taskmanager.pyx":69
+/* "foolysh/taskmanager.pyx":52
  *     cdef TaskManager _task_manager
  * 
  *     def __cinit__(self, name, cb, args, kwargs, task_manager):             # <<<<<<<<<<<<<<
@@ -1746,29 +1716,29 @@ static int __pyx_pw_7foolysh_11taskmanager_4Task_1__cinit__(PyObject *__pyx_v_se
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_cb)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 5, 5, 1); __PYX_ERR(0, 69, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 5, 5, 1); __PYX_ERR(0, 52, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_args)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 5, 5, 2); __PYX_ERR(0, 69, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 5, 5, 2); __PYX_ERR(0, 52, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_kwargs)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 5, 5, 3); __PYX_ERR(0, 69, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 5, 5, 3); __PYX_ERR(0, 52, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  4:
         if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_task_manager)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 5, 5, 4); __PYX_ERR(0, 69, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 5, 5, 4); __PYX_ERR(0, 52, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__cinit__") < 0)) __PYX_ERR(0, 69, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__cinit__") < 0)) __PYX_ERR(0, 52, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 5) {
       goto __pyx_L5_argtuple_error;
@@ -1787,7 +1757,7 @@ static int __pyx_pw_7foolysh_11taskmanager_4Task_1__cinit__(PyObject *__pyx_v_se
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 5, 5, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 69, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 5, 5, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 52, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("foolysh.taskmanager.Task.__cinit__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -1806,7 +1776,7 @@ static int __pyx_pf_7foolysh_11taskmanager_4Task___cinit__(struct __pyx_obj_7foo
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("__cinit__", 0);
 
-  /* "foolysh/taskmanager.pyx":70
+  /* "foolysh/taskmanager.pyx":53
  * 
  *     def __cinit__(self, name, cb, args, kwargs, task_manager):
  *         self._name = name             # <<<<<<<<<<<<<<
@@ -1819,7 +1789,7 @@ static int __pyx_pf_7foolysh_11taskmanager_4Task___cinit__(struct __pyx_obj_7foo
   __Pyx_DECREF(__pyx_v_self->_name);
   __pyx_v_self->_name = __pyx_v_name;
 
-  /* "foolysh/taskmanager.pyx":71
+  /* "foolysh/taskmanager.pyx":54
  *     def __cinit__(self, name, cb, args, kwargs, task_manager):
  *         self._name = name
  *         self._cb = cb             # <<<<<<<<<<<<<<
@@ -1832,7 +1802,7 @@ static int __pyx_pf_7foolysh_11taskmanager_4Task___cinit__(struct __pyx_obj_7foo
   __Pyx_DECREF(__pyx_v_self->_cb);
   __pyx_v_self->_cb = __pyx_v_cb;
 
-  /* "foolysh/taskmanager.pyx":72
+  /* "foolysh/taskmanager.pyx":55
  *         self._name = name
  *         self._cb = cb
  *         self._args = args             # <<<<<<<<<<<<<<
@@ -1845,7 +1815,7 @@ static int __pyx_pf_7foolysh_11taskmanager_4Task___cinit__(struct __pyx_obj_7foo
   __Pyx_DECREF(__pyx_v_self->_args);
   __pyx_v_self->_args = __pyx_v_args;
 
-  /* "foolysh/taskmanager.pyx":73
+  /* "foolysh/taskmanager.pyx":56
  *         self._cb = cb
  *         self._args = args
  *         self._kwargs = kwargs             # <<<<<<<<<<<<<<
@@ -1858,14 +1828,14 @@ static int __pyx_pf_7foolysh_11taskmanager_4Task___cinit__(struct __pyx_obj_7foo
   __Pyx_DECREF(__pyx_v_self->_kwargs);
   __pyx_v_self->_kwargs = __pyx_v_kwargs;
 
-  /* "foolysh/taskmanager.pyx":74
+  /* "foolysh/taskmanager.pyx":57
  *         self._args = args
  *         self._kwargs = kwargs
  *         self._task_manager = task_manager             # <<<<<<<<<<<<<<
  * 
- *     @property
+ *     cdef tuple get_callback(self):
  */
-  if (!(likely(((__pyx_v_task_manager) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_task_manager, __pyx_ptype_7foolysh_11taskmanager_TaskManager))))) __PYX_ERR(0, 74, __pyx_L1_error)
+  if (!(likely(((__pyx_v_task_manager) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_task_manager, __pyx_ptype_7foolysh_11taskmanager_TaskManager))))) __PYX_ERR(0, 57, __pyx_L1_error)
   __pyx_t_1 = __pyx_v_task_manager;
   __Pyx_INCREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
@@ -1874,7 +1844,7 @@ static int __pyx_pf_7foolysh_11taskmanager_4Task___cinit__(struct __pyx_obj_7foo
   __pyx_v_self->_task_manager = ((struct __pyx_obj_7foolysh_11taskmanager_TaskManager *)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "foolysh/taskmanager.pyx":69
+  /* "foolysh/taskmanager.pyx":52
  *     cdef TaskManager _task_manager
  * 
  *     def __cinit__(self, name, cb, args, kwargs, task_manager):             # <<<<<<<<<<<<<<
@@ -1894,7 +1864,63 @@ static int __pyx_pf_7foolysh_11taskmanager_4Task___cinit__(struct __pyx_obj_7foo
   return __pyx_r;
 }
 
-/* "foolysh/taskmanager.pyx":77
+/* "foolysh/taskmanager.pyx":59
+ *         self._task_manager = task_manager
+ * 
+ *     cdef tuple get_callback(self):             # <<<<<<<<<<<<<<
+ *         """Used to get a Tuple of callback, args and kwargs."""
+ *         return self._cb, self._args, self._kwargs
+ */
+
+static PyObject *__pyx_f_7foolysh_11taskmanager_4Task_get_callback(struct __pyx_obj_7foolysh_11taskmanager_Task *__pyx_v_self) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  __Pyx_RefNannySetupContext("get_callback", 0);
+
+  /* "foolysh/taskmanager.pyx":61
+ *     cdef tuple get_callback(self):
+ *         """Used to get a Tuple of callback, args and kwargs."""
+ *         return self._cb, self._args, self._kwargs             # <<<<<<<<<<<<<<
+ * 
+ *     @property
+ */
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_t_1 = PyTuple_New(3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 61, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_INCREF(__pyx_v_self->_cb);
+  __Pyx_GIVEREF(__pyx_v_self->_cb);
+  PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_v_self->_cb);
+  __Pyx_INCREF(__pyx_v_self->_args);
+  __Pyx_GIVEREF(__pyx_v_self->_args);
+  PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_v_self->_args);
+  __Pyx_INCREF(__pyx_v_self->_kwargs);
+  __Pyx_GIVEREF(__pyx_v_self->_kwargs);
+  PyTuple_SET_ITEM(__pyx_t_1, 2, __pyx_v_self->_kwargs);
+  __pyx_r = ((PyObject*)__pyx_t_1);
+  __pyx_t_1 = 0;
+  goto __pyx_L0;
+
+  /* "foolysh/taskmanager.pyx":59
+ *         self._task_manager = task_manager
+ * 
+ *     cdef tuple get_callback(self):             # <<<<<<<<<<<<<<
+ *         """Used to get a Tuple of callback, args and kwargs."""
+ *         return self._cb, self._args, self._kwargs
+ */
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("foolysh.taskmanager.Task.get_callback", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = 0;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "foolysh/taskmanager.pyx":64
  * 
  *     @property
  *     def delay(self):             # <<<<<<<<<<<<<<
@@ -1922,7 +1948,7 @@ static PyObject *__pyx_pf_7foolysh_11taskmanager_4Task_5delay___get__(struct __p
   PyObject *__pyx_t_2 = NULL;
   __Pyx_RefNannySetupContext("__get__", 0);
 
-  /* "foolysh/taskmanager.pyx":87
+  /* "foolysh/taskmanager.pyx":74
  *             remaining time until next execution to the specified value!
  *         """
  *         return self._task_manager.get_delay(self._name)             # <<<<<<<<<<<<<<
@@ -1932,14 +1958,14 @@ static PyObject *__pyx_pf_7foolysh_11taskmanager_4Task_5delay___get__(struct __p
   __Pyx_XDECREF(__pyx_r);
   __pyx_t_1 = __pyx_v_self->_name;
   __Pyx_INCREF(__pyx_t_1);
-  __pyx_t_2 = PyFloat_FromDouble(((struct __pyx_vtabstruct_7foolysh_11taskmanager_TaskManager *)__pyx_v_self->_task_manager->__pyx_vtab)->get_delay(__pyx_v_self->_task_manager, __pyx_t_1, 0)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 87, __pyx_L1_error)
+  __pyx_t_2 = PyFloat_FromDouble(((struct __pyx_vtabstruct_7foolysh_11taskmanager_TaskManager *)__pyx_v_self->_task_manager->__pyx_vtab)->get_delay(__pyx_v_self->_task_manager, __pyx_t_1, 0)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 74, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_r = __pyx_t_2;
   __pyx_t_2 = 0;
   goto __pyx_L0;
 
-  /* "foolysh/taskmanager.pyx":77
+  /* "foolysh/taskmanager.pyx":64
  * 
  *     @property
  *     def delay(self):             # <<<<<<<<<<<<<<
@@ -1959,7 +1985,7 @@ static PyObject *__pyx_pf_7foolysh_11taskmanager_4Task_5delay___get__(struct __p
   return __pyx_r;
 }
 
-/* "foolysh/taskmanager.pyx":90
+/* "foolysh/taskmanager.pyx":77
  * 
  *     @delay.setter
  *     def delay(self, value):             # <<<<<<<<<<<<<<
@@ -1990,7 +2016,7 @@ static int __pyx_pf_7foolysh_11taskmanager_4Task_5delay_2__set__(struct __pyx_ob
   double __pyx_t_5;
   __Pyx_RefNannySetupContext("__set__", 0);
 
-  /* "foolysh/taskmanager.pyx":91
+  /* "foolysh/taskmanager.pyx":78
  *     @delay.setter
  *     def delay(self, value):
  *         if isinstance(value, (float, int)):             # <<<<<<<<<<<<<<
@@ -2011,32 +2037,32 @@ static int __pyx_pf_7foolysh_11taskmanager_4Task_5delay_2__set__(struct __pyx_ob
   __pyx_t_2 = (__pyx_t_1 != 0);
   if (likely(__pyx_t_2)) {
 
-    /* "foolysh/taskmanager.pyx":92
+    /* "foolysh/taskmanager.pyx":79
  *     def delay(self, value):
  *         if isinstance(value, (float, int)):
  *             if value < 0:             # <<<<<<<<<<<<<<
  *                 raise ValueError('delay must be >= 0')
  *             self._task_manager.set_delay(self._name, <double> value)
  */
-    __pyx_t_4 = PyObject_RichCompare(__pyx_v_value, __pyx_int_0, Py_LT); __Pyx_XGOTREF(__pyx_t_4); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 92, __pyx_L1_error)
-    __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 92, __pyx_L1_error)
+    __pyx_t_4 = PyObject_RichCompare(__pyx_v_value, __pyx_int_0, Py_LT); __Pyx_XGOTREF(__pyx_t_4); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 79, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 79, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     if (unlikely(__pyx_t_2)) {
 
-      /* "foolysh/taskmanager.pyx":93
+      /* "foolysh/taskmanager.pyx":80
  *         if isinstance(value, (float, int)):
  *             if value < 0:
  *                 raise ValueError('delay must be >= 0')             # <<<<<<<<<<<<<<
  *             self._task_manager.set_delay(self._name, <double> value)
  *         else:
  */
-      __pyx_t_4 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple_, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 93, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple_, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 80, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_Raise(__pyx_t_4, 0, 0, 0);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      __PYX_ERR(0, 93, __pyx_L1_error)
+      __PYX_ERR(0, 80, __pyx_L1_error)
 
-      /* "foolysh/taskmanager.pyx":92
+      /* "foolysh/taskmanager.pyx":79
  *     def delay(self, value):
  *         if isinstance(value, (float, int)):
  *             if value < 0:             # <<<<<<<<<<<<<<
@@ -2045,7 +2071,7 @@ static int __pyx_pf_7foolysh_11taskmanager_4Task_5delay_2__set__(struct __pyx_ob
  */
     }
 
-    /* "foolysh/taskmanager.pyx":94
+    /* "foolysh/taskmanager.pyx":81
  *             if value < 0:
  *                 raise ValueError('delay must be >= 0')
  *             self._task_manager.set_delay(self._name, <double> value)             # <<<<<<<<<<<<<<
@@ -2054,11 +2080,11 @@ static int __pyx_pf_7foolysh_11taskmanager_4Task_5delay_2__set__(struct __pyx_ob
  */
     __pyx_t_4 = __pyx_v_self->_name;
     __Pyx_INCREF(__pyx_t_4);
-    __pyx_t_5 = __pyx_PyFloat_AsDouble(__pyx_v_value); if (unlikely((__pyx_t_5 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 94, __pyx_L1_error)
+    __pyx_t_5 = __pyx_PyFloat_AsDouble(__pyx_v_value); if (unlikely((__pyx_t_5 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 81, __pyx_L1_error)
     ((struct __pyx_vtabstruct_7foolysh_11taskmanager_TaskManager *)__pyx_v_self->_task_manager->__pyx_vtab)->set_delay(__pyx_v_self->_task_manager, __pyx_t_4, ((double)__pyx_t_5), 0);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-    /* "foolysh/taskmanager.pyx":91
+    /* "foolysh/taskmanager.pyx":78
  *     @delay.setter
  *     def delay(self, value):
  *         if isinstance(value, (float, int)):             # <<<<<<<<<<<<<<
@@ -2068,7 +2094,7 @@ static int __pyx_pf_7foolysh_11taskmanager_4Task_5delay_2__set__(struct __pyx_ob
     goto __pyx_L3;
   }
 
-  /* "foolysh/taskmanager.pyx":96
+  /* "foolysh/taskmanager.pyx":83
  *             self._task_manager.set_delay(self._name, <double> value)
  *         else:
  *             raise TypeError             # <<<<<<<<<<<<<<
@@ -2077,11 +2103,11 @@ static int __pyx_pf_7foolysh_11taskmanager_4Task_5delay_2__set__(struct __pyx_ob
  */
   /*else*/ {
     __Pyx_Raise(__pyx_builtin_TypeError, 0, 0, 0);
-    __PYX_ERR(0, 96, __pyx_L1_error)
+    __PYX_ERR(0, 83, __pyx_L1_error)
   }
   __pyx_L3:;
 
-  /* "foolysh/taskmanager.pyx":90
+  /* "foolysh/taskmanager.pyx":77
  * 
  *     @delay.setter
  *     def delay(self, value):             # <<<<<<<<<<<<<<
@@ -2101,7 +2127,7 @@ static int __pyx_pf_7foolysh_11taskmanager_4Task_5delay_2__set__(struct __pyx_ob
   return __pyx_r;
 }
 
-/* "foolysh/taskmanager.pyx":99
+/* "foolysh/taskmanager.pyx":86
  * 
  *     @property
  *     def name(self):             # <<<<<<<<<<<<<<
@@ -2127,7 +2153,7 @@ static PyObject *__pyx_pf_7foolysh_11taskmanager_4Task_4name___get__(struct __py
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__get__", 0);
 
-  /* "foolysh/taskmanager.pyx":103
+  /* "foolysh/taskmanager.pyx":90
  *         The identifier of this Task.
  *         """
  *         return self._name             # <<<<<<<<<<<<<<
@@ -2139,7 +2165,7 @@ static PyObject *__pyx_pf_7foolysh_11taskmanager_4Task_4name___get__(struct __py
   __pyx_r = __pyx_v_self->_name;
   goto __pyx_L0;
 
-  /* "foolysh/taskmanager.pyx":99
+  /* "foolysh/taskmanager.pyx":86
  * 
  *     @property
  *     def name(self):             # <<<<<<<<<<<<<<
@@ -2154,7 +2180,7 @@ static PyObject *__pyx_pf_7foolysh_11taskmanager_4Task_4name___get__(struct __py
   return __pyx_r;
 }
 
-/* "foolysh/taskmanager.pyx":106
+/* "foolysh/taskmanager.pyx":93
  * 
  *     @property
  *     def ispaused(self):             # <<<<<<<<<<<<<<
@@ -2180,26 +2206,42 @@ static PyObject *__pyx_pf_7foolysh_11taskmanager_4Task_8ispaused___get__(struct 
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   PyObject *__pyx_t_2 = NULL;
+  PyObject *__pyx_t_3 = NULL;
   __Pyx_RefNannySetupContext("__get__", 0);
 
-  /* "foolysh/taskmanager.pyx":110
+  /* "foolysh/taskmanager.pyx":97
  *         ``bool``
  *         """
- *         return not self._task_manager.state(self._name)             # <<<<<<<<<<<<<<
+ *         return not self._task_manager.state(self._name.decode('UTF-8'))             # <<<<<<<<<<<<<<
  * 
  *     def pause(self):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_v_self->_name;
-  __Pyx_INCREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyBool_FromLong((!(((struct __pyx_vtabstruct_7foolysh_11taskmanager_TaskManager *)__pyx_v_self->_task_manager->__pyx_vtab)->state(__pyx_v_self->_task_manager, __pyx_t_1, 0) != 0))); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 110, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->_name, __pyx_n_s_decode); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 97, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = NULL;
+  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
+    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_2);
+    if (likely(__pyx_t_3)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
+      __Pyx_INCREF(__pyx_t_3);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_2, function);
+    }
+  }
+  __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_3, __pyx_kp_u_UTF_8) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_kp_u_UTF_8);
+  __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 97, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = __Pyx_PyBool_FromLong((!(((struct __pyx_vtabstruct_7foolysh_11taskmanager_TaskManager *)__pyx_v_self->_task_manager->__pyx_vtab)->state(__pyx_v_self->_task_manager, __pyx_t_1, 0) != 0))); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 97, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_r = __pyx_t_2;
   __pyx_t_2 = 0;
   goto __pyx_L0;
 
-  /* "foolysh/taskmanager.pyx":106
+  /* "foolysh/taskmanager.pyx":93
  * 
  *     @property
  *     def ispaused(self):             # <<<<<<<<<<<<<<
@@ -2211,6 +2253,7 @@ static PyObject *__pyx_pf_7foolysh_11taskmanager_4Task_8ispaused___get__(struct 
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
   __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_3);
   __Pyx_AddTraceback("foolysh.taskmanager.Task.ispaused.__get__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
@@ -2219,12 +2262,12 @@ static PyObject *__pyx_pf_7foolysh_11taskmanager_4Task_8ispaused___get__(struct 
   return __pyx_r;
 }
 
-/* "foolysh/taskmanager.pyx":112
- *         return not self._task_manager.state(self._name)
+/* "foolysh/taskmanager.pyx":99
+ *         return not self._task_manager.state(self._name.decode('UTF-8'))
  * 
  *     def pause(self):             # <<<<<<<<<<<<<<
  *         """Pauses the execution of :class:`~foolysh.taskmanager.Task`."""
- *         self._task_manager.pause(self._name)
+ *         self._task_manager.pause(self._name.decode('UTF-8'))
  */
 
 /* Python wrapper */
@@ -2245,41 +2288,66 @@ static PyObject *__pyx_pf_7foolysh_11taskmanager_4Task_2pause(struct __pyx_obj_7
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
+  PyObject *__pyx_t_2 = NULL;
+  PyObject *__pyx_t_3 = NULL;
   __Pyx_RefNannySetupContext("pause", 0);
 
-  /* "foolysh/taskmanager.pyx":114
+  /* "foolysh/taskmanager.pyx":101
  *     def pause(self):
  *         """Pauses the execution of :class:`~foolysh.taskmanager.Task`."""
- *         self._task_manager.pause(self._name)             # <<<<<<<<<<<<<<
+ *         self._task_manager.pause(self._name.decode('UTF-8'))             # <<<<<<<<<<<<<<
  * 
  *     def resume(self):
  */
-  __pyx_t_1 = __pyx_v_self->_name;
-  __Pyx_INCREF(__pyx_t_1);
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->_name, __pyx_n_s_decode); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 101, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = NULL;
+  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
+    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_2);
+    if (likely(__pyx_t_3)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
+      __Pyx_INCREF(__pyx_t_3);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_2, function);
+    }
+  }
+  __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_3, __pyx_kp_u_UTF_8) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_kp_u_UTF_8);
+  __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 101, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   ((struct __pyx_vtabstruct_7foolysh_11taskmanager_TaskManager *)__pyx_v_self->_task_manager->__pyx_vtab)->pause(__pyx_v_self->_task_manager, __pyx_t_1, 0);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "foolysh/taskmanager.pyx":112
- *         return not self._task_manager.state(self._name)
+  /* "foolysh/taskmanager.pyx":99
+ *         return not self._task_manager.state(self._name.decode('UTF-8'))
  * 
  *     def pause(self):             # <<<<<<<<<<<<<<
  *         """Pauses the execution of :class:`~foolysh.taskmanager.Task`."""
- *         self._task_manager.pause(self._name)
+ *         self._task_manager.pause(self._name.decode('UTF-8'))
  */
 
   /* function exit code */
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_AddTraceback("foolysh.taskmanager.Task.pause", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "foolysh/taskmanager.pyx":116
- *         self._task_manager.pause(self._name)
+/* "foolysh/taskmanager.pyx":103
+ *         self._task_manager.pause(self._name.decode('UTF-8'))
  * 
  *     def resume(self):             # <<<<<<<<<<<<<<
  *         """Resumes the execution of :class:`~foolysh.taskmanager.Task`."""
- *         self._task_manager.resume(self._name)
+ *         self._task_manager.resume(self._name.decode('UTF-8'))
  */
 
 /* Python wrapper */
@@ -2300,37 +2368,62 @@ static PyObject *__pyx_pf_7foolysh_11taskmanager_4Task_4resume(struct __pyx_obj_
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
+  PyObject *__pyx_t_2 = NULL;
+  PyObject *__pyx_t_3 = NULL;
   __Pyx_RefNannySetupContext("resume", 0);
 
-  /* "foolysh/taskmanager.pyx":118
+  /* "foolysh/taskmanager.pyx":105
  *     def resume(self):
  *         """Resumes the execution of :class:`~foolysh.taskmanager.Task`."""
- *         self._task_manager.resume(self._name)             # <<<<<<<<<<<<<<
+ *         self._task_manager.resume(self._name.decode('UTF-8'))             # <<<<<<<<<<<<<<
  * 
  *     def __call__(self):
  */
-  __pyx_t_1 = __pyx_v_self->_name;
-  __Pyx_INCREF(__pyx_t_1);
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->_name, __pyx_n_s_decode); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 105, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = NULL;
+  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
+    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_2);
+    if (likely(__pyx_t_3)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
+      __Pyx_INCREF(__pyx_t_3);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_2, function);
+    }
+  }
+  __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_3, __pyx_kp_u_UTF_8) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_kp_u_UTF_8);
+  __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 105, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   ((struct __pyx_vtabstruct_7foolysh_11taskmanager_TaskManager *)__pyx_v_self->_task_manager->__pyx_vtab)->resume(__pyx_v_self->_task_manager, __pyx_t_1, 0);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "foolysh/taskmanager.pyx":116
- *         self._task_manager.pause(self._name)
+  /* "foolysh/taskmanager.pyx":103
+ *         self._task_manager.pause(self._name.decode('UTF-8'))
  * 
  *     def resume(self):             # <<<<<<<<<<<<<<
  *         """Resumes the execution of :class:`~foolysh.taskmanager.Task`."""
- *         self._task_manager.resume(self._name)
+ *         self._task_manager.resume(self._name.decode('UTF-8'))
  */
 
   /* function exit code */
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_AddTraceback("foolysh.taskmanager.Task.resume", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "foolysh/taskmanager.pyx":120
- *         self._task_manager.resume(self._name)
+/* "foolysh/taskmanager.pyx":107
+ *         self._task_manager.resume(self._name.decode('UTF-8'))
  * 
  *     def __call__(self):             # <<<<<<<<<<<<<<
  *         """
@@ -2365,34 +2458,34 @@ static PyObject *__pyx_pf_7foolysh_11taskmanager_4Task_6__call__(struct __pyx_ob
   PyObject *__pyx_t_3 = NULL;
   __Pyx_RefNannySetupContext("__call__", 0);
 
-  /* "foolysh/taskmanager.pyx":124
+  /* "foolysh/taskmanager.pyx":111
  *         Manually execute the Task.
  *         """
  *         self._cb(*self._args, **self._kwargs)             # <<<<<<<<<<<<<<
  * 
  *     def __repr__(self):
  */
-  __pyx_t_1 = __Pyx_PySequence_Tuple(__pyx_v_self->_args); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 124, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PySequence_Tuple(__pyx_v_self->_args); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 111, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   if (unlikely(__pyx_v_self->_kwargs == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "argument after ** must be a mapping, not NoneType");
-    __PYX_ERR(0, 124, __pyx_L1_error)
+    __PYX_ERR(0, 111, __pyx_L1_error)
   }
   if (likely(PyDict_CheckExact(__pyx_v_self->_kwargs))) {
-    __pyx_t_2 = PyDict_Copy(__pyx_v_self->_kwargs); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 124, __pyx_L1_error)
+    __pyx_t_2 = PyDict_Copy(__pyx_v_self->_kwargs); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 111, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
   } else {
-    __pyx_t_2 = PyObject_CallFunctionObjArgs((PyObject*)&PyDict_Type, __pyx_v_self->_kwargs, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 124, __pyx_L1_error)
+    __pyx_t_2 = PyObject_CallFunctionObjArgs((PyObject*)&PyDict_Type, __pyx_v_self->_kwargs, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 111, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
   }
-  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_v_self->_cb, __pyx_t_1, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 124, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_v_self->_cb, __pyx_t_1, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 111, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "foolysh/taskmanager.pyx":120
- *         self._task_manager.resume(self._name)
+  /* "foolysh/taskmanager.pyx":107
+ *         self._task_manager.resume(self._name.decode('UTF-8'))
  * 
  *     def __call__(self):             # <<<<<<<<<<<<<<
  *         """
@@ -2414,7 +2507,7 @@ static PyObject *__pyx_pf_7foolysh_11taskmanager_4Task_6__call__(struct __pyx_ob
   return __pyx_r;
 }
 
-/* "foolysh/taskmanager.pyx":126
+/* "foolysh/taskmanager.pyx":113
  *         self._cb(*self._args, **self._kwargs)
  * 
  *     def __repr__(self):             # <<<<<<<<<<<<<<
@@ -2445,7 +2538,7 @@ static PyObject *__pyx_pf_7foolysh_11taskmanager_4Task_8__repr__(struct __pyx_ob
   PyObject *__pyx_t_5 = NULL;
   __Pyx_RefNannySetupContext("__repr__", 0);
 
-  /* "foolysh/taskmanager.pyx":127
+  /* "foolysh/taskmanager.pyx":114
  * 
  *     def __repr__(self):
  *         return f'{type(self).__name__}({self._name}, {self.delay:.4f})'             # <<<<<<<<<<<<<<
@@ -2453,13 +2546,13 @@ static PyObject *__pyx_pf_7foolysh_11taskmanager_4Task_8__repr__(struct __pyx_ob
  *     def __str__(self):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyTuple_New(6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 127, __pyx_L1_error)
+  __pyx_t_1 = PyTuple_New(6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 114, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_t_2 = 0;
   __pyx_t_3 = 127;
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self))), __pyx_n_s_name_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 127, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self))), __pyx_n_s_name_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 114, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = __Pyx_PyObject_FormatSimple(__pyx_t_4, __pyx_empty_unicode); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 127, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_FormatSimple(__pyx_t_4, __pyx_empty_unicode); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 114, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_t_3 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_5) > __pyx_t_3) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_5) : __pyx_t_3;
@@ -2471,7 +2564,7 @@ static PyObject *__pyx_pf_7foolysh_11taskmanager_4Task_8__repr__(struct __pyx_ob
   __pyx_t_2 += 1;
   __Pyx_GIVEREF(__pyx_kp_u__2);
   PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_kp_u__2);
-  __pyx_t_5 = __Pyx_PyObject_FormatSimple(__pyx_v_self->_name, __pyx_empty_unicode); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 127, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_FormatSimple(__pyx_v_self->_name, __pyx_empty_unicode); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 114, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __pyx_t_3 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_5) > __pyx_t_3) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_5) : __pyx_t_3;
   __pyx_t_2 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_5);
@@ -2482,9 +2575,9 @@ static PyObject *__pyx_pf_7foolysh_11taskmanager_4Task_8__repr__(struct __pyx_ob
   __pyx_t_2 += 2;
   __Pyx_GIVEREF(__pyx_kp_u__3);
   PyTuple_SET_ITEM(__pyx_t_1, 3, __pyx_kp_u__3);
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_delay); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 127, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_delay); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 114, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_4 = __Pyx_PyObject_Format(__pyx_t_5, __pyx_kp_u_4f); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 127, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_Format(__pyx_t_5, __pyx_kp_u_4f); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 114, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __pyx_t_3 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_4) > __pyx_t_3) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_4) : __pyx_t_3;
@@ -2496,14 +2589,14 @@ static PyObject *__pyx_pf_7foolysh_11taskmanager_4Task_8__repr__(struct __pyx_ob
   __pyx_t_2 += 1;
   __Pyx_GIVEREF(__pyx_kp_u__4);
   PyTuple_SET_ITEM(__pyx_t_1, 5, __pyx_kp_u__4);
-  __pyx_t_4 = __Pyx_PyUnicode_Join(__pyx_t_1, 6, __pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 127, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyUnicode_Join(__pyx_t_1, 6, __pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 114, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_r = __pyx_t_4;
   __pyx_t_4 = 0;
   goto __pyx_L0;
 
-  /* "foolysh/taskmanager.pyx":126
+  /* "foolysh/taskmanager.pyx":113
  *         self._cb(*self._args, **self._kwargs)
  * 
  *     def __repr__(self):             # <<<<<<<<<<<<<<
@@ -2524,7 +2617,7 @@ static PyObject *__pyx_pf_7foolysh_11taskmanager_4Task_8__repr__(struct __pyx_ob
   return __pyx_r;
 }
 
-/* "foolysh/taskmanager.pyx":129
+/* "foolysh/taskmanager.pyx":116
  *         return f'{type(self).__name__}({self._name}, {self.delay:.4f})'
  * 
  *     def __str__(self):             # <<<<<<<<<<<<<<
@@ -2553,7 +2646,7 @@ static PyObject *__pyx_pf_7foolysh_11taskmanager_4Task_10__str__(struct __pyx_ob
   PyObject *__pyx_t_3 = NULL;
   __Pyx_RefNannySetupContext("__str__", 0);
 
-  /* "foolysh/taskmanager.pyx":130
+  /* "foolysh/taskmanager.pyx":117
  * 
  *     def __str__(self):
  *         return self.__repr__()             # <<<<<<<<<<<<<<
@@ -2561,7 +2654,7 @@ static PyObject *__pyx_pf_7foolysh_11taskmanager_4Task_10__str__(struct __pyx_ob
  * 
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_repr); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 130, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_repr); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 117, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -2575,14 +2668,14 @@ static PyObject *__pyx_pf_7foolysh_11taskmanager_4Task_10__str__(struct __pyx_ob
   }
   __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 130, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 117, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "foolysh/taskmanager.pyx":129
+  /* "foolysh/taskmanager.pyx":116
  *         return f'{type(self).__name__}({self._name}, {self.delay:.4f})'
  * 
  *     def __str__(self):             # <<<<<<<<<<<<<<
@@ -2712,12 +2805,12 @@ static PyObject *__pyx_pf_7foolysh_11taskmanager_4Task_14__setstate_cython__(CYT
   return __pyx_r;
 }
 
-/* "foolysh/taskmanager.pyx":154
+/* "foolysh/taskmanager.pyx":141
  *     cdef list _remove
  * 
  *     def __cinit__(self, *args, **kwargs):             # <<<<<<<<<<<<<<
  *         self.thisptr.reset(new _TaskManager())
- *         cdef callback _cb = _run_callback
+ *         cdef callback _cb = <callback> self._run_callback
  */
 
 /* Python wrapper */
@@ -2748,47 +2841,47 @@ static int __pyx_pf_7foolysh_11taskmanager_11TaskManager___cinit__(struct __pyx_
   PyObject *__pyx_t_2 = NULL;
   __Pyx_RefNannySetupContext("__cinit__", 0);
 
-  /* "foolysh/taskmanager.pyx":155
+  /* "foolysh/taskmanager.pyx":142
  * 
  *     def __cinit__(self, *args, **kwargs):
  *         self.thisptr.reset(new _TaskManager())             # <<<<<<<<<<<<<<
- *         cdef callback _cb = _run_callback
+ *         cdef callback _cb = <callback> self._run_callback
  *         deref(self.thisptr).set_callback(_cb)
  */
   try {
     __pyx_t_1 = new foolysh::tools::TaskManager();
   } catch(...) {
     __Pyx_CppExn2PyErr();
-    __PYX_ERR(0, 155, __pyx_L1_error)
+    __PYX_ERR(0, 142, __pyx_L1_error)
   }
   __pyx_v_self->thisptr.reset(__pyx_t_1);
 
-  /* "foolysh/taskmanager.pyx":156
+  /* "foolysh/taskmanager.pyx":143
  *     def __cinit__(self, *args, **kwargs):
  *         self.thisptr.reset(new _TaskManager())
- *         cdef callback _cb = _run_callback             # <<<<<<<<<<<<<<
+ *         cdef callback _cb = <callback> self._run_callback             # <<<<<<<<<<<<<<
  *         deref(self.thisptr).set_callback(_cb)
  *         self._tasks = {}
  */
-  __pyx_v__cb = __pyx_f_7foolysh_11taskmanager__run_callback;
+  __pyx_v__cb = ((foolysh::tools::callback)((struct __pyx_vtabstruct_7foolysh_11taskmanager_TaskManager *)__pyx_v_self->__pyx_vtab)->_run_callback);
 
-  /* "foolysh/taskmanager.pyx":157
+  /* "foolysh/taskmanager.pyx":144
  *         self.thisptr.reset(new _TaskManager())
- *         cdef callback _cb = _run_callback
+ *         cdef callback _cb = <callback> self._run_callback
  *         deref(self.thisptr).set_callback(_cb)             # <<<<<<<<<<<<<<
  *         self._tasks = {}
  *         self._remove = []
  */
   (*__pyx_v_self->thisptr).set_callback(__pyx_v__cb);
 
-  /* "foolysh/taskmanager.pyx":158
- *         cdef callback _cb = _run_callback
+  /* "foolysh/taskmanager.pyx":145
+ *         cdef callback _cb = <callback> self._run_callback
  *         deref(self.thisptr).set_callback(_cb)
  *         self._tasks = {}             # <<<<<<<<<<<<<<
  *         self._remove = []
  * 
  */
-  __pyx_t_2 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 158, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 145, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_GIVEREF(__pyx_t_2);
   __Pyx_GOTREF(__pyx_v_self->_tasks);
@@ -2796,14 +2889,14 @@ static int __pyx_pf_7foolysh_11taskmanager_11TaskManager___cinit__(struct __pyx_
   __pyx_v_self->_tasks = ((PyObject*)__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "foolysh/taskmanager.pyx":159
+  /* "foolysh/taskmanager.pyx":146
  *         deref(self.thisptr).set_callback(_cb)
  *         self._tasks = {}
  *         self._remove = []             # <<<<<<<<<<<<<<
  * 
  *     def __call__(self, dt):
  */
-  __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 159, __pyx_L1_error)
+  __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 146, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_GIVEREF(__pyx_t_2);
   __Pyx_GOTREF(__pyx_v_self->_remove);
@@ -2811,12 +2904,12 @@ static int __pyx_pf_7foolysh_11taskmanager_11TaskManager___cinit__(struct __pyx_
   __pyx_v_self->_remove = ((PyObject*)__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "foolysh/taskmanager.pyx":154
+  /* "foolysh/taskmanager.pyx":141
  *     cdef list _remove
  * 
  *     def __cinit__(self, *args, **kwargs):             # <<<<<<<<<<<<<<
  *         self.thisptr.reset(new _TaskManager())
- *         cdef callback _cb = _run_callback
+ *         cdef callback _cb = <callback> self._run_callback
  */
 
   /* function exit code */
@@ -2831,7 +2924,7 @@ static int __pyx_pf_7foolysh_11taskmanager_11TaskManager___cinit__(struct __pyx_
   return __pyx_r;
 }
 
-/* "foolysh/taskmanager.pyx":161
+/* "foolysh/taskmanager.pyx":148
  *         self._remove = []
  * 
  *     def __call__(self, dt):             # <<<<<<<<<<<<<<
@@ -2865,7 +2958,7 @@ static PyObject *__pyx_pw_7foolysh_11taskmanager_11TaskManager_3__call__(PyObjec
         else goto __pyx_L5_argtuple_error;
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__call__") < 0)) __PYX_ERR(0, 161, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__call__") < 0)) __PYX_ERR(0, 148, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 1) {
       goto __pyx_L5_argtuple_error;
@@ -2876,7 +2969,7 @@ static PyObject *__pyx_pw_7foolysh_11taskmanager_11TaskManager_3__call__(PyObjec
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__call__", 1, 1, 1, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 161, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("__call__", 1, 1, 1, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 148, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("foolysh.taskmanager.TaskManager.__call__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -2895,17 +2988,17 @@ static PyObject *__pyx_pf_7foolysh_11taskmanager_11TaskManager_2__call__(struct 
   double __pyx_t_1;
   __Pyx_RefNannySetupContext("__call__", 0);
 
-  /* "foolysh/taskmanager.pyx":162
+  /* "foolysh/taskmanager.pyx":149
  * 
  *     def __call__(self, dt):
  *         self.execute(dt)             # <<<<<<<<<<<<<<
  * 
- *     cpdef Task add_task(
+ *     cdef void _run_callback(self, string name, const double dt,
  */
-  __pyx_t_1 = __pyx_PyFloat_AsDouble(__pyx_v_dt); if (unlikely((__pyx_t_1 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 162, __pyx_L1_error)
+  __pyx_t_1 = __pyx_PyFloat_AsDouble(__pyx_v_dt); if (unlikely((__pyx_t_1 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 149, __pyx_L1_error)
   ((struct __pyx_vtabstruct_7foolysh_11taskmanager_TaskManager *)__pyx_v_self->__pyx_vtab)->execute(__pyx_v_self, __pyx_t_1, 0);
 
-  /* "foolysh/taskmanager.pyx":161
+  /* "foolysh/taskmanager.pyx":148
  *         self._remove = []
  * 
  *     def __call__(self, dt):             # <<<<<<<<<<<<<<
@@ -2925,43 +3018,387 @@ static PyObject *__pyx_pf_7foolysh_11taskmanager_11TaskManager_2__call__(struct 
   return __pyx_r;
 }
 
-/* "foolysh/taskmanager.pyx":164
+/* "foolysh/taskmanager.pyx":151
  *         self.execute(dt)
  * 
- *     cpdef Task add_task(             # <<<<<<<<<<<<<<
- *         self,
- *         name,
+ *     cdef void _run_callback(self, string name, const double dt,             # <<<<<<<<<<<<<<
+ *                             const bool with_dt):
+ *         """
+ */
+
+static void __pyx_f_7foolysh_11taskmanager_11TaskManager__run_callback(struct __pyx_obj_7foolysh_11taskmanager_TaskManager *__pyx_v_self, std::string __pyx_v_name, double const __pyx_v_dt, bool const __pyx_v_with_dt) {
+  struct __pyx_obj_7foolysh_11taskmanager_Task *__pyx_v_task = 0;
+  PyObject *__pyx_v_cb = NULL;
+  PyObject *__pyx_v_a = NULL;
+  PyObject *__pyx_v_kw = NULL;
+  PyObject *__pyx_v_err = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  PyObject *__pyx_t_2 = NULL;
+  PyObject *__pyx_t_3 = NULL;
+  PyObject *__pyx_t_4 = NULL;
+  int __pyx_t_5;
+  PyObject *__pyx_t_6 = NULL;
+  PyObject *__pyx_t_7 = NULL;
+  PyObject *__pyx_t_8 = NULL;
+  int __pyx_t_9;
+  Py_ssize_t __pyx_t_10;
+  Py_UCS4 __pyx_t_11;
+  PyObject *__pyx_t_12 = NULL;
+  PyObject *__pyx_t_13 = NULL;
+  int __pyx_t_14;
+  char const *__pyx_t_15;
+  PyObject *__pyx_t_16 = NULL;
+  PyObject *__pyx_t_17 = NULL;
+  PyObject *__pyx_t_18 = NULL;
+  PyObject *__pyx_t_19 = NULL;
+  PyObject *__pyx_t_20 = NULL;
+  PyObject *__pyx_t_21 = NULL;
+  __Pyx_RefNannySetupContext("_run_callback", 0);
+
+  /* "foolysh/taskmanager.pyx":157
+ *         """
+ *         cdef Task task
+ *         task = self._tasks[name]             # <<<<<<<<<<<<<<
+ *         cb, a, kw = task.get_callback()
+ *         if with_dt:
+ */
+  if (unlikely(__pyx_v_self->_tasks == Py_None)) {
+    PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
+    __PYX_ERR(0, 157, __pyx_L1_error)
+  }
+  __pyx_t_1 = __pyx_convert_PyBytes_string_to_py_std__in_string(__pyx_v_name); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 157, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_2 = __Pyx_PyDict_GetItem(__pyx_v_self->_tasks, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 157, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_7foolysh_11taskmanager_Task))))) __PYX_ERR(0, 157, __pyx_L1_error)
+  __pyx_v_task = ((struct __pyx_obj_7foolysh_11taskmanager_Task *)__pyx_t_2);
+  __pyx_t_2 = 0;
+
+  /* "foolysh/taskmanager.pyx":158
+ *         cdef Task task
+ *         task = self._tasks[name]
+ *         cb, a, kw = task.get_callback()             # <<<<<<<<<<<<<<
+ *         if with_dt:
+ *             kw['dt'] = dt
+ */
+  __pyx_t_2 = ((struct __pyx_vtabstruct_7foolysh_11taskmanager_Task *)__pyx_v_task->__pyx_vtab)->get_callback(__pyx_v_task); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 158, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (likely(__pyx_t_2 != Py_None)) {
+    PyObject* sequence = __pyx_t_2;
+    Py_ssize_t size = __Pyx_PySequence_SIZE(sequence);
+    if (unlikely(size != 3)) {
+      if (size > 3) __Pyx_RaiseTooManyValuesError(3);
+      else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
+      __PYX_ERR(0, 158, __pyx_L1_error)
+    }
+    #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
+    __pyx_t_1 = PyTuple_GET_ITEM(sequence, 0); 
+    __pyx_t_3 = PyTuple_GET_ITEM(sequence, 1); 
+    __pyx_t_4 = PyTuple_GET_ITEM(sequence, 2); 
+    __Pyx_INCREF(__pyx_t_1);
+    __Pyx_INCREF(__pyx_t_3);
+    __Pyx_INCREF(__pyx_t_4);
+    #else
+    __pyx_t_1 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 158, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __pyx_t_3 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 158, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __pyx_t_4 = PySequence_ITEM(sequence, 2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 158, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_4);
+    #endif
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  } else {
+    __Pyx_RaiseNoneNotIterableError(); __PYX_ERR(0, 158, __pyx_L1_error)
+  }
+  __pyx_v_cb = __pyx_t_1;
+  __pyx_t_1 = 0;
+  __pyx_v_a = __pyx_t_3;
+  __pyx_t_3 = 0;
+  __pyx_v_kw = __pyx_t_4;
+  __pyx_t_4 = 0;
+
+  /* "foolysh/taskmanager.pyx":159
+ *         task = self._tasks[name]
+ *         cb, a, kw = task.get_callback()
+ *         if with_dt:             # <<<<<<<<<<<<<<
+ *             kw['dt'] = dt
+ *         try:
+ */
+  __pyx_t_5 = (__pyx_v_with_dt != 0);
+  if (__pyx_t_5) {
+
+    /* "foolysh/taskmanager.pyx":160
+ *         cb, a, kw = task.get_callback()
+ *         if with_dt:
+ *             kw['dt'] = dt             # <<<<<<<<<<<<<<
+ *         try:
+ *             cb(*a, **kw)
+ */
+    __pyx_t_2 = PyFloat_FromDouble(__pyx_v_dt); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 160, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    if (unlikely(PyObject_SetItem(__pyx_v_kw, __pyx_n_u_dt, __pyx_t_2) < 0)) __PYX_ERR(0, 160, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+
+    /* "foolysh/taskmanager.pyx":159
+ *         task = self._tasks[name]
+ *         cb, a, kw = task.get_callback()
+ *         if with_dt:             # <<<<<<<<<<<<<<
+ *             kw['dt'] = dt
+ *         try:
+ */
+  }
+
+  /* "foolysh/taskmanager.pyx":161
+ *         if with_dt:
+ *             kw['dt'] = dt
+ *         try:             # <<<<<<<<<<<<<<
+ *             cb(*a, **kw)
+ *         except TypeError as err:
+ */
+  {
+    __Pyx_PyThreadState_declare
+    __Pyx_PyThreadState_assign
+    __Pyx_ExceptionSave(&__pyx_t_6, &__pyx_t_7, &__pyx_t_8);
+    __Pyx_XGOTREF(__pyx_t_6);
+    __Pyx_XGOTREF(__pyx_t_7);
+    __Pyx_XGOTREF(__pyx_t_8);
+    /*try:*/ {
+
+      /* "foolysh/taskmanager.pyx":162
+ *             kw['dt'] = dt
+ *         try:
+ *             cb(*a, **kw)             # <<<<<<<<<<<<<<
+ *         except TypeError as err:
+ *             print(f'Error occurred while trying to execute task {name}: {err}')
+ */
+      __pyx_t_2 = __Pyx_PySequence_Tuple(__pyx_v_a); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 162, __pyx_L4_error)
+      __Pyx_GOTREF(__pyx_t_2);
+      if (unlikely(__pyx_v_kw == Py_None)) {
+        PyErr_SetString(PyExc_TypeError, "argument after ** must be a mapping, not NoneType");
+        __PYX_ERR(0, 162, __pyx_L4_error)
+      }
+      if (likely(PyDict_CheckExact(__pyx_v_kw))) {
+        __pyx_t_4 = PyDict_Copy(__pyx_v_kw); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 162, __pyx_L4_error)
+        __Pyx_GOTREF(__pyx_t_4);
+      } else {
+        __pyx_t_4 = PyObject_CallFunctionObjArgs((PyObject*)&PyDict_Type, __pyx_v_kw, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 162, __pyx_L4_error)
+        __Pyx_GOTREF(__pyx_t_4);
+      }
+      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_v_cb, __pyx_t_2, __pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 162, __pyx_L4_error)
+      __Pyx_GOTREF(__pyx_t_3);
+      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+
+      /* "foolysh/taskmanager.pyx":161
+ *         if with_dt:
+ *             kw['dt'] = dt
+ *         try:             # <<<<<<<<<<<<<<
+ *             cb(*a, **kw)
+ *         except TypeError as err:
+ */
+    }
+    __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
+    __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
+    __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
+    goto __pyx_L9_try_end;
+    __pyx_L4_error:;
+    __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+    __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+
+    /* "foolysh/taskmanager.pyx":163
+ *         try:
+ *             cb(*a, **kw)
+ *         except TypeError as err:             # <<<<<<<<<<<<<<
+ *             print(f'Error occurred while trying to execute task {name}: {err}')
+ * 
+ */
+    __pyx_t_9 = __Pyx_PyErr_ExceptionMatches(__pyx_builtin_TypeError);
+    if (__pyx_t_9) {
+      __Pyx_AddTraceback("foolysh.taskmanager.TaskManager._run_callback", __pyx_clineno, __pyx_lineno, __pyx_filename);
+      if (__Pyx_GetException(&__pyx_t_3, &__pyx_t_4, &__pyx_t_2) < 0) __PYX_ERR(0, 163, __pyx_L6_except_error)
+      __Pyx_GOTREF(__pyx_t_3);
+      __Pyx_GOTREF(__pyx_t_4);
+      __Pyx_GOTREF(__pyx_t_2);
+      __Pyx_INCREF(__pyx_t_4);
+      __pyx_v_err = __pyx_t_4;
+      /*try:*/ {
+
+        /* "foolysh/taskmanager.pyx":164
+ *             cb(*a, **kw)
+ *         except TypeError as err:
+ *             print(f'Error occurred while trying to execute task {name}: {err}')             # <<<<<<<<<<<<<<
+ * 
+ *     cpdef Task add_task(self, name, cb, double delay=0.0, bool with_dt=True,
+ */
+        __pyx_t_1 = PyTuple_New(4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 164, __pyx_L15_error)
+        __Pyx_GOTREF(__pyx_t_1);
+        __pyx_t_10 = 0;
+        __pyx_t_11 = 127;
+        __Pyx_INCREF(__pyx_kp_u_Error_occurred_while_trying_to_e);
+        __pyx_t_10 += 44;
+        __Pyx_GIVEREF(__pyx_kp_u_Error_occurred_while_trying_to_e);
+        PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_kp_u_Error_occurred_while_trying_to_e);
+        __pyx_t_12 = __pyx_convert_PyBytes_string_to_py_std__in_string(__pyx_v_name); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 164, __pyx_L15_error)
+        __Pyx_GOTREF(__pyx_t_12);
+        __pyx_t_13 = __Pyx_PyObject_FormatSimple(__pyx_t_12, __pyx_empty_unicode); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 164, __pyx_L15_error)
+        __Pyx_GOTREF(__pyx_t_13);
+        __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
+        __pyx_t_11 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_13) > __pyx_t_11) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_13) : __pyx_t_11;
+        __pyx_t_10 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_13);
+        __Pyx_GIVEREF(__pyx_t_13);
+        PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_t_13);
+        __pyx_t_13 = 0;
+        __Pyx_INCREF(__pyx_kp_u__7);
+        __pyx_t_10 += 2;
+        __Pyx_GIVEREF(__pyx_kp_u__7);
+        PyTuple_SET_ITEM(__pyx_t_1, 2, __pyx_kp_u__7);
+        __pyx_t_13 = __Pyx_PyObject_FormatSimple(__pyx_v_err, __pyx_empty_unicode); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 164, __pyx_L15_error)
+        __Pyx_GOTREF(__pyx_t_13);
+        __pyx_t_11 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_13) > __pyx_t_11) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_13) : __pyx_t_11;
+        __pyx_t_10 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_13);
+        __Pyx_GIVEREF(__pyx_t_13);
+        PyTuple_SET_ITEM(__pyx_t_1, 3, __pyx_t_13);
+        __pyx_t_13 = 0;
+        __pyx_t_13 = __Pyx_PyUnicode_Join(__pyx_t_1, 4, __pyx_t_10, __pyx_t_11); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 164, __pyx_L15_error)
+        __Pyx_GOTREF(__pyx_t_13);
+        __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+        __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_builtin_print, __pyx_t_13); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 164, __pyx_L15_error)
+        __Pyx_GOTREF(__pyx_t_1);
+        __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
+        __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+      }
+
+      /* "foolysh/taskmanager.pyx":163
+ *         try:
+ *             cb(*a, **kw)
+ *         except TypeError as err:             # <<<<<<<<<<<<<<
+ *             print(f'Error occurred while trying to execute task {name}: {err}')
+ * 
+ */
+      /*finally:*/ {
+        /*normal exit:*/{
+          __Pyx_DECREF(__pyx_v_err);
+          __pyx_v_err = NULL;
+          goto __pyx_L16;
+        }
+        __pyx_L15_error:;
+        /*exception exit:*/{
+          __Pyx_PyThreadState_declare
+          __Pyx_PyThreadState_assign
+          __pyx_t_16 = 0; __pyx_t_17 = 0; __pyx_t_18 = 0; __pyx_t_19 = 0; __pyx_t_20 = 0; __pyx_t_21 = 0;
+          __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+          __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
+          __Pyx_XDECREF(__pyx_t_13); __pyx_t_13 = 0;
+          if (PY_MAJOR_VERSION >= 3) __Pyx_ExceptionSwap(&__pyx_t_19, &__pyx_t_20, &__pyx_t_21);
+          if ((PY_MAJOR_VERSION < 3) || unlikely(__Pyx_GetException(&__pyx_t_16, &__pyx_t_17, &__pyx_t_18) < 0)) __Pyx_ErrFetch(&__pyx_t_16, &__pyx_t_17, &__pyx_t_18);
+          __Pyx_XGOTREF(__pyx_t_16);
+          __Pyx_XGOTREF(__pyx_t_17);
+          __Pyx_XGOTREF(__pyx_t_18);
+          __Pyx_XGOTREF(__pyx_t_19);
+          __Pyx_XGOTREF(__pyx_t_20);
+          __Pyx_XGOTREF(__pyx_t_21);
+          __pyx_t_9 = __pyx_lineno; __pyx_t_14 = __pyx_clineno; __pyx_t_15 = __pyx_filename;
+          {
+            __Pyx_DECREF(__pyx_v_err);
+            __pyx_v_err = NULL;
+          }
+          if (PY_MAJOR_VERSION >= 3) {
+            __Pyx_XGIVEREF(__pyx_t_19);
+            __Pyx_XGIVEREF(__pyx_t_20);
+            __Pyx_XGIVEREF(__pyx_t_21);
+            __Pyx_ExceptionReset(__pyx_t_19, __pyx_t_20, __pyx_t_21);
+          }
+          __Pyx_XGIVEREF(__pyx_t_16);
+          __Pyx_XGIVEREF(__pyx_t_17);
+          __Pyx_XGIVEREF(__pyx_t_18);
+          __Pyx_ErrRestore(__pyx_t_16, __pyx_t_17, __pyx_t_18);
+          __pyx_t_16 = 0; __pyx_t_17 = 0; __pyx_t_18 = 0; __pyx_t_19 = 0; __pyx_t_20 = 0; __pyx_t_21 = 0;
+          __pyx_lineno = __pyx_t_9; __pyx_clineno = __pyx_t_14; __pyx_filename = __pyx_t_15;
+          goto __pyx_L6_except_error;
+        }
+        __pyx_L16:;
+      }
+      __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+      __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+      __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+      goto __pyx_L5_exception_handled;
+    }
+    goto __pyx_L6_except_error;
+    __pyx_L6_except_error:;
+
+    /* "foolysh/taskmanager.pyx":161
+ *         if with_dt:
+ *             kw['dt'] = dt
+ *         try:             # <<<<<<<<<<<<<<
+ *             cb(*a, **kw)
+ *         except TypeError as err:
+ */
+    __Pyx_XGIVEREF(__pyx_t_6);
+    __Pyx_XGIVEREF(__pyx_t_7);
+    __Pyx_XGIVEREF(__pyx_t_8);
+    __Pyx_ExceptionReset(__pyx_t_6, __pyx_t_7, __pyx_t_8);
+    goto __pyx_L1_error;
+    __pyx_L5_exception_handled:;
+    __Pyx_XGIVEREF(__pyx_t_6);
+    __Pyx_XGIVEREF(__pyx_t_7);
+    __Pyx_XGIVEREF(__pyx_t_8);
+    __Pyx_ExceptionReset(__pyx_t_6, __pyx_t_7, __pyx_t_8);
+    __pyx_L9_try_end:;
+  }
+
+  /* "foolysh/taskmanager.pyx":151
+ *         self.execute(dt)
+ * 
+ *     cdef void _run_callback(self, string name, const double dt,             # <<<<<<<<<<<<<<
+ *                             const bool with_dt):
+ *         """
+ */
+
+  /* function exit code */
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_4);
+  __Pyx_XDECREF(__pyx_t_12);
+  __Pyx_XDECREF(__pyx_t_13);
+  __Pyx_WriteUnraisable("foolysh.taskmanager.TaskManager._run_callback", __pyx_clineno, __pyx_lineno, __pyx_filename, 1, 0);
+  __pyx_L0:;
+  __Pyx_XDECREF((PyObject *)__pyx_v_task);
+  __Pyx_XDECREF(__pyx_v_cb);
+  __Pyx_XDECREF(__pyx_v_a);
+  __Pyx_XDECREF(__pyx_v_kw);
+  __Pyx_XDECREF(__pyx_v_err);
+  __Pyx_RefNannyFinishContext();
+}
+
+/* "foolysh/taskmanager.pyx":166
+ *             print(f'Error occurred while trying to execute task {name}: {err}')
+ * 
+ *     cpdef Task add_task(self, name, cb, double delay=0.0, bool with_dt=True,             # <<<<<<<<<<<<<<
+ *                         args=None, kwargs=None):
+ *         """
  */
 
 static PyObject *__pyx_pw_7foolysh_11taskmanager_11TaskManager_5add_task(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
 static struct __pyx_obj_7foolysh_11taskmanager_Task *__pyx_f_7foolysh_11taskmanager_11TaskManager_add_task(struct __pyx_obj_7foolysh_11taskmanager_TaskManager *__pyx_v_self, PyObject *__pyx_v_name, PyObject *__pyx_v_cb, int __pyx_skip_dispatch, struct __pyx_opt_args_7foolysh_11taskmanager_11TaskManager_add_task *__pyx_optional_args) {
   double __pyx_v_delay = ((double)0.0);
-
-  /* "foolysh/taskmanager.pyx":169
- *         cb,
- *         double delay=0.0,
- *         bool with_dt=True,             # <<<<<<<<<<<<<<
- *         args=None,
- *         kwargs=None
- */
   bool __pyx_v_with_dt = ((bool)1);
 
-  /* "foolysh/taskmanager.pyx":170
- *         double delay=0.0,
- *         bool with_dt=True,
- *         args=None,             # <<<<<<<<<<<<<<
- *         kwargs=None
- *     ):
+  /* "foolysh/taskmanager.pyx":167
+ * 
+ *     cpdef Task add_task(self, name, cb, double delay=0.0, bool with_dt=True,
+ *                         args=None, kwargs=None):             # <<<<<<<<<<<<<<
+ *         """
+ *         Add a task to the :class:`TaskManager`.
  */
   PyObject *__pyx_v_args = ((PyObject *)Py_None);
-
-  /* "foolysh/taskmanager.pyx":171
- *         bool with_dt=True,
- *         args=None,
- *         kwargs=None             # <<<<<<<<<<<<<<
- *     ):
- *         """
- */
   PyObject *__pyx_v_kwargs = ((PyObject *)Py_None);
   PyObject *__pyx_v_t = NULL;
   struct __pyx_obj_7foolysh_11taskmanager_Task *__pyx_r = NULL;
@@ -2992,15 +3429,16 @@ static struct __pyx_obj_7foolysh_11taskmanager_Task *__pyx_f_7foolysh_11taskmana
       }
     }
   }
+  __Pyx_INCREF(__pyx_v_name);
   __Pyx_INCREF(__pyx_v_args);
   __Pyx_INCREF(__pyx_v_kwargs);
 
-  /* "foolysh/taskmanager.pyx":164
- *         self.execute(dt)
+  /* "foolysh/taskmanager.pyx":166
+ *             print(f'Error occurred while trying to execute task {name}: {err}')
  * 
- *     cpdef Task add_task(             # <<<<<<<<<<<<<<
- *         self,
- *         name,
+ *     cpdef Task add_task(self, name, cb, double delay=0.0, bool with_dt=True,             # <<<<<<<<<<<<<<
+ *                         args=None, kwargs=None):
+ *         """
  */
   /* Check if called by wrapper */
   if (unlikely(__pyx_skip_dispatch)) ;
@@ -3011,13 +3449,13 @@ static struct __pyx_obj_7foolysh_11taskmanager_Task *__pyx_f_7foolysh_11taskmana
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_type_dict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_add_task); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 164, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_add_task); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 166, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_7foolysh_11taskmanager_11TaskManager_5add_task)) {
         __Pyx_XDECREF(((PyObject *)__pyx_r));
-        __pyx_t_3 = PyFloat_FromDouble(__pyx_v_delay); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 164, __pyx_L1_error)
+        __pyx_t_3 = PyFloat_FromDouble(__pyx_v_delay); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 166, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
-        __pyx_t_4 = __Pyx_PyBool_FromLong(__pyx_v_with_dt); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 164, __pyx_L1_error)
+        __pyx_t_4 = __Pyx_PyBool_FromLong(__pyx_v_with_dt); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 166, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
         __Pyx_INCREF(__pyx_t_1);
         __pyx_t_5 = __pyx_t_1; __pyx_t_6 = NULL;
@@ -3035,7 +3473,7 @@ static struct __pyx_obj_7foolysh_11taskmanager_Task *__pyx_f_7foolysh_11taskmana
         #if CYTHON_FAST_PYCALL
         if (PyFunction_Check(__pyx_t_5)) {
           PyObject *__pyx_temp[7] = {__pyx_t_6, __pyx_v_name, __pyx_v_cb, __pyx_t_3, __pyx_t_4, __pyx_v_args, __pyx_v_kwargs};
-          __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_7, 6+__pyx_t_7); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 164, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_7, 6+__pyx_t_7); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 166, __pyx_L1_error)
           __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -3045,7 +3483,7 @@ static struct __pyx_obj_7foolysh_11taskmanager_Task *__pyx_f_7foolysh_11taskmana
         #if CYTHON_FAST_PYCCALL
         if (__Pyx_PyFastCFunction_Check(__pyx_t_5)) {
           PyObject *__pyx_temp[7] = {__pyx_t_6, __pyx_v_name, __pyx_v_cb, __pyx_t_3, __pyx_t_4, __pyx_v_args, __pyx_v_kwargs};
-          __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_7, 6+__pyx_t_7); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 164, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_7, 6+__pyx_t_7); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 166, __pyx_L1_error)
           __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -3053,7 +3491,7 @@ static struct __pyx_obj_7foolysh_11taskmanager_Task *__pyx_f_7foolysh_11taskmana
         } else
         #endif
         {
-          __pyx_t_8 = PyTuple_New(6+__pyx_t_7); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 164, __pyx_L1_error)
+          __pyx_t_8 = PyTuple_New(6+__pyx_t_7); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 166, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_8);
           if (__pyx_t_6) {
             __Pyx_GIVEREF(__pyx_t_6); PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_t_6); __pyx_t_6 = NULL;
@@ -3076,12 +3514,12 @@ static struct __pyx_obj_7foolysh_11taskmanager_Task *__pyx_f_7foolysh_11taskmana
           PyTuple_SET_ITEM(__pyx_t_8, 5+__pyx_t_7, __pyx_v_kwargs);
           __pyx_t_3 = 0;
           __pyx_t_4 = 0;
-          __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_8, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 164, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_8, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 166, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
         }
         __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-        if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_7foolysh_11taskmanager_Task))))) __PYX_ERR(0, 164, __pyx_L1_error)
+        if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_7foolysh_11taskmanager_Task))))) __PYX_ERR(0, 166, __pyx_L1_error)
         __pyx_r = ((struct __pyx_obj_7foolysh_11taskmanager_Task *)__pyx_t_2);
         __pyx_t_2 = 0;
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -3100,7 +3538,7 @@ static struct __pyx_obj_7foolysh_11taskmanager_Task *__pyx_f_7foolysh_11taskmana
     #endif
   }
 
-  /* "foolysh/taskmanager.pyx":190
+  /* "foolysh/taskmanager.pyx":185
  *             :class:`~foolysh.taskmanager.Task` instance of the added task.
  *         """
  *         if args is None:             # <<<<<<<<<<<<<<
@@ -3111,19 +3549,19 @@ static struct __pyx_obj_7foolysh_11taskmanager_Task *__pyx_f_7foolysh_11taskmana
   __pyx_t_10 = (__pyx_t_9 != 0);
   if (__pyx_t_10) {
 
-    /* "foolysh/taskmanager.pyx":191
+    /* "foolysh/taskmanager.pyx":186
  *         """
  *         if args is None:
  *             args = tuple()             # <<<<<<<<<<<<<<
  *         if kwargs is None:
  *             kwargs = dict()
  */
-    __pyx_t_1 = __Pyx_PyObject_CallNoArg(((PyObject *)(&PyTuple_Type))); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 191, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_CallNoArg(((PyObject *)(&PyTuple_Type))); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 186, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF_SET(__pyx_v_args, __pyx_t_1);
     __pyx_t_1 = 0;
 
-    /* "foolysh/taskmanager.pyx":190
+    /* "foolysh/taskmanager.pyx":185
  *             :class:`~foolysh.taskmanager.Task` instance of the added task.
  *         """
  *         if args is None:             # <<<<<<<<<<<<<<
@@ -3132,46 +3570,46 @@ static struct __pyx_obj_7foolysh_11taskmanager_Task *__pyx_f_7foolysh_11taskmana
  */
   }
 
-  /* "foolysh/taskmanager.pyx":192
+  /* "foolysh/taskmanager.pyx":187
  *         if args is None:
  *             args = tuple()
  *         if kwargs is None:             # <<<<<<<<<<<<<<
  *             kwargs = dict()
- *         deref(self.thisptr).add_task(
+ *         name = name.encode('UTF-8')
  */
   __pyx_t_10 = (__pyx_v_kwargs == Py_None);
   __pyx_t_9 = (__pyx_t_10 != 0);
   if (__pyx_t_9) {
 
-    /* "foolysh/taskmanager.pyx":193
+    /* "foolysh/taskmanager.pyx":188
  *             args = tuple()
  *         if kwargs is None:
  *             kwargs = dict()             # <<<<<<<<<<<<<<
- *         deref(self.thisptr).add_task(
- *             name.encode('UTF-8'),
+ *         name = name.encode('UTF-8')
+ *         t = Task.__new__(Task, name, cb, args, kwargs, self)
  */
-    __pyx_t_1 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 193, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 188, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF_SET(__pyx_v_kwargs, __pyx_t_1);
     __pyx_t_1 = 0;
 
-    /* "foolysh/taskmanager.pyx":192
+    /* "foolysh/taskmanager.pyx":187
  *         if args is None:
  *             args = tuple()
  *         if kwargs is None:             # <<<<<<<<<<<<<<
  *             kwargs = dict()
- *         deref(self.thisptr).add_task(
+ *         name = name.encode('UTF-8')
  */
   }
 
-  /* "foolysh/taskmanager.pyx":195
+  /* "foolysh/taskmanager.pyx":189
+ *         if kwargs is None:
  *             kwargs = dict()
- *         deref(self.thisptr).add_task(
- *             name.encode('UTF-8'),             # <<<<<<<<<<<<<<
- *             delay,
- *             with_dt,
+ *         name = name.encode('UTF-8')             # <<<<<<<<<<<<<<
+ *         t = Task.__new__(Task, name, cb, args, kwargs, self)
+ *         self._tasks[name] = t
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_name, __pyx_n_s_encode); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 195, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_name, __pyx_n_s_encode); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 189, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_5 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -3185,29 +3623,20 @@ static struct __pyx_obj_7foolysh_11taskmanager_Task *__pyx_f_7foolysh_11taskmana
   }
   __pyx_t_1 = (__pyx_t_5) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_5, __pyx_kp_u_UTF_8) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_kp_u_UTF_8);
   __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 195, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 189, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_11 = __pyx_convert_string_from_py_std__in_string(__pyx_t_1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 195, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __Pyx_DECREF_SET(__pyx_v_name, __pyx_t_1);
+  __pyx_t_1 = 0;
 
-  /* "foolysh/taskmanager.pyx":194
- *         if kwargs is None:
+  /* "foolysh/taskmanager.pyx":190
  *             kwargs = dict()
- *         deref(self.thisptr).add_task(             # <<<<<<<<<<<<<<
- *             name.encode('UTF-8'),
- *             delay,
- */
-  (*__pyx_v_self->thisptr).add_task(__pyx_t_11, __pyx_v_delay, __pyx_v_with_dt, ((void *)__pyx_v_cb), ((void *)__pyx_v_args), ((void *)__pyx_v_kwargs));
-
-  /* "foolysh/taskmanager.pyx":202
- *             <void*> kwargs
- *         )
+ *         name = name.encode('UTF-8')
  *         t = Task.__new__(Task, name, cb, args, kwargs, self)             # <<<<<<<<<<<<<<
- *         self._tasks[name] = t  # make sure references stay alive
- *         return t
+ *         self._tasks[name] = t
+ *         self._add_task(name, delay, with_dt)
  */
-  __pyx_t_1 = PyTuple_New(5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 202, __pyx_L1_error)
+  __pyx_t_1 = PyTuple_New(5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 190, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_INCREF(__pyx_v_name);
   __Pyx_GIVEREF(__pyx_v_name);
@@ -3224,44 +3653,56 @@ static struct __pyx_obj_7foolysh_11taskmanager_Task *__pyx_f_7foolysh_11taskmana
   __Pyx_INCREF(((PyObject *)__pyx_v_self));
   __Pyx_GIVEREF(((PyObject *)__pyx_v_self));
   PyTuple_SET_ITEM(__pyx_t_1, 4, ((PyObject *)__pyx_v_self));
-  __pyx_t_2 = ((PyObject *)__pyx_tp_new_7foolysh_11taskmanager_Task(((PyTypeObject *)__pyx_ptype_7foolysh_11taskmanager_Task), __pyx_t_1, NULL)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 202, __pyx_L1_error)
+  __pyx_t_2 = ((PyObject *)__pyx_tp_new_7foolysh_11taskmanager_Task(((PyTypeObject *)__pyx_ptype_7foolysh_11taskmanager_Task), __pyx_t_1, NULL)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 190, __pyx_L1_error)
   __Pyx_GOTREF(((PyObject *)__pyx_t_2));
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_t = ((PyObject *)__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "foolysh/taskmanager.pyx":203
- *         )
+  /* "foolysh/taskmanager.pyx":191
+ *         name = name.encode('UTF-8')
  *         t = Task.__new__(Task, name, cb, args, kwargs, self)
- *         self._tasks[name] = t  # make sure references stay alive             # <<<<<<<<<<<<<<
+ *         self._tasks[name] = t             # <<<<<<<<<<<<<<
+ *         self._add_task(name, delay, with_dt)
  *         return t
- * 
  */
   if (unlikely(__pyx_v_self->_tasks == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-    __PYX_ERR(0, 203, __pyx_L1_error)
+    __PYX_ERR(0, 191, __pyx_L1_error)
   }
-  if (unlikely(PyDict_SetItem(__pyx_v_self->_tasks, __pyx_v_name, __pyx_v_t) < 0)) __PYX_ERR(0, 203, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_self->_tasks, __pyx_v_name, __pyx_v_t) < 0)) __PYX_ERR(0, 191, __pyx_L1_error)
 
-  /* "foolysh/taskmanager.pyx":204
+  /* "foolysh/taskmanager.pyx":192
  *         t = Task.__new__(Task, name, cb, args, kwargs, self)
- *         self._tasks[name] = t  # make sure references stay alive
+ *         self._tasks[name] = t
+ *         self._add_task(name, delay, with_dt)             # <<<<<<<<<<<<<<
+ *         return t
+ * 
+ */
+  __pyx_t_11 = __pyx_convert_string_from_py_std__in_string(__pyx_v_name); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 192, __pyx_L1_error)
+  __pyx_t_2 = ((struct __pyx_vtabstruct_7foolysh_11taskmanager_TaskManager *)__pyx_v_self->__pyx_vtab)->_add_task(__pyx_v_self, __pyx_t_11, __pyx_v_delay, __pyx_v_with_dt); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 192, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+
+  /* "foolysh/taskmanager.pyx":193
+ *         self._tasks[name] = t
+ *         self._add_task(name, delay, with_dt)
  *         return t             # <<<<<<<<<<<<<<
  * 
- *     cpdef void remove_task(self, name):
+ *     cdef _add_task(self, string name, double delay, bool with_dt):
  */
   __Pyx_XDECREF(((PyObject *)__pyx_r));
-  if (!(likely(((__pyx_v_t) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_t, __pyx_ptype_7foolysh_11taskmanager_Task))))) __PYX_ERR(0, 204, __pyx_L1_error)
+  if (!(likely(((__pyx_v_t) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_t, __pyx_ptype_7foolysh_11taskmanager_Task))))) __PYX_ERR(0, 193, __pyx_L1_error)
   __Pyx_INCREF(__pyx_v_t);
   __pyx_r = ((struct __pyx_obj_7foolysh_11taskmanager_Task *)__pyx_v_t);
   goto __pyx_L0;
 
-  /* "foolysh/taskmanager.pyx":164
- *         self.execute(dt)
+  /* "foolysh/taskmanager.pyx":166
+ *             print(f'Error occurred while trying to execute task {name}: {err}')
  * 
- *     cpdef Task add_task(             # <<<<<<<<<<<<<<
- *         self,
- *         name,
+ *     cpdef Task add_task(self, name, cb, double delay=0.0, bool with_dt=True,             # <<<<<<<<<<<<<<
+ *                         args=None, kwargs=None):
+ *         """
  */
 
   /* function exit code */
@@ -3277,6 +3718,7 @@ static struct __pyx_obj_7foolysh_11taskmanager_Task *__pyx_f_7foolysh_11taskmana
   __pyx_r = 0;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_t);
+  __Pyx_XDECREF(__pyx_v_name);
   __Pyx_XDECREF(__pyx_v_args);
   __Pyx_XDECREF(__pyx_v_kwargs);
   __Pyx_XGIVEREF((PyObject *)__pyx_r);
@@ -3301,22 +3743,14 @@ static PyObject *__pyx_pw_7foolysh_11taskmanager_11TaskManager_5add_task(PyObjec
     static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_name,&__pyx_n_s_cb,&__pyx_n_s_delay,&__pyx_n_s_with_dt,&__pyx_n_s_args,&__pyx_n_s_kwargs,0};
     PyObject* values[6] = {0,0,0,0,0,0};
 
-    /* "foolysh/taskmanager.pyx":170
- *         double delay=0.0,
- *         bool with_dt=True,
- *         args=None,             # <<<<<<<<<<<<<<
- *         kwargs=None
- *     ):
+    /* "foolysh/taskmanager.pyx":167
+ * 
+ *     cpdef Task add_task(self, name, cb, double delay=0.0, bool with_dt=True,
+ *                         args=None, kwargs=None):             # <<<<<<<<<<<<<<
+ *         """
+ *         Add a task to the :class:`TaskManager`.
  */
     values[4] = ((PyObject *)Py_None);
-
-    /* "foolysh/taskmanager.pyx":171
- *         bool with_dt=True,
- *         args=None,
- *         kwargs=None             # <<<<<<<<<<<<<<
- *     ):
- *         """
- */
     values[5] = ((PyObject *)Py_None);
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
@@ -3346,7 +3780,7 @@ static PyObject *__pyx_pw_7foolysh_11taskmanager_11TaskManager_5add_task(PyObjec
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_cb)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("add_task", 0, 2, 6, 1); __PYX_ERR(0, 164, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("add_task", 0, 2, 6, 1); __PYX_ERR(0, 166, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
@@ -3374,7 +3808,7 @@ static PyObject *__pyx_pw_7foolysh_11taskmanager_11TaskManager_5add_task(PyObjec
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "add_task") < 0)) __PYX_ERR(0, 164, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "add_task") < 0)) __PYX_ERR(0, 166, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -3395,20 +3829,20 @@ static PyObject *__pyx_pw_7foolysh_11taskmanager_11TaskManager_5add_task(PyObjec
     __pyx_v_name = values[0];
     __pyx_v_cb = values[1];
     if (values[2]) {
-      __pyx_v_delay = __pyx_PyFloat_AsDouble(values[2]); if (unlikely((__pyx_v_delay == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 168, __pyx_L3_error)
+      __pyx_v_delay = __pyx_PyFloat_AsDouble(values[2]); if (unlikely((__pyx_v_delay == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 166, __pyx_L3_error)
     } else {
       __pyx_v_delay = ((double)0.0);
     }
     if (values[3]) {
-      __pyx_v_with_dt = __Pyx_PyObject_IsTrue(values[3]); if (unlikely((__pyx_v_with_dt == ((bool)-1)) && PyErr_Occurred())) __PYX_ERR(0, 169, __pyx_L3_error)
+      __pyx_v_with_dt = __Pyx_PyObject_IsTrue(values[3]); if (unlikely((__pyx_v_with_dt == ((bool)-1)) && PyErr_Occurred())) __PYX_ERR(0, 166, __pyx_L3_error)
     } else {
 
-      /* "foolysh/taskmanager.pyx":169
- *         cb,
- *         double delay=0.0,
- *         bool with_dt=True,             # <<<<<<<<<<<<<<
- *         args=None,
- *         kwargs=None
+      /* "foolysh/taskmanager.pyx":166
+ *             print(f'Error occurred while trying to execute task {name}: {err}')
+ * 
+ *     cpdef Task add_task(self, name, cb, double delay=0.0, bool with_dt=True,             # <<<<<<<<<<<<<<
+ *                         args=None, kwargs=None):
+ *         """
  */
       __pyx_v_with_dt = ((bool)1);
     }
@@ -3417,21 +3851,13 @@ static PyObject *__pyx_pw_7foolysh_11taskmanager_11TaskManager_5add_task(PyObjec
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("add_task", 0, 2, 6, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 164, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("add_task", 0, 2, 6, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 166, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("foolysh.taskmanager.TaskManager.add_task", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
   __pyx_r = __pyx_pf_7foolysh_11taskmanager_11TaskManager_4add_task(((struct __pyx_obj_7foolysh_11taskmanager_TaskManager *)__pyx_v_self), __pyx_v_name, __pyx_v_cb, __pyx_v_delay, __pyx_v_with_dt, __pyx_v_args, __pyx_v_kwargs);
-
-  /* "foolysh/taskmanager.pyx":164
- *         self.execute(dt)
- * 
- *     cpdef Task add_task(             # <<<<<<<<<<<<<<
- *         self,
- *         name,
- */
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
@@ -3450,7 +3876,7 @@ static PyObject *__pyx_pf_7foolysh_11taskmanager_11TaskManager_4add_task(struct 
   __pyx_t_2.with_dt = __pyx_v_with_dt;
   __pyx_t_2.args = __pyx_v_args;
   __pyx_t_2.kwargs = __pyx_v_kwargs;
-  __pyx_t_1 = ((PyObject *)__pyx_vtabptr_7foolysh_11taskmanager_TaskManager->add_task(__pyx_v_self, __pyx_v_name, __pyx_v_cb, 1, &__pyx_t_2)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 164, __pyx_L1_error)
+  __pyx_t_1 = ((PyObject *)__pyx_vtabptr_7foolysh_11taskmanager_TaskManager->add_task(__pyx_v_self, __pyx_v_name, __pyx_v_cb, 1, &__pyx_t_2)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 166, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -3467,8 +3893,55 @@ static PyObject *__pyx_pf_7foolysh_11taskmanager_11TaskManager_4add_task(struct 
   return __pyx_r;
 }
 
-/* "foolysh/taskmanager.pyx":206
+/* "foolysh/taskmanager.pyx":195
  *         return t
+ * 
+ *     cdef _add_task(self, string name, double delay, bool with_dt):             # <<<<<<<<<<<<<<
+ *         cdef void* pyobj
+ *         pyobj = <void*> self
+ */
+
+static PyObject *__pyx_f_7foolysh_11taskmanager_11TaskManager__add_task(struct __pyx_obj_7foolysh_11taskmanager_TaskManager *__pyx_v_self, std::string __pyx_v_name, double __pyx_v_delay, bool __pyx_v_with_dt) {
+  void *__pyx_v_pyobj;
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("_add_task", 0);
+
+  /* "foolysh/taskmanager.pyx":197
+ *     cdef _add_task(self, string name, double delay, bool with_dt):
+ *         cdef void* pyobj
+ *         pyobj = <void*> self             # <<<<<<<<<<<<<<
+ *         deref(self.thisptr).add_task(name, delay, with_dt, pyobj)
+ * 
+ */
+  __pyx_v_pyobj = ((void *)__pyx_v_self);
+
+  /* "foolysh/taskmanager.pyx":198
+ *         cdef void* pyobj
+ *         pyobj = <void*> self
+ *         deref(self.thisptr).add_task(name, delay, with_dt, pyobj)             # <<<<<<<<<<<<<<
+ * 
+ *     cpdef void remove_task(self, name):
+ */
+  (*__pyx_v_self->thisptr).add_task(__pyx_v_name, __pyx_v_delay, __pyx_v_with_dt, __pyx_v_pyobj);
+
+  /* "foolysh/taskmanager.pyx":195
+ *         return t
+ * 
+ *     cdef _add_task(self, string name, double delay, bool with_dt):             # <<<<<<<<<<<<<<
+ *         cdef void* pyobj
+ *         pyobj = <void*> self
+ */
+
+  /* function exit code */
+  __pyx_r = Py_None; __Pyx_INCREF(Py_None);
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "foolysh/taskmanager.pyx":200
+ *         deref(self.thisptr).add_task(name, delay, with_dt, pyobj)
  * 
  *     cpdef void remove_task(self, name):             # <<<<<<<<<<<<<<
  *         """
@@ -3489,6 +3962,7 @@ static void __pyx_f_7foolysh_11taskmanager_11TaskManager_remove_task(struct __py
   std::string __pyx_t_9;
   int __pyx_t_10;
   __Pyx_RefNannySetupContext("remove_task", 0);
+  __Pyx_INCREF(__pyx_v_name);
   /* Check if called by wrapper */
   if (unlikely(__pyx_skip_dispatch)) ;
   /* Check if overridden in Python */
@@ -3498,7 +3972,7 @@ static void __pyx_f_7foolysh_11taskmanager_11TaskManager_remove_task(struct __py
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_type_dict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_remove_task); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 206, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_remove_task); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 200, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_7foolysh_11taskmanager_11TaskManager_7remove_task)) {
         __Pyx_INCREF(__pyx_t_1);
@@ -3514,7 +3988,7 @@ static void __pyx_f_7foolysh_11taskmanager_11TaskManager_remove_task(struct __py
         }
         __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_4, __pyx_v_name) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_name);
         __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 206, __pyx_L1_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 200, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -3534,74 +4008,14 @@ static void __pyx_f_7foolysh_11taskmanager_11TaskManager_remove_task(struct __py
     #endif
   }
 
-  /* "foolysh/taskmanager.pyx":213
+  /* "foolysh/taskmanager.pyx":207
  *             name: ``str``
  *         """
- *         if name not in self._tasks:             # <<<<<<<<<<<<<<
- *             raise ValueError(f'No task named "{name}"')
- *         deref(self.thisptr).remove_task(name.encode('UTF-8'))
- */
-  if (unlikely(__pyx_v_self->_tasks == Py_None)) {
-    PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-    __PYX_ERR(0, 213, __pyx_L1_error)
-  }
-  __pyx_t_5 = (__Pyx_PyDict_ContainsTF(__pyx_v_name, __pyx_v_self->_tasks, Py_NE)); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 213, __pyx_L1_error)
-  __pyx_t_6 = (__pyx_t_5 != 0);
-  if (unlikely(__pyx_t_6)) {
-
-    /* "foolysh/taskmanager.pyx":214
- *         """
- *         if name not in self._tasks:
- *             raise ValueError(f'No task named "{name}"')             # <<<<<<<<<<<<<<
- *         deref(self.thisptr).remove_task(name.encode('UTF-8'))
- *         self._remove.append(name)
- */
-    __pyx_t_1 = PyTuple_New(3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 214, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_7 = 0;
-    __pyx_t_8 = 127;
-    __Pyx_INCREF(__pyx_kp_u_No_task_named);
-    __pyx_t_7 += 15;
-    __Pyx_GIVEREF(__pyx_kp_u_No_task_named);
-    PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_kp_u_No_task_named);
-    __pyx_t_2 = __Pyx_PyObject_FormatSimple(__pyx_v_name, __pyx_empty_unicode); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 214, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_8 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_2) > __pyx_t_8) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_2) : __pyx_t_8;
-    __pyx_t_7 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_2);
-    __Pyx_GIVEREF(__pyx_t_2);
-    PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_t_2);
-    __pyx_t_2 = 0;
-    __Pyx_INCREF(__pyx_kp_u__7);
-    __pyx_t_7 += 1;
-    __Pyx_GIVEREF(__pyx_kp_u__7);
-    PyTuple_SET_ITEM(__pyx_t_1, 2, __pyx_kp_u__7);
-    __pyx_t_2 = __Pyx_PyUnicode_Join(__pyx_t_1, 3, __pyx_t_7, __pyx_t_8); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 214, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_builtin_ValueError, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 214, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __Pyx_Raise(__pyx_t_1, 0, 0, 0);
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __PYX_ERR(0, 214, __pyx_L1_error)
-
-    /* "foolysh/taskmanager.pyx":213
- *             name: ``str``
- *         """
- *         if name not in self._tasks:             # <<<<<<<<<<<<<<
- *             raise ValueError(f'No task named "{name}"')
- *         deref(self.thisptr).remove_task(name.encode('UTF-8'))
- */
-  }
-
-  /* "foolysh/taskmanager.pyx":215
+ *         name = name.encode('UTF-8')             # <<<<<<<<<<<<<<
  *         if name not in self._tasks:
  *             raise ValueError(f'No task named "{name}"')
- *         deref(self.thisptr).remove_task(name.encode('UTF-8'))             # <<<<<<<<<<<<<<
- *         self._remove.append(name)
- * 
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_name, __pyx_n_s_encode); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 215, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_name, __pyx_n_s_encode); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 207, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -3615,28 +4029,97 @@ static void __pyx_f_7foolysh_11taskmanager_11TaskManager_remove_task(struct __py
   }
   __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_3, __pyx_kp_u_UTF_8) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_kp_u_UTF_8);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 215, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 207, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_9 = __pyx_convert_string_from_py_std__in_string(__pyx_t_1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 215, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __Pyx_DECREF_SET(__pyx_v_name, __pyx_t_1);
+  __pyx_t_1 = 0;
+
+  /* "foolysh/taskmanager.pyx":208
+ *         """
+ *         name = name.encode('UTF-8')
+ *         if name not in self._tasks:             # <<<<<<<<<<<<<<
+ *             raise ValueError(f'No task named "{name}"')
+ *         deref(self.thisptr).remove_task(name)
+ */
+  if (unlikely(__pyx_v_self->_tasks == Py_None)) {
+    PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
+    __PYX_ERR(0, 208, __pyx_L1_error)
+  }
+  __pyx_t_5 = (__Pyx_PyDict_ContainsTF(__pyx_v_name, __pyx_v_self->_tasks, Py_NE)); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 208, __pyx_L1_error)
+  __pyx_t_6 = (__pyx_t_5 != 0);
+  if (unlikely(__pyx_t_6)) {
+
+    /* "foolysh/taskmanager.pyx":209
+ *         name = name.encode('UTF-8')
+ *         if name not in self._tasks:
+ *             raise ValueError(f'No task named "{name}"')             # <<<<<<<<<<<<<<
+ *         deref(self.thisptr).remove_task(name)
+ *         self._remove.append(name)
+ */
+    __pyx_t_1 = PyTuple_New(3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 209, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __pyx_t_7 = 0;
+    __pyx_t_8 = 127;
+    __Pyx_INCREF(__pyx_kp_u_No_task_named);
+    __pyx_t_7 += 15;
+    __Pyx_GIVEREF(__pyx_kp_u_No_task_named);
+    PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_kp_u_No_task_named);
+    __pyx_t_2 = __Pyx_PyObject_FormatSimple(__pyx_v_name, __pyx_empty_unicode); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 209, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __pyx_t_8 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_2) > __pyx_t_8) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_2) : __pyx_t_8;
+    __pyx_t_7 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_2);
+    __Pyx_GIVEREF(__pyx_t_2);
+    PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_t_2);
+    __pyx_t_2 = 0;
+    __Pyx_INCREF(__pyx_kp_u__8);
+    __pyx_t_7 += 1;
+    __Pyx_GIVEREF(__pyx_kp_u__8);
+    PyTuple_SET_ITEM(__pyx_t_1, 2, __pyx_kp_u__8);
+    __pyx_t_2 = __Pyx_PyUnicode_Join(__pyx_t_1, 3, __pyx_t_7, __pyx_t_8); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 209, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_builtin_ValueError, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 209, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __Pyx_Raise(__pyx_t_1, 0, 0, 0);
+    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+    __PYX_ERR(0, 209, __pyx_L1_error)
+
+    /* "foolysh/taskmanager.pyx":208
+ *         """
+ *         name = name.encode('UTF-8')
+ *         if name not in self._tasks:             # <<<<<<<<<<<<<<
+ *             raise ValueError(f'No task named "{name}"')
+ *         deref(self.thisptr).remove_task(name)
+ */
+  }
+
+  /* "foolysh/taskmanager.pyx":210
+ *         if name not in self._tasks:
+ *             raise ValueError(f'No task named "{name}"')
+ *         deref(self.thisptr).remove_task(name)             # <<<<<<<<<<<<<<
+ *         self._remove.append(name)
+ * 
+ */
+  __pyx_t_9 = __pyx_convert_string_from_py_std__in_string(__pyx_v_name); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 210, __pyx_L1_error)
   (*__pyx_v_self->thisptr).remove_task(__pyx_t_9);
 
-  /* "foolysh/taskmanager.pyx":216
+  /* "foolysh/taskmanager.pyx":211
  *             raise ValueError(f'No task named "{name}"')
- *         deref(self.thisptr).remove_task(name.encode('UTF-8'))
+ *         deref(self.thisptr).remove_task(name)
  *         self._remove.append(name)             # <<<<<<<<<<<<<<
  * 
  *     cpdef void execute(self, const double dt):
  */
   if (unlikely(__pyx_v_self->_remove == Py_None)) {
     PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "append");
-    __PYX_ERR(0, 216, __pyx_L1_error)
+    __PYX_ERR(0, 211, __pyx_L1_error)
   }
-  __pyx_t_10 = __Pyx_PyList_Append(__pyx_v_self->_remove, __pyx_v_name); if (unlikely(__pyx_t_10 == ((int)-1))) __PYX_ERR(0, 216, __pyx_L1_error)
+  __pyx_t_10 = __Pyx_PyList_Append(__pyx_v_self->_remove, __pyx_v_name); if (unlikely(__pyx_t_10 == ((int)-1))) __PYX_ERR(0, 211, __pyx_L1_error)
 
-  /* "foolysh/taskmanager.pyx":206
- *         return t
+  /* "foolysh/taskmanager.pyx":200
+ *         deref(self.thisptr).add_task(name, delay, with_dt, pyobj)
  * 
  *     cpdef void remove_task(self, name):             # <<<<<<<<<<<<<<
  *         """
@@ -3652,6 +4135,7 @@ static void __pyx_f_7foolysh_11taskmanager_11TaskManager_remove_task(struct __py
   __Pyx_XDECREF(__pyx_t_4);
   __Pyx_WriteUnraisable("foolysh.taskmanager.TaskManager.remove_task", __pyx_clineno, __pyx_lineno, __pyx_filename, 1, 0);
   __pyx_L0:;
+  __Pyx_XDECREF(__pyx_v_name);
   __Pyx_RefNannyFinishContext();
 }
 
@@ -3675,7 +4159,7 @@ static PyObject *__pyx_pf_7foolysh_11taskmanager_11TaskManager_6remove_task(stru
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("remove_task", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_void_to_None(__pyx_f_7foolysh_11taskmanager_11TaskManager_remove_task(__pyx_v_self, __pyx_v_name, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 206, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_void_to_None(__pyx_f_7foolysh_11taskmanager_11TaskManager_remove_task(__pyx_v_self, __pyx_v_name, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 200, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -3692,7 +4176,7 @@ static PyObject *__pyx_pf_7foolysh_11taskmanager_11TaskManager_6remove_task(stru
   return __pyx_r;
 }
 
-/* "foolysh/taskmanager.pyx":218
+/* "foolysh/taskmanager.pyx":213
  *         self._remove.append(name)
  * 
  *     cpdef void execute(self, const double dt):             # <<<<<<<<<<<<<<
@@ -3720,10 +4204,10 @@ static void __pyx_f_7foolysh_11taskmanager_11TaskManager_execute(struct __pyx_ob
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_type_dict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_execute); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 218, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_execute); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 213, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_7foolysh_11taskmanager_11TaskManager_9execute)) {
-        __pyx_t_3 = PyFloat_FromDouble(__pyx_v_dt); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 218, __pyx_L1_error)
+        __pyx_t_3 = PyFloat_FromDouble(__pyx_v_dt); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 213, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_INCREF(__pyx_t_1);
         __pyx_t_4 = __pyx_t_1; __pyx_t_5 = NULL;
@@ -3739,7 +4223,7 @@ static void __pyx_f_7foolysh_11taskmanager_11TaskManager_execute(struct __pyx_ob
         __pyx_t_2 = (__pyx_t_5) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_5, __pyx_t_3) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_3);
         __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 218, __pyx_L1_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 213, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -3759,7 +4243,7 @@ static void __pyx_f_7foolysh_11taskmanager_11TaskManager_execute(struct __pyx_ob
     #endif
   }
 
-  /* "foolysh/taskmanager.pyx":223
+  /* "foolysh/taskmanager.pyx":218
  *         calls all scheduled/overdue tasks.
  *         """
  *         while len(self._remove) > 0:             # <<<<<<<<<<<<<<
@@ -3771,14 +4255,14 @@ static void __pyx_f_7foolysh_11taskmanager_11TaskManager_execute(struct __pyx_ob
     __Pyx_INCREF(__pyx_t_1);
     if (unlikely(__pyx_t_1 == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "object of type 'NoneType' has no len()");
-      __PYX_ERR(0, 223, __pyx_L1_error)
+      __PYX_ERR(0, 218, __pyx_L1_error)
     }
-    __pyx_t_6 = PyList_GET_SIZE(__pyx_t_1); if (unlikely(__pyx_t_6 == ((Py_ssize_t)-1))) __PYX_ERR(0, 223, __pyx_L1_error)
+    __pyx_t_6 = PyList_GET_SIZE(__pyx_t_1); if (unlikely(__pyx_t_6 == ((Py_ssize_t)-1))) __PYX_ERR(0, 218, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_t_7 = ((__pyx_t_6 > 0) != 0);
     if (!__pyx_t_7) break;
 
-    /* "foolysh/taskmanager.pyx":224
+    /* "foolysh/taskmanager.pyx":219
  *         """
  *         while len(self._remove) > 0:
  *             self._tasks.pop(self._remove.pop())             # <<<<<<<<<<<<<<
@@ -3787,21 +4271,21 @@ static void __pyx_f_7foolysh_11taskmanager_11TaskManager_execute(struct __pyx_ob
  */
     if (unlikely(__pyx_v_self->_tasks == Py_None)) {
       PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "pop");
-      __PYX_ERR(0, 224, __pyx_L1_error)
+      __PYX_ERR(0, 219, __pyx_L1_error)
     }
     if (unlikely(__pyx_v_self->_remove == Py_None)) {
       PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "pop");
-      __PYX_ERR(0, 224, __pyx_L1_error)
+      __PYX_ERR(0, 219, __pyx_L1_error)
     }
-    __pyx_t_1 = __Pyx_PyList_Pop(__pyx_v_self->_remove); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 224, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyList_Pop(__pyx_v_self->_remove); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 219, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_2 = __Pyx_PyDict_Pop(__pyx_v_self->_tasks, __pyx_t_1, ((PyObject *)NULL)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 224, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyDict_Pop(__pyx_v_self->_tasks, __pyx_t_1, ((PyObject *)NULL)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 219, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   }
 
-  /* "foolysh/taskmanager.pyx":225
+  /* "foolysh/taskmanager.pyx":220
  *         while len(self._remove) > 0:
  *             self._tasks.pop(self._remove.pop())
  *         deref(self.thisptr).execute(dt)             # <<<<<<<<<<<<<<
@@ -3810,7 +4294,7 @@ static void __pyx_f_7foolysh_11taskmanager_11TaskManager_execute(struct __pyx_ob
  */
   (*__pyx_v_self->thisptr).execute(__pyx_v_dt);
 
-  /* "foolysh/taskmanager.pyx":218
+  /* "foolysh/taskmanager.pyx":213
  *         self._remove.append(name)
  * 
  *     cpdef void execute(self, const double dt):             # <<<<<<<<<<<<<<
@@ -3840,7 +4324,7 @@ static PyObject *__pyx_pw_7foolysh_11taskmanager_11TaskManager_9execute(PyObject
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("execute (wrapper)", 0);
   assert(__pyx_arg_dt); {
-    __pyx_v_dt = __pyx_PyFloat_AsDouble(__pyx_arg_dt); if (unlikely((__pyx_v_dt == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 218, __pyx_L3_error)
+    __pyx_v_dt = __pyx_PyFloat_AsDouble(__pyx_arg_dt); if (unlikely((__pyx_v_dt == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 213, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -3861,7 +4345,7 @@ static PyObject *__pyx_pf_7foolysh_11taskmanager_11TaskManager_8execute(struct _
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("execute", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_void_to_None(__pyx_f_7foolysh_11taskmanager_11TaskManager_execute(__pyx_v_self, __pyx_v_dt, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 218, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_void_to_None(__pyx_f_7foolysh_11taskmanager_11TaskManager_execute(__pyx_v_self, __pyx_v_dt, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 213, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -3878,7 +4362,7 @@ static PyObject *__pyx_pf_7foolysh_11taskmanager_11TaskManager_8execute(struct _
   return __pyx_r;
 }
 
-/* "foolysh/taskmanager.pyx":227
+/* "foolysh/taskmanager.pyx":222
  *         deref(self.thisptr).execute(dt)
  * 
  *     cpdef void set_delay(self, name, const double delay):             # <<<<<<<<<<<<<<
@@ -3902,6 +4386,7 @@ static void __pyx_f_7foolysh_11taskmanager_11TaskManager_set_delay(struct __pyx_
   Py_UCS4 __pyx_t_11;
   std::string __pyx_t_12;
   __Pyx_RefNannySetupContext("set_delay", 0);
+  __Pyx_INCREF(__pyx_v_name);
   /* Check if called by wrapper */
   if (unlikely(__pyx_skip_dispatch)) ;
   /* Check if overridden in Python */
@@ -3911,10 +4396,10 @@ static void __pyx_f_7foolysh_11taskmanager_11TaskManager_set_delay(struct __pyx_
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_type_dict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_set_delay); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 227, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_set_delay); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 222, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_7foolysh_11taskmanager_11TaskManager_11set_delay)) {
-        __pyx_t_3 = PyFloat_FromDouble(__pyx_v_delay); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 227, __pyx_L1_error)
+        __pyx_t_3 = PyFloat_FromDouble(__pyx_v_delay); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 222, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_INCREF(__pyx_t_1);
         __pyx_t_4 = __pyx_t_1; __pyx_t_5 = NULL;
@@ -3932,7 +4417,7 @@ static void __pyx_f_7foolysh_11taskmanager_11TaskManager_set_delay(struct __pyx_
         #if CYTHON_FAST_PYCALL
         if (PyFunction_Check(__pyx_t_4)) {
           PyObject *__pyx_temp[3] = {__pyx_t_5, __pyx_v_name, __pyx_t_3};
-          __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 227, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 222, __pyx_L1_error)
           __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -3941,14 +4426,14 @@ static void __pyx_f_7foolysh_11taskmanager_11TaskManager_set_delay(struct __pyx_
         #if CYTHON_FAST_PYCCALL
         if (__Pyx_PyFastCFunction_Check(__pyx_t_4)) {
           PyObject *__pyx_temp[3] = {__pyx_t_5, __pyx_v_name, __pyx_t_3};
-          __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 227, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 222, __pyx_L1_error)
           __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         } else
         #endif
         {
-          __pyx_t_7 = PyTuple_New(2+__pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 227, __pyx_L1_error)
+          __pyx_t_7 = PyTuple_New(2+__pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 222, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_7);
           if (__pyx_t_5) {
             __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_5); __pyx_t_5 = NULL;
@@ -3959,7 +4444,7 @@ static void __pyx_f_7foolysh_11taskmanager_11TaskManager_set_delay(struct __pyx_
           __Pyx_GIVEREF(__pyx_t_3);
           PyTuple_SET_ITEM(__pyx_t_7, 1+__pyx_t_6, __pyx_t_3);
           __pyx_t_3 = 0;
-          __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_7, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 227, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_7, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 222, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
         }
@@ -3981,74 +4466,14 @@ static void __pyx_f_7foolysh_11taskmanager_11TaskManager_set_delay(struct __pyx_
     #endif
   }
 
-  /* "foolysh/taskmanager.pyx":235
+  /* "foolysh/taskmanager.pyx":230
  *             delay: ``float`` new value of the delay.
  *         """
- *         if name not in self._tasks:             # <<<<<<<<<<<<<<
- *             raise ValueError(f'No task named "{name}"')
- *         deref(self.thisptr).set_delay(name.encode('UTF-8'), delay)
- */
-  if (unlikely(__pyx_v_self->_tasks == Py_None)) {
-    PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-    __PYX_ERR(0, 235, __pyx_L1_error)
-  }
-  __pyx_t_8 = (__Pyx_PyDict_ContainsTF(__pyx_v_name, __pyx_v_self->_tasks, Py_NE)); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 235, __pyx_L1_error)
-  __pyx_t_9 = (__pyx_t_8 != 0);
-  if (unlikely(__pyx_t_9)) {
-
-    /* "foolysh/taskmanager.pyx":236
- *         """
- *         if name not in self._tasks:
- *             raise ValueError(f'No task named "{name}"')             # <<<<<<<<<<<<<<
- *         deref(self.thisptr).set_delay(name.encode('UTF-8'), delay)
- * 
- */
-    __pyx_t_1 = PyTuple_New(3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 236, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_10 = 0;
-    __pyx_t_11 = 127;
-    __Pyx_INCREF(__pyx_kp_u_No_task_named);
-    __pyx_t_10 += 15;
-    __Pyx_GIVEREF(__pyx_kp_u_No_task_named);
-    PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_kp_u_No_task_named);
-    __pyx_t_2 = __Pyx_PyObject_FormatSimple(__pyx_v_name, __pyx_empty_unicode); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 236, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_11 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_2) > __pyx_t_11) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_2) : __pyx_t_11;
-    __pyx_t_10 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_2);
-    __Pyx_GIVEREF(__pyx_t_2);
-    PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_t_2);
-    __pyx_t_2 = 0;
-    __Pyx_INCREF(__pyx_kp_u__7);
-    __pyx_t_10 += 1;
-    __Pyx_GIVEREF(__pyx_kp_u__7);
-    PyTuple_SET_ITEM(__pyx_t_1, 2, __pyx_kp_u__7);
-    __pyx_t_2 = __Pyx_PyUnicode_Join(__pyx_t_1, 3, __pyx_t_10, __pyx_t_11); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 236, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_builtin_ValueError, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 236, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __Pyx_Raise(__pyx_t_1, 0, 0, 0);
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __PYX_ERR(0, 236, __pyx_L1_error)
-
-    /* "foolysh/taskmanager.pyx":235
- *             delay: ``float`` new value of the delay.
- *         """
- *         if name not in self._tasks:             # <<<<<<<<<<<<<<
- *             raise ValueError(f'No task named "{name}"')
- *         deref(self.thisptr).set_delay(name.encode('UTF-8'), delay)
- */
-  }
-
-  /* "foolysh/taskmanager.pyx":237
+ *         name = name.encode('UTF-8')             # <<<<<<<<<<<<<<
  *         if name not in self._tasks:
  *             raise ValueError(f'No task named "{name}"')
- *         deref(self.thisptr).set_delay(name.encode('UTF-8'), delay)             # <<<<<<<<<<<<<<
- * 
- *     cpdef void pause(self, name):
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_name, __pyx_n_s_encode); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 237, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_name, __pyx_n_s_encode); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 230, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_4 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -4062,14 +4487,83 @@ static void __pyx_f_7foolysh_11taskmanager_11TaskManager_set_delay(struct __pyx_
   }
   __pyx_t_1 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_4, __pyx_kp_u_UTF_8) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_kp_u_UTF_8);
   __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 237, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 230, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_12 = __pyx_convert_string_from_py_std__in_string(__pyx_t_1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 237, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __Pyx_DECREF_SET(__pyx_v_name, __pyx_t_1);
+  __pyx_t_1 = 0;
+
+  /* "foolysh/taskmanager.pyx":231
+ *         """
+ *         name = name.encode('UTF-8')
+ *         if name not in self._tasks:             # <<<<<<<<<<<<<<
+ *             raise ValueError(f'No task named "{name}"')
+ *         deref(self.thisptr).set_delay(name, delay)
+ */
+  if (unlikely(__pyx_v_self->_tasks == Py_None)) {
+    PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
+    __PYX_ERR(0, 231, __pyx_L1_error)
+  }
+  __pyx_t_8 = (__Pyx_PyDict_ContainsTF(__pyx_v_name, __pyx_v_self->_tasks, Py_NE)); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 231, __pyx_L1_error)
+  __pyx_t_9 = (__pyx_t_8 != 0);
+  if (unlikely(__pyx_t_9)) {
+
+    /* "foolysh/taskmanager.pyx":232
+ *         name = name.encode('UTF-8')
+ *         if name not in self._tasks:
+ *             raise ValueError(f'No task named "{name}"')             # <<<<<<<<<<<<<<
+ *         deref(self.thisptr).set_delay(name, delay)
+ * 
+ */
+    __pyx_t_1 = PyTuple_New(3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 232, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __pyx_t_10 = 0;
+    __pyx_t_11 = 127;
+    __Pyx_INCREF(__pyx_kp_u_No_task_named);
+    __pyx_t_10 += 15;
+    __Pyx_GIVEREF(__pyx_kp_u_No_task_named);
+    PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_kp_u_No_task_named);
+    __pyx_t_2 = __Pyx_PyObject_FormatSimple(__pyx_v_name, __pyx_empty_unicode); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 232, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __pyx_t_11 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_2) > __pyx_t_11) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_2) : __pyx_t_11;
+    __pyx_t_10 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_2);
+    __Pyx_GIVEREF(__pyx_t_2);
+    PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_t_2);
+    __pyx_t_2 = 0;
+    __Pyx_INCREF(__pyx_kp_u__8);
+    __pyx_t_10 += 1;
+    __Pyx_GIVEREF(__pyx_kp_u__8);
+    PyTuple_SET_ITEM(__pyx_t_1, 2, __pyx_kp_u__8);
+    __pyx_t_2 = __Pyx_PyUnicode_Join(__pyx_t_1, 3, __pyx_t_10, __pyx_t_11); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 232, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_builtin_ValueError, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 232, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __Pyx_Raise(__pyx_t_1, 0, 0, 0);
+    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+    __PYX_ERR(0, 232, __pyx_L1_error)
+
+    /* "foolysh/taskmanager.pyx":231
+ *         """
+ *         name = name.encode('UTF-8')
+ *         if name not in self._tasks:             # <<<<<<<<<<<<<<
+ *             raise ValueError(f'No task named "{name}"')
+ *         deref(self.thisptr).set_delay(name, delay)
+ */
+  }
+
+  /* "foolysh/taskmanager.pyx":233
+ *         if name not in self._tasks:
+ *             raise ValueError(f'No task named "{name}"')
+ *         deref(self.thisptr).set_delay(name, delay)             # <<<<<<<<<<<<<<
+ * 
+ *     cpdef void pause(self, name):
+ */
+  __pyx_t_12 = __pyx_convert_string_from_py_std__in_string(__pyx_v_name); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 233, __pyx_L1_error)
   (*__pyx_v_self->thisptr).set_delay(__pyx_t_12, __pyx_v_delay);
 
-  /* "foolysh/taskmanager.pyx":227
+  /* "foolysh/taskmanager.pyx":222
  *         deref(self.thisptr).execute(dt)
  * 
  *     cpdef void set_delay(self, name, const double delay):             # <<<<<<<<<<<<<<
@@ -4088,6 +4582,7 @@ static void __pyx_f_7foolysh_11taskmanager_11TaskManager_set_delay(struct __pyx_
   __Pyx_XDECREF(__pyx_t_7);
   __Pyx_WriteUnraisable("foolysh.taskmanager.TaskManager.set_delay", __pyx_clineno, __pyx_lineno, __pyx_filename, 1, 0);
   __pyx_L0:;
+  __Pyx_XDECREF(__pyx_v_name);
   __Pyx_RefNannyFinishContext();
 }
 
@@ -4123,11 +4618,11 @@ static PyObject *__pyx_pw_7foolysh_11taskmanager_11TaskManager_11set_delay(PyObj
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_delay)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("set_delay", 1, 2, 2, 1); __PYX_ERR(0, 227, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("set_delay", 1, 2, 2, 1); __PYX_ERR(0, 222, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "set_delay") < 0)) __PYX_ERR(0, 227, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "set_delay") < 0)) __PYX_ERR(0, 222, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -4136,11 +4631,11 @@ static PyObject *__pyx_pw_7foolysh_11taskmanager_11TaskManager_11set_delay(PyObj
       values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
     }
     __pyx_v_name = values[0];
-    __pyx_v_delay = __pyx_PyFloat_AsDouble(values[1]); if (unlikely((__pyx_v_delay == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 227, __pyx_L3_error)
+    __pyx_v_delay = __pyx_PyFloat_AsDouble(values[1]); if (unlikely((__pyx_v_delay == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 222, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("set_delay", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 227, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("set_delay", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 222, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("foolysh.taskmanager.TaskManager.set_delay", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -4159,7 +4654,7 @@ static PyObject *__pyx_pf_7foolysh_11taskmanager_11TaskManager_10set_delay(struc
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("set_delay", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_void_to_None(__pyx_f_7foolysh_11taskmanager_11TaskManager_set_delay(__pyx_v_self, __pyx_v_name, __pyx_v_delay, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 227, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_void_to_None(__pyx_f_7foolysh_11taskmanager_11TaskManager_set_delay(__pyx_v_self, __pyx_v_name, __pyx_v_delay, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 222, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -4176,8 +4671,8 @@ static PyObject *__pyx_pf_7foolysh_11taskmanager_11TaskManager_10set_delay(struc
   return __pyx_r;
 }
 
-/* "foolysh/taskmanager.pyx":239
- *         deref(self.thisptr).set_delay(name.encode('UTF-8'), delay)
+/* "foolysh/taskmanager.pyx":235
+ *         deref(self.thisptr).set_delay(name, delay)
  * 
  *     cpdef void pause(self, name):             # <<<<<<<<<<<<<<
  *         """
@@ -4197,6 +4692,7 @@ static void __pyx_f_7foolysh_11taskmanager_11TaskManager_pause(struct __pyx_obj_
   Py_UCS4 __pyx_t_8;
   std::string __pyx_t_9;
   __Pyx_RefNannySetupContext("pause", 0);
+  __Pyx_INCREF(__pyx_v_name);
   /* Check if called by wrapper */
   if (unlikely(__pyx_skip_dispatch)) ;
   /* Check if overridden in Python */
@@ -4206,7 +4702,7 @@ static void __pyx_f_7foolysh_11taskmanager_11TaskManager_pause(struct __pyx_obj_
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_type_dict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_pause); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 239, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_pause); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 235, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_7foolysh_11taskmanager_11TaskManager_13pause)) {
         __Pyx_INCREF(__pyx_t_1);
@@ -4222,7 +4718,7 @@ static void __pyx_f_7foolysh_11taskmanager_11TaskManager_pause(struct __pyx_obj_
         }
         __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_4, __pyx_v_name) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_name);
         __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 239, __pyx_L1_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 235, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -4242,74 +4738,14 @@ static void __pyx_f_7foolysh_11taskmanager_11TaskManager_pause(struct __pyx_obj_
     #endif
   }
 
-  /* "foolysh/taskmanager.pyx":246
+  /* "foolysh/taskmanager.pyx":242
  *             name: ``str``
  *         """
- *         if name not in self._tasks:             # <<<<<<<<<<<<<<
- *             raise ValueError(f'No task named "{name}"')
- *         deref(self.thisptr).pause(name.encode('UTF-8'))
- */
-  if (unlikely(__pyx_v_self->_tasks == Py_None)) {
-    PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-    __PYX_ERR(0, 246, __pyx_L1_error)
-  }
-  __pyx_t_5 = (__Pyx_PyDict_ContainsTF(__pyx_v_name, __pyx_v_self->_tasks, Py_NE)); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 246, __pyx_L1_error)
-  __pyx_t_6 = (__pyx_t_5 != 0);
-  if (unlikely(__pyx_t_6)) {
-
-    /* "foolysh/taskmanager.pyx":247
- *         """
- *         if name not in self._tasks:
- *             raise ValueError(f'No task named "{name}"')             # <<<<<<<<<<<<<<
- *         deref(self.thisptr).pause(name.encode('UTF-8'))
- * 
- */
-    __pyx_t_1 = PyTuple_New(3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 247, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_7 = 0;
-    __pyx_t_8 = 127;
-    __Pyx_INCREF(__pyx_kp_u_No_task_named);
-    __pyx_t_7 += 15;
-    __Pyx_GIVEREF(__pyx_kp_u_No_task_named);
-    PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_kp_u_No_task_named);
-    __pyx_t_2 = __Pyx_PyObject_FormatSimple(__pyx_v_name, __pyx_empty_unicode); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 247, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_8 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_2) > __pyx_t_8) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_2) : __pyx_t_8;
-    __pyx_t_7 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_2);
-    __Pyx_GIVEREF(__pyx_t_2);
-    PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_t_2);
-    __pyx_t_2 = 0;
-    __Pyx_INCREF(__pyx_kp_u__7);
-    __pyx_t_7 += 1;
-    __Pyx_GIVEREF(__pyx_kp_u__7);
-    PyTuple_SET_ITEM(__pyx_t_1, 2, __pyx_kp_u__7);
-    __pyx_t_2 = __Pyx_PyUnicode_Join(__pyx_t_1, 3, __pyx_t_7, __pyx_t_8); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 247, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_builtin_ValueError, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 247, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __Pyx_Raise(__pyx_t_1, 0, 0, 0);
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __PYX_ERR(0, 247, __pyx_L1_error)
-
-    /* "foolysh/taskmanager.pyx":246
- *             name: ``str``
- *         """
- *         if name not in self._tasks:             # <<<<<<<<<<<<<<
- *             raise ValueError(f'No task named "{name}"')
- *         deref(self.thisptr).pause(name.encode('UTF-8'))
- */
-  }
-
-  /* "foolysh/taskmanager.pyx":248
+ *         name = name.encode('UTF-8')             # <<<<<<<<<<<<<<
  *         if name not in self._tasks:
  *             raise ValueError(f'No task named "{name}"')
- *         deref(self.thisptr).pause(name.encode('UTF-8'))             # <<<<<<<<<<<<<<
- * 
- *     cpdef void resume(self, name):
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_name, __pyx_n_s_encode); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 248, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_name, __pyx_n_s_encode); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 242, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -4323,15 +4759,84 @@ static void __pyx_f_7foolysh_11taskmanager_11TaskManager_pause(struct __pyx_obj_
   }
   __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_3, __pyx_kp_u_UTF_8) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_kp_u_UTF_8);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 248, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 242, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_9 = __pyx_convert_string_from_py_std__in_string(__pyx_t_1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 248, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __Pyx_DECREF_SET(__pyx_v_name, __pyx_t_1);
+  __pyx_t_1 = 0;
+
+  /* "foolysh/taskmanager.pyx":243
+ *         """
+ *         name = name.encode('UTF-8')
+ *         if name not in self._tasks:             # <<<<<<<<<<<<<<
+ *             raise ValueError(f'No task named "{name}"')
+ *         deref(self.thisptr).pause(name)
+ */
+  if (unlikely(__pyx_v_self->_tasks == Py_None)) {
+    PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
+    __PYX_ERR(0, 243, __pyx_L1_error)
+  }
+  __pyx_t_5 = (__Pyx_PyDict_ContainsTF(__pyx_v_name, __pyx_v_self->_tasks, Py_NE)); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 243, __pyx_L1_error)
+  __pyx_t_6 = (__pyx_t_5 != 0);
+  if (unlikely(__pyx_t_6)) {
+
+    /* "foolysh/taskmanager.pyx":244
+ *         name = name.encode('UTF-8')
+ *         if name not in self._tasks:
+ *             raise ValueError(f'No task named "{name}"')             # <<<<<<<<<<<<<<
+ *         deref(self.thisptr).pause(name)
+ * 
+ */
+    __pyx_t_1 = PyTuple_New(3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 244, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __pyx_t_7 = 0;
+    __pyx_t_8 = 127;
+    __Pyx_INCREF(__pyx_kp_u_No_task_named);
+    __pyx_t_7 += 15;
+    __Pyx_GIVEREF(__pyx_kp_u_No_task_named);
+    PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_kp_u_No_task_named);
+    __pyx_t_2 = __Pyx_PyObject_FormatSimple(__pyx_v_name, __pyx_empty_unicode); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 244, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __pyx_t_8 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_2) > __pyx_t_8) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_2) : __pyx_t_8;
+    __pyx_t_7 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_2);
+    __Pyx_GIVEREF(__pyx_t_2);
+    PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_t_2);
+    __pyx_t_2 = 0;
+    __Pyx_INCREF(__pyx_kp_u__8);
+    __pyx_t_7 += 1;
+    __Pyx_GIVEREF(__pyx_kp_u__8);
+    PyTuple_SET_ITEM(__pyx_t_1, 2, __pyx_kp_u__8);
+    __pyx_t_2 = __Pyx_PyUnicode_Join(__pyx_t_1, 3, __pyx_t_7, __pyx_t_8); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 244, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_builtin_ValueError, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 244, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __Pyx_Raise(__pyx_t_1, 0, 0, 0);
+    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+    __PYX_ERR(0, 244, __pyx_L1_error)
+
+    /* "foolysh/taskmanager.pyx":243
+ *         """
+ *         name = name.encode('UTF-8')
+ *         if name not in self._tasks:             # <<<<<<<<<<<<<<
+ *             raise ValueError(f'No task named "{name}"')
+ *         deref(self.thisptr).pause(name)
+ */
+  }
+
+  /* "foolysh/taskmanager.pyx":245
+ *         if name not in self._tasks:
+ *             raise ValueError(f'No task named "{name}"')
+ *         deref(self.thisptr).pause(name)             # <<<<<<<<<<<<<<
+ * 
+ *     cpdef void resume(self, name):
+ */
+  __pyx_t_9 = __pyx_convert_string_from_py_std__in_string(__pyx_v_name); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 245, __pyx_L1_error)
   (*__pyx_v_self->thisptr).pause(__pyx_t_9);
 
-  /* "foolysh/taskmanager.pyx":239
- *         deref(self.thisptr).set_delay(name.encode('UTF-8'), delay)
+  /* "foolysh/taskmanager.pyx":235
+ *         deref(self.thisptr).set_delay(name, delay)
  * 
  *     cpdef void pause(self, name):             # <<<<<<<<<<<<<<
  *         """
@@ -4347,6 +4852,7 @@ static void __pyx_f_7foolysh_11taskmanager_11TaskManager_pause(struct __pyx_obj_
   __Pyx_XDECREF(__pyx_t_4);
   __Pyx_WriteUnraisable("foolysh.taskmanager.TaskManager.pause", __pyx_clineno, __pyx_lineno, __pyx_filename, 1, 0);
   __pyx_L0:;
+  __Pyx_XDECREF(__pyx_v_name);
   __Pyx_RefNannyFinishContext();
 }
 
@@ -4370,7 +4876,7 @@ static PyObject *__pyx_pf_7foolysh_11taskmanager_11TaskManager_12pause(struct __
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("pause", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_void_to_None(__pyx_f_7foolysh_11taskmanager_11TaskManager_pause(__pyx_v_self, __pyx_v_name, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 239, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_void_to_None(__pyx_f_7foolysh_11taskmanager_11TaskManager_pause(__pyx_v_self, __pyx_v_name, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 235, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -4387,8 +4893,8 @@ static PyObject *__pyx_pf_7foolysh_11taskmanager_11TaskManager_12pause(struct __
   return __pyx_r;
 }
 
-/* "foolysh/taskmanager.pyx":250
- *         deref(self.thisptr).pause(name.encode('UTF-8'))
+/* "foolysh/taskmanager.pyx":247
+ *         deref(self.thisptr).pause(name)
  * 
  *     cpdef void resume(self, name):             # <<<<<<<<<<<<<<
  *         """
@@ -4408,6 +4914,7 @@ static void __pyx_f_7foolysh_11taskmanager_11TaskManager_resume(struct __pyx_obj
   Py_UCS4 __pyx_t_8;
   std::string __pyx_t_9;
   __Pyx_RefNannySetupContext("resume", 0);
+  __Pyx_INCREF(__pyx_v_name);
   /* Check if called by wrapper */
   if (unlikely(__pyx_skip_dispatch)) ;
   /* Check if overridden in Python */
@@ -4417,7 +4924,7 @@ static void __pyx_f_7foolysh_11taskmanager_11TaskManager_resume(struct __pyx_obj
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_type_dict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_resume); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 250, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_resume); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 247, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_7foolysh_11taskmanager_11TaskManager_15resume)) {
         __Pyx_INCREF(__pyx_t_1);
@@ -4433,7 +4940,7 @@ static void __pyx_f_7foolysh_11taskmanager_11TaskManager_resume(struct __pyx_obj
         }
         __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_4, __pyx_v_name) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_name);
         __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 250, __pyx_L1_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 247, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -4453,74 +4960,14 @@ static void __pyx_f_7foolysh_11taskmanager_11TaskManager_resume(struct __pyx_obj
     #endif
   }
 
-  /* "foolysh/taskmanager.pyx":257
+  /* "foolysh/taskmanager.pyx":254
  *             name: ``str``
  *         """
- *         if name not in self._tasks:             # <<<<<<<<<<<<<<
- *             raise ValueError(f'No task named "{name}"')
- *         deref(self.thisptr).resume(name.encode('UTF-8'))
- */
-  if (unlikely(__pyx_v_self->_tasks == Py_None)) {
-    PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-    __PYX_ERR(0, 257, __pyx_L1_error)
-  }
-  __pyx_t_5 = (__Pyx_PyDict_ContainsTF(__pyx_v_name, __pyx_v_self->_tasks, Py_NE)); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 257, __pyx_L1_error)
-  __pyx_t_6 = (__pyx_t_5 != 0);
-  if (unlikely(__pyx_t_6)) {
-
-    /* "foolysh/taskmanager.pyx":258
- *         """
- *         if name not in self._tasks:
- *             raise ValueError(f'No task named "{name}"')             # <<<<<<<<<<<<<<
- *         deref(self.thisptr).resume(name.encode('UTF-8'))
- * 
- */
-    __pyx_t_1 = PyTuple_New(3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 258, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_7 = 0;
-    __pyx_t_8 = 127;
-    __Pyx_INCREF(__pyx_kp_u_No_task_named);
-    __pyx_t_7 += 15;
-    __Pyx_GIVEREF(__pyx_kp_u_No_task_named);
-    PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_kp_u_No_task_named);
-    __pyx_t_2 = __Pyx_PyObject_FormatSimple(__pyx_v_name, __pyx_empty_unicode); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 258, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_8 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_2) > __pyx_t_8) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_2) : __pyx_t_8;
-    __pyx_t_7 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_2);
-    __Pyx_GIVEREF(__pyx_t_2);
-    PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_t_2);
-    __pyx_t_2 = 0;
-    __Pyx_INCREF(__pyx_kp_u__7);
-    __pyx_t_7 += 1;
-    __Pyx_GIVEREF(__pyx_kp_u__7);
-    PyTuple_SET_ITEM(__pyx_t_1, 2, __pyx_kp_u__7);
-    __pyx_t_2 = __Pyx_PyUnicode_Join(__pyx_t_1, 3, __pyx_t_7, __pyx_t_8); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 258, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_builtin_ValueError, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 258, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __Pyx_Raise(__pyx_t_1, 0, 0, 0);
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __PYX_ERR(0, 258, __pyx_L1_error)
-
-    /* "foolysh/taskmanager.pyx":257
- *             name: ``str``
- *         """
- *         if name not in self._tasks:             # <<<<<<<<<<<<<<
- *             raise ValueError(f'No task named "{name}"')
- *         deref(self.thisptr).resume(name.encode('UTF-8'))
- */
-  }
-
-  /* "foolysh/taskmanager.pyx":259
+ *         name = name.encode('UTF-8')             # <<<<<<<<<<<<<<
  *         if name not in self._tasks:
  *             raise ValueError(f'No task named "{name}"')
- *         deref(self.thisptr).resume(name.encode('UTF-8'))             # <<<<<<<<<<<<<<
- * 
- *     cpdef bool state(self, name):
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_name, __pyx_n_s_encode); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 259, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_name, __pyx_n_s_encode); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 254, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -4534,15 +4981,84 @@ static void __pyx_f_7foolysh_11taskmanager_11TaskManager_resume(struct __pyx_obj
   }
   __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_3, __pyx_kp_u_UTF_8) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_kp_u_UTF_8);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 259, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 254, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_9 = __pyx_convert_string_from_py_std__in_string(__pyx_t_1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 259, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __Pyx_DECREF_SET(__pyx_v_name, __pyx_t_1);
+  __pyx_t_1 = 0;
+
+  /* "foolysh/taskmanager.pyx":255
+ *         """
+ *         name = name.encode('UTF-8')
+ *         if name not in self._tasks:             # <<<<<<<<<<<<<<
+ *             raise ValueError(f'No task named "{name}"')
+ *         deref(self.thisptr).resume(name)
+ */
+  if (unlikely(__pyx_v_self->_tasks == Py_None)) {
+    PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
+    __PYX_ERR(0, 255, __pyx_L1_error)
+  }
+  __pyx_t_5 = (__Pyx_PyDict_ContainsTF(__pyx_v_name, __pyx_v_self->_tasks, Py_NE)); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 255, __pyx_L1_error)
+  __pyx_t_6 = (__pyx_t_5 != 0);
+  if (unlikely(__pyx_t_6)) {
+
+    /* "foolysh/taskmanager.pyx":256
+ *         name = name.encode('UTF-8')
+ *         if name not in self._tasks:
+ *             raise ValueError(f'No task named "{name}"')             # <<<<<<<<<<<<<<
+ *         deref(self.thisptr).resume(name)
+ * 
+ */
+    __pyx_t_1 = PyTuple_New(3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 256, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __pyx_t_7 = 0;
+    __pyx_t_8 = 127;
+    __Pyx_INCREF(__pyx_kp_u_No_task_named);
+    __pyx_t_7 += 15;
+    __Pyx_GIVEREF(__pyx_kp_u_No_task_named);
+    PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_kp_u_No_task_named);
+    __pyx_t_2 = __Pyx_PyObject_FormatSimple(__pyx_v_name, __pyx_empty_unicode); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 256, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __pyx_t_8 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_2) > __pyx_t_8) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_2) : __pyx_t_8;
+    __pyx_t_7 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_2);
+    __Pyx_GIVEREF(__pyx_t_2);
+    PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_t_2);
+    __pyx_t_2 = 0;
+    __Pyx_INCREF(__pyx_kp_u__8);
+    __pyx_t_7 += 1;
+    __Pyx_GIVEREF(__pyx_kp_u__8);
+    PyTuple_SET_ITEM(__pyx_t_1, 2, __pyx_kp_u__8);
+    __pyx_t_2 = __Pyx_PyUnicode_Join(__pyx_t_1, 3, __pyx_t_7, __pyx_t_8); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 256, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_builtin_ValueError, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 256, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __Pyx_Raise(__pyx_t_1, 0, 0, 0);
+    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+    __PYX_ERR(0, 256, __pyx_L1_error)
+
+    /* "foolysh/taskmanager.pyx":255
+ *         """
+ *         name = name.encode('UTF-8')
+ *         if name not in self._tasks:             # <<<<<<<<<<<<<<
+ *             raise ValueError(f'No task named "{name}"')
+ *         deref(self.thisptr).resume(name)
+ */
+  }
+
+  /* "foolysh/taskmanager.pyx":257
+ *         if name not in self._tasks:
+ *             raise ValueError(f'No task named "{name}"')
+ *         deref(self.thisptr).resume(name)             # <<<<<<<<<<<<<<
+ * 
+ *     cpdef bool state(self, name):
+ */
+  __pyx_t_9 = __pyx_convert_string_from_py_std__in_string(__pyx_v_name); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 257, __pyx_L1_error)
   (*__pyx_v_self->thisptr).resume(__pyx_t_9);
 
-  /* "foolysh/taskmanager.pyx":250
- *         deref(self.thisptr).pause(name.encode('UTF-8'))
+  /* "foolysh/taskmanager.pyx":247
+ *         deref(self.thisptr).pause(name)
  * 
  *     cpdef void resume(self, name):             # <<<<<<<<<<<<<<
  *         """
@@ -4558,6 +5074,7 @@ static void __pyx_f_7foolysh_11taskmanager_11TaskManager_resume(struct __pyx_obj
   __Pyx_XDECREF(__pyx_t_4);
   __Pyx_WriteUnraisable("foolysh.taskmanager.TaskManager.resume", __pyx_clineno, __pyx_lineno, __pyx_filename, 1, 0);
   __pyx_L0:;
+  __Pyx_XDECREF(__pyx_v_name);
   __Pyx_RefNannyFinishContext();
 }
 
@@ -4581,7 +5098,7 @@ static PyObject *__pyx_pf_7foolysh_11taskmanager_11TaskManager_14resume(struct _
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("resume", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_void_to_None(__pyx_f_7foolysh_11taskmanager_11TaskManager_resume(__pyx_v_self, __pyx_v_name, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 250, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_void_to_None(__pyx_f_7foolysh_11taskmanager_11TaskManager_resume(__pyx_v_self, __pyx_v_name, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 247, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -4598,8 +5115,8 @@ static PyObject *__pyx_pf_7foolysh_11taskmanager_11TaskManager_14resume(struct _
   return __pyx_r;
 }
 
-/* "foolysh/taskmanager.pyx":261
- *         deref(self.thisptr).resume(name.encode('UTF-8'))
+/* "foolysh/taskmanager.pyx":259
+ *         deref(self.thisptr).resume(name)
  * 
  *     cpdef bool state(self, name):             # <<<<<<<<<<<<<<
  *         """
@@ -4621,6 +5138,7 @@ static bool __pyx_f_7foolysh_11taskmanager_11TaskManager_state(struct __pyx_obj_
   Py_UCS4 __pyx_t_9;
   std::string __pyx_t_10;
   __Pyx_RefNannySetupContext("state", 0);
+  __Pyx_INCREF(__pyx_v_name);
   /* Check if called by wrapper */
   if (unlikely(__pyx_skip_dispatch)) ;
   /* Check if overridden in Python */
@@ -4630,7 +5148,7 @@ static bool __pyx_f_7foolysh_11taskmanager_11TaskManager_state(struct __pyx_obj_
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_type_dict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_state); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 261, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_state); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 259, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_7foolysh_11taskmanager_11TaskManager_17state)) {
         __Pyx_INCREF(__pyx_t_1);
@@ -4646,10 +5164,10 @@ static bool __pyx_f_7foolysh_11taskmanager_11TaskManager_state(struct __pyx_obj_
         }
         __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_4, __pyx_v_name) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_name);
         __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 261, __pyx_L1_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 259, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely((__pyx_t_5 == ((bool)-1)) && PyErr_Occurred())) __PYX_ERR(0, 261, __pyx_L1_error)
+        __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely((__pyx_t_5 == ((bool)-1)) && PyErr_Occurred())) __PYX_ERR(0, 259, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         __pyx_r = __pyx_t_5;
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -4668,74 +5186,14 @@ static bool __pyx_f_7foolysh_11taskmanager_11TaskManager_state(struct __pyx_obj_
     #endif
   }
 
-  /* "foolysh/taskmanager.pyx":271
+  /* "foolysh/taskmanager.pyx":269
  *             ``bool`` ``True`` if the task is running, otherwise ``False``.
  *         """
- *         if name not in self._tasks:             # <<<<<<<<<<<<<<
- *             raise ValueError(f'No task named "{name}"')
- *         return deref(self.thisptr).state(name.encode('UTF-8'))
- */
-  if (unlikely(__pyx_v_self->_tasks == Py_None)) {
-    PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-    __PYX_ERR(0, 271, __pyx_L1_error)
-  }
-  __pyx_t_6 = (__Pyx_PyDict_ContainsTF(__pyx_v_name, __pyx_v_self->_tasks, Py_NE)); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 271, __pyx_L1_error)
-  __pyx_t_7 = (__pyx_t_6 != 0);
-  if (unlikely(__pyx_t_7)) {
-
-    /* "foolysh/taskmanager.pyx":272
- *         """
- *         if name not in self._tasks:
- *             raise ValueError(f'No task named "{name}"')             # <<<<<<<<<<<<<<
- *         return deref(self.thisptr).state(name.encode('UTF-8'))
- * 
- */
-    __pyx_t_1 = PyTuple_New(3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 272, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_8 = 0;
-    __pyx_t_9 = 127;
-    __Pyx_INCREF(__pyx_kp_u_No_task_named);
-    __pyx_t_8 += 15;
-    __Pyx_GIVEREF(__pyx_kp_u_No_task_named);
-    PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_kp_u_No_task_named);
-    __pyx_t_2 = __Pyx_PyObject_FormatSimple(__pyx_v_name, __pyx_empty_unicode); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 272, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_9 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_2) > __pyx_t_9) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_2) : __pyx_t_9;
-    __pyx_t_8 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_2);
-    __Pyx_GIVEREF(__pyx_t_2);
-    PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_t_2);
-    __pyx_t_2 = 0;
-    __Pyx_INCREF(__pyx_kp_u__7);
-    __pyx_t_8 += 1;
-    __Pyx_GIVEREF(__pyx_kp_u__7);
-    PyTuple_SET_ITEM(__pyx_t_1, 2, __pyx_kp_u__7);
-    __pyx_t_2 = __Pyx_PyUnicode_Join(__pyx_t_1, 3, __pyx_t_8, __pyx_t_9); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 272, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_builtin_ValueError, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 272, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __Pyx_Raise(__pyx_t_1, 0, 0, 0);
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __PYX_ERR(0, 272, __pyx_L1_error)
-
-    /* "foolysh/taskmanager.pyx":271
- *             ``bool`` ``True`` if the task is running, otherwise ``False``.
- *         """
- *         if name not in self._tasks:             # <<<<<<<<<<<<<<
- *             raise ValueError(f'No task named "{name}"')
- *         return deref(self.thisptr).state(name.encode('UTF-8'))
- */
-  }
-
-  /* "foolysh/taskmanager.pyx":273
+ *         name = name.encode('UTF-8')             # <<<<<<<<<<<<<<
  *         if name not in self._tasks:
  *             raise ValueError(f'No task named "{name}"')
- *         return deref(self.thisptr).state(name.encode('UTF-8'))             # <<<<<<<<<<<<<<
- * 
- *     cpdef double get_delay(self, name):
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_name, __pyx_n_s_encode); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 273, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_name, __pyx_n_s_encode); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 269, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -4749,16 +5207,85 @@ static bool __pyx_f_7foolysh_11taskmanager_11TaskManager_state(struct __pyx_obj_
   }
   __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_3, __pyx_kp_u_UTF_8) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_kp_u_UTF_8);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 273, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 269, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_10 = __pyx_convert_string_from_py_std__in_string(__pyx_t_1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 273, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __Pyx_DECREF_SET(__pyx_v_name, __pyx_t_1);
+  __pyx_t_1 = 0;
+
+  /* "foolysh/taskmanager.pyx":270
+ *         """
+ *         name = name.encode('UTF-8')
+ *         if name not in self._tasks:             # <<<<<<<<<<<<<<
+ *             raise ValueError(f'No task named "{name}"')
+ *         return deref(self.thisptr).state(name)
+ */
+  if (unlikely(__pyx_v_self->_tasks == Py_None)) {
+    PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
+    __PYX_ERR(0, 270, __pyx_L1_error)
+  }
+  __pyx_t_6 = (__Pyx_PyDict_ContainsTF(__pyx_v_name, __pyx_v_self->_tasks, Py_NE)); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 270, __pyx_L1_error)
+  __pyx_t_7 = (__pyx_t_6 != 0);
+  if (unlikely(__pyx_t_7)) {
+
+    /* "foolysh/taskmanager.pyx":271
+ *         name = name.encode('UTF-8')
+ *         if name not in self._tasks:
+ *             raise ValueError(f'No task named "{name}"')             # <<<<<<<<<<<<<<
+ *         return deref(self.thisptr).state(name)
+ * 
+ */
+    __pyx_t_1 = PyTuple_New(3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 271, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __pyx_t_8 = 0;
+    __pyx_t_9 = 127;
+    __Pyx_INCREF(__pyx_kp_u_No_task_named);
+    __pyx_t_8 += 15;
+    __Pyx_GIVEREF(__pyx_kp_u_No_task_named);
+    PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_kp_u_No_task_named);
+    __pyx_t_2 = __Pyx_PyObject_FormatSimple(__pyx_v_name, __pyx_empty_unicode); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 271, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __pyx_t_9 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_2) > __pyx_t_9) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_2) : __pyx_t_9;
+    __pyx_t_8 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_2);
+    __Pyx_GIVEREF(__pyx_t_2);
+    PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_t_2);
+    __pyx_t_2 = 0;
+    __Pyx_INCREF(__pyx_kp_u__8);
+    __pyx_t_8 += 1;
+    __Pyx_GIVEREF(__pyx_kp_u__8);
+    PyTuple_SET_ITEM(__pyx_t_1, 2, __pyx_kp_u__8);
+    __pyx_t_2 = __Pyx_PyUnicode_Join(__pyx_t_1, 3, __pyx_t_8, __pyx_t_9); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 271, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_builtin_ValueError, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 271, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __Pyx_Raise(__pyx_t_1, 0, 0, 0);
+    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+    __PYX_ERR(0, 271, __pyx_L1_error)
+
+    /* "foolysh/taskmanager.pyx":270
+ *         """
+ *         name = name.encode('UTF-8')
+ *         if name not in self._tasks:             # <<<<<<<<<<<<<<
+ *             raise ValueError(f'No task named "{name}"')
+ *         return deref(self.thisptr).state(name)
+ */
+  }
+
+  /* "foolysh/taskmanager.pyx":272
+ *         if name not in self._tasks:
+ *             raise ValueError(f'No task named "{name}"')
+ *         return deref(self.thisptr).state(name)             # <<<<<<<<<<<<<<
+ * 
+ *     cpdef double get_delay(self, name):
+ */
+  __pyx_t_10 = __pyx_convert_string_from_py_std__in_string(__pyx_v_name); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 272, __pyx_L1_error)
   __pyx_r = (*__pyx_v_self->thisptr).state(__pyx_t_10);
   goto __pyx_L0;
 
-  /* "foolysh/taskmanager.pyx":261
- *         deref(self.thisptr).resume(name.encode('UTF-8'))
+  /* "foolysh/taskmanager.pyx":259
+ *         deref(self.thisptr).resume(name)
  * 
  *     cpdef bool state(self, name):             # <<<<<<<<<<<<<<
  *         """
@@ -4774,6 +5301,7 @@ static bool __pyx_f_7foolysh_11taskmanager_11TaskManager_state(struct __pyx_obj_
   __Pyx_WriteUnraisable("foolysh.taskmanager.TaskManager.state", __pyx_clineno, __pyx_lineno, __pyx_filename, 1, 0);
   __pyx_r = 0;
   __pyx_L0:;
+  __Pyx_XDECREF(__pyx_v_name);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
@@ -4798,7 +5326,7 @@ static PyObject *__pyx_pf_7foolysh_11taskmanager_11TaskManager_16state(struct __
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("state", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyBool_FromLong(__pyx_f_7foolysh_11taskmanager_11TaskManager_state(__pyx_v_self, __pyx_v_name, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 261, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyBool_FromLong(__pyx_f_7foolysh_11taskmanager_11TaskManager_state(__pyx_v_self, __pyx_v_name, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 259, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -4815,8 +5343,8 @@ static PyObject *__pyx_pf_7foolysh_11taskmanager_11TaskManager_16state(struct __
   return __pyx_r;
 }
 
-/* "foolysh/taskmanager.pyx":275
- *         return deref(self.thisptr).state(name.encode('UTF-8'))
+/* "foolysh/taskmanager.pyx":274
+ *         return deref(self.thisptr).state(name)
  * 
  *     cpdef double get_delay(self, name):             # <<<<<<<<<<<<<<
  *         """
@@ -4838,6 +5366,7 @@ static double __pyx_f_7foolysh_11taskmanager_11TaskManager_get_delay(struct __py
   Py_UCS4 __pyx_t_9;
   std::string __pyx_t_10;
   __Pyx_RefNannySetupContext("get_delay", 0);
+  __Pyx_INCREF(__pyx_v_name);
   /* Check if called by wrapper */
   if (unlikely(__pyx_skip_dispatch)) ;
   /* Check if overridden in Python */
@@ -4847,7 +5376,7 @@ static double __pyx_f_7foolysh_11taskmanager_11TaskManager_get_delay(struct __py
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_type_dict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_get_delay); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 275, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_get_delay); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 274, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_7foolysh_11taskmanager_11TaskManager_19get_delay)) {
         __Pyx_INCREF(__pyx_t_1);
@@ -4863,10 +5392,10 @@ static double __pyx_f_7foolysh_11taskmanager_11TaskManager_get_delay(struct __py
         }
         __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_4, __pyx_v_name) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_name);
         __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 275, __pyx_L1_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 274, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        __pyx_t_5 = __pyx_PyFloat_AsDouble(__pyx_t_2); if (unlikely((__pyx_t_5 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 275, __pyx_L1_error)
+        __pyx_t_5 = __pyx_PyFloat_AsDouble(__pyx_t_2); if (unlikely((__pyx_t_5 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 274, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         __pyx_r = __pyx_t_5;
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -4885,12 +5414,39 @@ static double __pyx_f_7foolysh_11taskmanager_11TaskManager_get_delay(struct __py
     #endif
   }
 
-  /* "foolysh/taskmanager.pyx":285
+  /* "foolysh/taskmanager.pyx":284
  *             ``float`` delay in seconds.
  *         """
+ *         name = name.encode('UTF-8')             # <<<<<<<<<<<<<<
+ *         if name not in self._tasks:
+ *             raise ValueError(f'No task named "{name}"')
+ */
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_name, __pyx_n_s_encode); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 284, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = NULL;
+  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
+    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_2);
+    if (likely(__pyx_t_3)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
+      __Pyx_INCREF(__pyx_t_3);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_2, function);
+    }
+  }
+  __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_3, __pyx_kp_u_UTF_8) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_kp_u_UTF_8);
+  __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 284, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_DECREF_SET(__pyx_v_name, __pyx_t_1);
+  __pyx_t_1 = 0;
+
+  /* "foolysh/taskmanager.pyx":285
+ *         """
+ *         name = name.encode('UTF-8')
  *         if name not in self._tasks:             # <<<<<<<<<<<<<<
  *             raise ValueError(f'No task named "{name}"')
- *         return deref(self.thisptr).get_delay(name.encode('UTF-8'))
+ *         return deref(self.thisptr).get_delay(name)
  */
   if (unlikely(__pyx_v_self->_tasks == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
@@ -4901,10 +5457,10 @@ static double __pyx_f_7foolysh_11taskmanager_11TaskManager_get_delay(struct __py
   if (unlikely(__pyx_t_7)) {
 
     /* "foolysh/taskmanager.pyx":286
- *         """
+ *         name = name.encode('UTF-8')
  *         if name not in self._tasks:
  *             raise ValueError(f'No task named "{name}"')             # <<<<<<<<<<<<<<
- *         return deref(self.thisptr).get_delay(name.encode('UTF-8'))
+ *         return deref(self.thisptr).get_delay(name)
  * 
  */
     __pyx_t_1 = PyTuple_New(3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 286, __pyx_L1_error)
@@ -4922,10 +5478,10 @@ static double __pyx_f_7foolysh_11taskmanager_11TaskManager_get_delay(struct __py
     __Pyx_GIVEREF(__pyx_t_2);
     PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_t_2);
     __pyx_t_2 = 0;
-    __Pyx_INCREF(__pyx_kp_u__7);
+    __Pyx_INCREF(__pyx_kp_u__8);
     __pyx_t_8 += 1;
-    __Pyx_GIVEREF(__pyx_kp_u__7);
-    PyTuple_SET_ITEM(__pyx_t_1, 2, __pyx_kp_u__7);
+    __Pyx_GIVEREF(__pyx_kp_u__8);
+    PyTuple_SET_ITEM(__pyx_t_1, 2, __pyx_kp_u__8);
     __pyx_t_2 = __Pyx_PyUnicode_Join(__pyx_t_1, 3, __pyx_t_8, __pyx_t_9); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 286, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -4937,45 +5493,27 @@ static double __pyx_f_7foolysh_11taskmanager_11TaskManager_get_delay(struct __py
     __PYX_ERR(0, 286, __pyx_L1_error)
 
     /* "foolysh/taskmanager.pyx":285
- *             ``float`` delay in seconds.
  *         """
+ *         name = name.encode('UTF-8')
  *         if name not in self._tasks:             # <<<<<<<<<<<<<<
  *             raise ValueError(f'No task named "{name}"')
- *         return deref(self.thisptr).get_delay(name.encode('UTF-8'))
+ *         return deref(self.thisptr).get_delay(name)
  */
   }
 
   /* "foolysh/taskmanager.pyx":287
  *         if name not in self._tasks:
  *             raise ValueError(f'No task named "{name}"')
- *         return deref(self.thisptr).get_delay(name.encode('UTF-8'))             # <<<<<<<<<<<<<<
+ *         return deref(self.thisptr).get_delay(name)             # <<<<<<<<<<<<<<
  * 
  *     def __getitem__(self, item):
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_name, __pyx_n_s_encode); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 287, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = NULL;
-  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
-    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_2);
-    if (likely(__pyx_t_3)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
-      __Pyx_INCREF(__pyx_t_3);
-      __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_2, function);
-    }
-  }
-  __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_3, __pyx_kp_u_UTF_8) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_kp_u_UTF_8);
-  __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 287, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_10 = __pyx_convert_string_from_py_std__in_string(__pyx_t_1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 287, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_10 = __pyx_convert_string_from_py_std__in_string(__pyx_v_name); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 287, __pyx_L1_error)
   __pyx_r = (*__pyx_v_self->thisptr).get_delay(__pyx_t_10);
   goto __pyx_L0;
 
-  /* "foolysh/taskmanager.pyx":275
- *         return deref(self.thisptr).state(name.encode('UTF-8'))
+  /* "foolysh/taskmanager.pyx":274
+ *         return deref(self.thisptr).state(name)
  * 
  *     cpdef double get_delay(self, name):             # <<<<<<<<<<<<<<
  *         """
@@ -4991,6 +5529,7 @@ static double __pyx_f_7foolysh_11taskmanager_11TaskManager_get_delay(struct __py
   __Pyx_WriteUnraisable("foolysh.taskmanager.TaskManager.get_delay", __pyx_clineno, __pyx_lineno, __pyx_filename, 1, 0);
   __pyx_r = 0;
   __pyx_L0:;
+  __Pyx_XDECREF(__pyx_v_name);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
@@ -5015,7 +5554,7 @@ static PyObject *__pyx_pf_7foolysh_11taskmanager_11TaskManager_18get_delay(struc
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("get_delay", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_f_7foolysh_11taskmanager_11TaskManager_get_delay(__pyx_v_self, __pyx_v_name, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 275, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_f_7foolysh_11taskmanager_11TaskManager_get_delay(__pyx_v_self, __pyx_v_name, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 274, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -5033,11 +5572,11 @@ static PyObject *__pyx_pf_7foolysh_11taskmanager_11TaskManager_18get_delay(struc
 }
 
 /* "foolysh/taskmanager.pyx":289
- *         return deref(self.thisptr).get_delay(name.encode('UTF-8'))
+ *         return deref(self.thisptr).get_delay(name)
  * 
  *     def __getitem__(self, item):             # <<<<<<<<<<<<<<
+ *         item = item.encode('UTF-8')
  *         if item in self._tasks:
- *             return self._tasks[item]
  */
 
 /* Python wrapper */
@@ -5056,28 +5595,58 @@ static PyObject *__pyx_pw_7foolysh_11taskmanager_11TaskManager_21__getitem__(PyO
 static PyObject *__pyx_pf_7foolysh_11taskmanager_11TaskManager_20__getitem__(struct __pyx_obj_7foolysh_11taskmanager_TaskManager *__pyx_v_self, PyObject *__pyx_v_item) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
-  int __pyx_t_1;
-  int __pyx_t_2;
+  PyObject *__pyx_t_1 = NULL;
+  PyObject *__pyx_t_2 = NULL;
   PyObject *__pyx_t_3 = NULL;
+  int __pyx_t_4;
+  int __pyx_t_5;
   __Pyx_RefNannySetupContext("__getitem__", 0);
+  __Pyx_INCREF(__pyx_v_item);
 
   /* "foolysh/taskmanager.pyx":290
  * 
  *     def __getitem__(self, item):
+ *         item = item.encode('UTF-8')             # <<<<<<<<<<<<<<
+ *         if item in self._tasks:
+ *             return self._tasks[item]
+ */
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_item, __pyx_n_s_encode); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 290, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = NULL;
+  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
+    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_2);
+    if (likely(__pyx_t_3)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
+      __Pyx_INCREF(__pyx_t_3);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_2, function);
+    }
+  }
+  __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_3, __pyx_kp_u_UTF_8) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_kp_u_UTF_8);
+  __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 290, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_DECREF_SET(__pyx_v_item, __pyx_t_1);
+  __pyx_t_1 = 0;
+
+  /* "foolysh/taskmanager.pyx":291
+ *     def __getitem__(self, item):
+ *         item = item.encode('UTF-8')
  *         if item in self._tasks:             # <<<<<<<<<<<<<<
  *             return self._tasks[item]
  *         raise IndexError
  */
   if (unlikely(__pyx_v_self->_tasks == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-    __PYX_ERR(0, 290, __pyx_L1_error)
+    __PYX_ERR(0, 291, __pyx_L1_error)
   }
-  __pyx_t_1 = (__Pyx_PyDict_ContainsTF(__pyx_v_item, __pyx_v_self->_tasks, Py_EQ)); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(0, 290, __pyx_L1_error)
-  __pyx_t_2 = (__pyx_t_1 != 0);
-  if (__pyx_t_2) {
+  __pyx_t_4 = (__Pyx_PyDict_ContainsTF(__pyx_v_item, __pyx_v_self->_tasks, Py_EQ)); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 291, __pyx_L1_error)
+  __pyx_t_5 = (__pyx_t_4 != 0);
+  if (__pyx_t_5) {
 
-    /* "foolysh/taskmanager.pyx":291
- *     def __getitem__(self, item):
+    /* "foolysh/taskmanager.pyx":292
+ *         item = item.encode('UTF-8')
  *         if item in self._tasks:
  *             return self._tasks[item]             # <<<<<<<<<<<<<<
  *         raise IndexError
@@ -5086,24 +5655,24 @@ static PyObject *__pyx_pf_7foolysh_11taskmanager_11TaskManager_20__getitem__(str
     __Pyx_XDECREF(__pyx_r);
     if (unlikely(__pyx_v_self->_tasks == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 291, __pyx_L1_error)
+      __PYX_ERR(0, 292, __pyx_L1_error)
     }
-    __pyx_t_3 = __Pyx_PyDict_GetItem(__pyx_v_self->_tasks, __pyx_v_item); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 291, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __pyx_r = __pyx_t_3;
-    __pyx_t_3 = 0;
+    __pyx_t_1 = __Pyx_PyDict_GetItem(__pyx_v_self->_tasks, __pyx_v_item); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 292, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __pyx_r = __pyx_t_1;
+    __pyx_t_1 = 0;
     goto __pyx_L0;
 
-    /* "foolysh/taskmanager.pyx":290
- * 
+    /* "foolysh/taskmanager.pyx":291
  *     def __getitem__(self, item):
+ *         item = item.encode('UTF-8')
  *         if item in self._tasks:             # <<<<<<<<<<<<<<
  *             return self._tasks[item]
  *         raise IndexError
  */
   }
 
-  /* "foolysh/taskmanager.pyx":292
+  /* "foolysh/taskmanager.pyx":293
  *         if item in self._tasks:
  *             return self._tasks[item]
  *         raise IndexError             # <<<<<<<<<<<<<<
@@ -5111,28 +5680,31 @@ static PyObject *__pyx_pf_7foolysh_11taskmanager_11TaskManager_20__getitem__(str
  *     def __repr__(self):
  */
   __Pyx_Raise(__pyx_builtin_IndexError, 0, 0, 0);
-  __PYX_ERR(0, 292, __pyx_L1_error)
+  __PYX_ERR(0, 293, __pyx_L1_error)
 
   /* "foolysh/taskmanager.pyx":289
- *         return deref(self.thisptr).get_delay(name.encode('UTF-8'))
+ *         return deref(self.thisptr).get_delay(name)
  * 
  *     def __getitem__(self, item):             # <<<<<<<<<<<<<<
+ *         item = item.encode('UTF-8')
  *         if item in self._tasks:
- *             return self._tasks[item]
  */
 
   /* function exit code */
   __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_AddTraceback("foolysh.taskmanager.TaskManager.__getitem__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
+  __Pyx_XDECREF(__pyx_v_item);
   __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "foolysh/taskmanager.pyx":294
+/* "foolysh/taskmanager.pyx":295
  *         raise IndexError
  * 
  *     def __repr__(self):             # <<<<<<<<<<<<<<
@@ -5164,7 +5736,7 @@ static PyObject *__pyx_pf_7foolysh_11taskmanager_11TaskManager_22__repr__(struct
   Py_ssize_t __pyx_t_6;
   __Pyx_RefNannySetupContext("__repr__", 0);
 
-  /* "foolysh/taskmanager.pyx":295
+  /* "foolysh/taskmanager.pyx":296
  * 
  *     def __repr__(self):
  *         return f'{type(self).__name__}({len(self._tasks)})'             # <<<<<<<<<<<<<<
@@ -5172,13 +5744,13 @@ static PyObject *__pyx_pf_7foolysh_11taskmanager_11TaskManager_22__repr__(struct
  *     def __str__(self):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyTuple_New(4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 295, __pyx_L1_error)
+  __pyx_t_1 = PyTuple_New(4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 296, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_t_2 = 0;
   __pyx_t_3 = 127;
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self))), __pyx_n_s_name_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 295, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self))), __pyx_n_s_name_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 296, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = __Pyx_PyObject_FormatSimple(__pyx_t_4, __pyx_empty_unicode); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 295, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_FormatSimple(__pyx_t_4, __pyx_empty_unicode); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 296, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_t_3 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_5) > __pyx_t_3) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_5) : __pyx_t_3;
@@ -5194,11 +5766,11 @@ static PyObject *__pyx_pf_7foolysh_11taskmanager_11TaskManager_22__repr__(struct
   __Pyx_INCREF(__pyx_t_5);
   if (unlikely(__pyx_t_5 == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "object of type 'NoneType' has no len()");
-    __PYX_ERR(0, 295, __pyx_L1_error)
+    __PYX_ERR(0, 296, __pyx_L1_error)
   }
-  __pyx_t_6 = PyDict_Size(__pyx_t_5); if (unlikely(__pyx_t_6 == ((Py_ssize_t)-1))) __PYX_ERR(0, 295, __pyx_L1_error)
+  __pyx_t_6 = PyDict_Size(__pyx_t_5); if (unlikely(__pyx_t_6 == ((Py_ssize_t)-1))) __PYX_ERR(0, 296, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_t_5 = __Pyx_PyUnicode_From_Py_ssize_t(__pyx_t_6, 0, ' ', 'd'); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 295, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyUnicode_From_Py_ssize_t(__pyx_t_6, 0, ' ', 'd'); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 296, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __pyx_t_2 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_5);
   __Pyx_GIVEREF(__pyx_t_5);
@@ -5208,14 +5780,14 @@ static PyObject *__pyx_pf_7foolysh_11taskmanager_11TaskManager_22__repr__(struct
   __pyx_t_2 += 1;
   __Pyx_GIVEREF(__pyx_kp_u__4);
   PyTuple_SET_ITEM(__pyx_t_1, 3, __pyx_kp_u__4);
-  __pyx_t_5 = __Pyx_PyUnicode_Join(__pyx_t_1, 4, __pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 295, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyUnicode_Join(__pyx_t_1, 4, __pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 296, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_r = __pyx_t_5;
   __pyx_t_5 = 0;
   goto __pyx_L0;
 
-  /* "foolysh/taskmanager.pyx":294
+  /* "foolysh/taskmanager.pyx":295
  *         raise IndexError
  * 
  *     def __repr__(self):             # <<<<<<<<<<<<<<
@@ -5236,7 +5808,7 @@ static PyObject *__pyx_pf_7foolysh_11taskmanager_11TaskManager_22__repr__(struct
   return __pyx_r;
 }
 
-/* "foolysh/taskmanager.pyx":297
+/* "foolysh/taskmanager.pyx":298
  *         return f'{type(self).__name__}({len(self._tasks)})'
  * 
  *     def __str__(self):             # <<<<<<<<<<<<<<
@@ -5264,13 +5836,13 @@ static PyObject *__pyx_pf_7foolysh_11taskmanager_11TaskManager_24__str__(struct 
   PyObject *__pyx_t_3 = NULL;
   __Pyx_RefNannySetupContext("__str__", 0);
 
-  /* "foolysh/taskmanager.pyx":298
+  /* "foolysh/taskmanager.pyx":299
  * 
  *     def __str__(self):
  *         return self.__repr__()             # <<<<<<<<<<<<<<
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_repr); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 298, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_repr); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 299, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -5284,14 +5856,14 @@ static PyObject *__pyx_pf_7foolysh_11taskmanager_11TaskManager_24__str__(struct 
   }
   __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 298, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 299, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "foolysh/taskmanager.pyx":297
+  /* "foolysh/taskmanager.pyx":298
  *         return f'{type(self).__name__}({len(self._tasks)})'
  * 
  *     def __str__(self):             # <<<<<<<<<<<<<<
@@ -5343,7 +5915,7 @@ static PyObject *__pyx_pf_7foolysh_11taskmanager_11TaskManager_26__reduce_cython
  * def __setstate_cython__(self, __pyx_state):
  *     raise TypeError("no default __reduce__ due to non-trivial __cinit__")
  */
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_TypeError, __pyx_tuple__8, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 2, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_TypeError, __pyx_tuple__9, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 2, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_Raise(__pyx_t_1, 0, 0, 0);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -5397,7 +5969,7 @@ static PyObject *__pyx_pf_7foolysh_11taskmanager_11TaskManager_28__setstate_cyth
  * def __setstate_cython__(self, __pyx_state):
  *     raise TypeError("no default __reduce__ due to non-trivial __cinit__")             # <<<<<<<<<<<<<<
  */
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_TypeError, __pyx_tuple__9, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 4, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_TypeError, __pyx_tuple__10, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 4, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_Raise(__pyx_t_1, 0, 0, 0);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -5415,6 +5987,240 @@ static PyObject *__pyx_pf_7foolysh_11taskmanager_11TaskManager_28__setstate_cyth
   __Pyx_XDECREF(__pyx_t_1);
   __Pyx_AddTraceback("foolysh.taskmanager.TaskManager.__setstate_cython__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "string.to_py":31
+ * 
+ * @cname("__pyx_convert_PyObject_string_to_py_std__in_string")
+ * cdef inline object __pyx_convert_PyObject_string_to_py_std__in_string(const string& s):             # <<<<<<<<<<<<<<
+ *     return __Pyx_PyObject_FromStringAndSize(s.data(), s.size())
+ * cdef extern from *:
+ */
+
+static CYTHON_INLINE PyObject *__pyx_convert_PyObject_string_to_py_std__in_string(std::string const &__pyx_v_s) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  __Pyx_RefNannySetupContext("__pyx_convert_PyObject_string_to_py_std__in_string", 0);
+
+  /* "string.to_py":32
+ * @cname("__pyx_convert_PyObject_string_to_py_std__in_string")
+ * cdef inline object __pyx_convert_PyObject_string_to_py_std__in_string(const string& s):
+ *     return __Pyx_PyObject_FromStringAndSize(s.data(), s.size())             # <<<<<<<<<<<<<<
+ * cdef extern from *:
+ *     cdef object __Pyx_PyUnicode_FromStringAndSize(const char*, size_t)
+ */
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_t_1 = __Pyx_PyObject_FromStringAndSize(__pyx_v_s.data(), __pyx_v_s.size()); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 32, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
+  goto __pyx_L0;
+
+  /* "string.to_py":31
+ * 
+ * @cname("__pyx_convert_PyObject_string_to_py_std__in_string")
+ * cdef inline object __pyx_convert_PyObject_string_to_py_std__in_string(const string& s):             # <<<<<<<<<<<<<<
+ *     return __Pyx_PyObject_FromStringAndSize(s.data(), s.size())
+ * cdef extern from *:
+ */
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("string.to_py.__pyx_convert_PyObject_string_to_py_std__in_string", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = 0;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "string.to_py":37
+ * 
+ * @cname("__pyx_convert_PyUnicode_string_to_py_std__in_string")
+ * cdef inline object __pyx_convert_PyUnicode_string_to_py_std__in_string(const string& s):             # <<<<<<<<<<<<<<
+ *     return __Pyx_PyUnicode_FromStringAndSize(s.data(), s.size())
+ * cdef extern from *:
+ */
+
+static CYTHON_INLINE PyObject *__pyx_convert_PyUnicode_string_to_py_std__in_string(std::string const &__pyx_v_s) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  __Pyx_RefNannySetupContext("__pyx_convert_PyUnicode_string_to_py_std__in_string", 0);
+
+  /* "string.to_py":38
+ * @cname("__pyx_convert_PyUnicode_string_to_py_std__in_string")
+ * cdef inline object __pyx_convert_PyUnicode_string_to_py_std__in_string(const string& s):
+ *     return __Pyx_PyUnicode_FromStringAndSize(s.data(), s.size())             # <<<<<<<<<<<<<<
+ * cdef extern from *:
+ *     cdef object __Pyx_PyStr_FromStringAndSize(const char*, size_t)
+ */
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_t_1 = __Pyx_PyUnicode_FromStringAndSize(__pyx_v_s.data(), __pyx_v_s.size()); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 38, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
+  goto __pyx_L0;
+
+  /* "string.to_py":37
+ * 
+ * @cname("__pyx_convert_PyUnicode_string_to_py_std__in_string")
+ * cdef inline object __pyx_convert_PyUnicode_string_to_py_std__in_string(const string& s):             # <<<<<<<<<<<<<<
+ *     return __Pyx_PyUnicode_FromStringAndSize(s.data(), s.size())
+ * cdef extern from *:
+ */
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("string.to_py.__pyx_convert_PyUnicode_string_to_py_std__in_string", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = 0;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "string.to_py":43
+ * 
+ * @cname("__pyx_convert_PyStr_string_to_py_std__in_string")
+ * cdef inline object __pyx_convert_PyStr_string_to_py_std__in_string(const string& s):             # <<<<<<<<<<<<<<
+ *     return __Pyx_PyStr_FromStringAndSize(s.data(), s.size())
+ * cdef extern from *:
+ */
+
+static CYTHON_INLINE PyObject *__pyx_convert_PyStr_string_to_py_std__in_string(std::string const &__pyx_v_s) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  __Pyx_RefNannySetupContext("__pyx_convert_PyStr_string_to_py_std__in_string", 0);
+
+  /* "string.to_py":44
+ * @cname("__pyx_convert_PyStr_string_to_py_std__in_string")
+ * cdef inline object __pyx_convert_PyStr_string_to_py_std__in_string(const string& s):
+ *     return __Pyx_PyStr_FromStringAndSize(s.data(), s.size())             # <<<<<<<<<<<<<<
+ * cdef extern from *:
+ *     cdef object __Pyx_PyBytes_FromStringAndSize(const char*, size_t)
+ */
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_t_1 = __Pyx_PyStr_FromStringAndSize(__pyx_v_s.data(), __pyx_v_s.size()); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 44, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
+  goto __pyx_L0;
+
+  /* "string.to_py":43
+ * 
+ * @cname("__pyx_convert_PyStr_string_to_py_std__in_string")
+ * cdef inline object __pyx_convert_PyStr_string_to_py_std__in_string(const string& s):             # <<<<<<<<<<<<<<
+ *     return __Pyx_PyStr_FromStringAndSize(s.data(), s.size())
+ * cdef extern from *:
+ */
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("string.to_py.__pyx_convert_PyStr_string_to_py_std__in_string", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = 0;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "string.to_py":49
+ * 
+ * @cname("__pyx_convert_PyBytes_string_to_py_std__in_string")
+ * cdef inline object __pyx_convert_PyBytes_string_to_py_std__in_string(const string& s):             # <<<<<<<<<<<<<<
+ *     return __Pyx_PyBytes_FromStringAndSize(s.data(), s.size())
+ * cdef extern from *:
+ */
+
+static CYTHON_INLINE PyObject *__pyx_convert_PyBytes_string_to_py_std__in_string(std::string const &__pyx_v_s) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  __Pyx_RefNannySetupContext("__pyx_convert_PyBytes_string_to_py_std__in_string", 0);
+
+  /* "string.to_py":50
+ * @cname("__pyx_convert_PyBytes_string_to_py_std__in_string")
+ * cdef inline object __pyx_convert_PyBytes_string_to_py_std__in_string(const string& s):
+ *     return __Pyx_PyBytes_FromStringAndSize(s.data(), s.size())             # <<<<<<<<<<<<<<
+ * cdef extern from *:
+ *     cdef object __Pyx_PyByteArray_FromStringAndSize(const char*, size_t)
+ */
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_t_1 = __Pyx_PyBytes_FromStringAndSize(__pyx_v_s.data(), __pyx_v_s.size()); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 50, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
+  goto __pyx_L0;
+
+  /* "string.to_py":49
+ * 
+ * @cname("__pyx_convert_PyBytes_string_to_py_std__in_string")
+ * cdef inline object __pyx_convert_PyBytes_string_to_py_std__in_string(const string& s):             # <<<<<<<<<<<<<<
+ *     return __Pyx_PyBytes_FromStringAndSize(s.data(), s.size())
+ * cdef extern from *:
+ */
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("string.to_py.__pyx_convert_PyBytes_string_to_py_std__in_string", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = 0;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "string.to_py":55
+ * 
+ * @cname("__pyx_convert_PyByteArray_string_to_py_std__in_string")
+ * cdef inline object __pyx_convert_PyByteArray_string_to_py_std__in_string(const string& s):             # <<<<<<<<<<<<<<
+ *     return __Pyx_PyByteArray_FromStringAndSize(s.data(), s.size())
+ * 
+ */
+
+static CYTHON_INLINE PyObject *__pyx_convert_PyByteArray_string_to_py_std__in_string(std::string const &__pyx_v_s) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  __Pyx_RefNannySetupContext("__pyx_convert_PyByteArray_string_to_py_std__in_string", 0);
+
+  /* "string.to_py":56
+ * @cname("__pyx_convert_PyByteArray_string_to_py_std__in_string")
+ * cdef inline object __pyx_convert_PyByteArray_string_to_py_std__in_string(const string& s):
+ *     return __Pyx_PyByteArray_FromStringAndSize(s.data(), s.size())             # <<<<<<<<<<<<<<
+ * 
+ */
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_t_1 = __Pyx_PyByteArray_FromStringAndSize(__pyx_v_s.data(), __pyx_v_s.size()); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 56, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
+  goto __pyx_L0;
+
+  /* "string.to_py":55
+ * 
+ * @cname("__pyx_convert_PyByteArray_string_to_py_std__in_string")
+ * cdef inline object __pyx_convert_PyByteArray_string_to_py_std__in_string(const string& s):             # <<<<<<<<<<<<<<
+ *     return __Pyx_PyByteArray_FromStringAndSize(s.data(), s.size())
+ * 
+ */
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("string.to_py.__pyx_convert_PyByteArray_string_to_py_std__in_string", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = 0;
+  __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
@@ -5481,6 +6287,7 @@ static std::string __pyx_convert_string_from_py_std__in_string(PyObject *__pyx_v
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
+static struct __pyx_vtabstruct_7foolysh_11taskmanager_Task __pyx_vtable_7foolysh_11taskmanager_Task;
 
 static PyObject *__pyx_tp_new_7foolysh_11taskmanager_Task(PyTypeObject *t, PyObject *a, PyObject *k) {
   struct __pyx_obj_7foolysh_11taskmanager_Task *p;
@@ -5492,6 +6299,7 @@ static PyObject *__pyx_tp_new_7foolysh_11taskmanager_Task(PyTypeObject *t, PyObj
   }
   if (unlikely(!o)) return 0;
   p = ((struct __pyx_obj_7foolysh_11taskmanager_Task *)o);
+  p->__pyx_vtab = __pyx_vtabptr_7foolysh_11taskmanager_Task;
   p->_name = Py_None; Py_INCREF(Py_None);
   p->_cb = Py_None; Py_INCREF(Py_None);
   p->_args = Py_None; Py_INCREF(Py_None);
@@ -5886,6 +6694,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_kp_u_0_1, __pyx_k_0_1, sizeof(__pyx_k_0_1), 0, 1, 0, 0},
   {&__pyx_kp_u_4f, __pyx_k_4f, sizeof(__pyx_k_4f), 0, 1, 0, 0},
   {&__pyx_kp_u_Copyright_c_2020_Tiziano_Bettio, __pyx_k_Copyright_c_2020_Tiziano_Bettio, sizeof(__pyx_k_Copyright_c_2020_Tiziano_Bettio), 0, 1, 0, 0},
+  {&__pyx_kp_u_Error_occurred_while_trying_to_e, __pyx_k_Error_occurred_while_trying_to_e, sizeof(__pyx_k_Error_occurred_while_trying_to_e), 0, 1, 0, 0},
   {&__pyx_n_s_IndexError, __pyx_k_IndexError, sizeof(__pyx_k_IndexError), 0, 0, 1, 1},
   {&__pyx_n_u_MIT, __pyx_k_MIT, sizeof(__pyx_k_MIT), 0, 1, 0, 1},
   {&__pyx_kp_u_No_task_named, __pyx_k_No_task_named, sizeof(__pyx_k_No_task_named), 0, 1, 0, 0},
@@ -5899,12 +6708,14 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_kp_u__3, __pyx_k__3, sizeof(__pyx_k__3), 0, 1, 0, 0},
   {&__pyx_kp_u__4, __pyx_k__4, sizeof(__pyx_k__4), 0, 1, 0, 0},
   {&__pyx_kp_u__7, __pyx_k__7, sizeof(__pyx_k__7), 0, 1, 0, 0},
+  {&__pyx_kp_u__8, __pyx_k__8, sizeof(__pyx_k__8), 0, 1, 0, 0},
   {&__pyx_n_s_add_task, __pyx_k_add_task, sizeof(__pyx_k_add_task), 0, 0, 1, 1},
   {&__pyx_n_s_args, __pyx_k_args, sizeof(__pyx_k_args), 0, 0, 1, 1},
   {&__pyx_n_s_author, __pyx_k_author, sizeof(__pyx_k_author), 0, 0, 1, 1},
   {&__pyx_n_s_cb, __pyx_k_cb, sizeof(__pyx_k_cb), 0, 0, 1, 1},
   {&__pyx_n_s_cline_in_traceback, __pyx_k_cline_in_traceback, sizeof(__pyx_k_cline_in_traceback), 0, 0, 1, 1},
   {&__pyx_n_s_copyright, __pyx_k_copyright, sizeof(__pyx_k_copyright), 0, 0, 1, 1},
+  {&__pyx_n_s_decode, __pyx_k_decode, sizeof(__pyx_k_decode), 0, 0, 1, 1},
   {&__pyx_n_s_delay, __pyx_k_delay, sizeof(__pyx_k_delay), 0, 0, 1, 1},
   {&__pyx_kp_u_delay_must_be_0, __pyx_k_delay_must_be_0, sizeof(__pyx_k_delay_must_be_0), 0, 1, 0, 0},
   {&__pyx_n_s_dt, __pyx_k_dt, sizeof(__pyx_k_dt), 0, 0, 1, 1},
@@ -5921,6 +6732,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_kp_s_no_default___reduce___due_to_non, __pyx_k_no_default___reduce___due_to_non, sizeof(__pyx_k_no_default___reduce___due_to_non), 0, 0, 1, 0},
   {&__pyx_n_s_pause, __pyx_k_pause, sizeof(__pyx_k_pause), 0, 0, 1, 1},
   {&__pyx_n_s_pop, __pyx_k_pop, sizeof(__pyx_k_pop), 0, 0, 1, 1},
+  {&__pyx_n_s_print, __pyx_k_print, sizeof(__pyx_k_print), 0, 0, 1, 1},
   {&__pyx_n_s_pyx_vtable, __pyx_k_pyx_vtable, sizeof(__pyx_k_pyx_vtable), 0, 0, 1, 1},
   {&__pyx_n_s_reduce, __pyx_k_reduce, sizeof(__pyx_k_reduce), 0, 0, 1, 1},
   {&__pyx_n_s_reduce_cython, __pyx_k_reduce_cython, sizeof(__pyx_k_reduce_cython), 0, 0, 1, 1},
@@ -5939,9 +6751,10 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {0, 0, 0, 0, 0, 0, 0}
 };
 static CYTHON_SMALL_CODE int __Pyx_InitCachedBuiltins(void) {
-  __pyx_builtin_ValueError = __Pyx_GetBuiltinName(__pyx_n_s_ValueError); if (!__pyx_builtin_ValueError) __PYX_ERR(0, 93, __pyx_L1_error)
-  __pyx_builtin_TypeError = __Pyx_GetBuiltinName(__pyx_n_s_TypeError); if (!__pyx_builtin_TypeError) __PYX_ERR(0, 96, __pyx_L1_error)
-  __pyx_builtin_IndexError = __Pyx_GetBuiltinName(__pyx_n_s_IndexError); if (!__pyx_builtin_IndexError) __PYX_ERR(0, 292, __pyx_L1_error)
+  __pyx_builtin_ValueError = __Pyx_GetBuiltinName(__pyx_n_s_ValueError); if (!__pyx_builtin_ValueError) __PYX_ERR(0, 80, __pyx_L1_error)
+  __pyx_builtin_TypeError = __Pyx_GetBuiltinName(__pyx_n_s_TypeError); if (!__pyx_builtin_TypeError) __PYX_ERR(0, 83, __pyx_L1_error)
+  __pyx_builtin_print = __Pyx_GetBuiltinName(__pyx_n_s_print); if (!__pyx_builtin_print) __PYX_ERR(0, 164, __pyx_L1_error)
+  __pyx_builtin_IndexError = __Pyx_GetBuiltinName(__pyx_n_s_IndexError); if (!__pyx_builtin_IndexError) __PYX_ERR(0, 293, __pyx_L1_error)
   return 0;
   __pyx_L1_error:;
   return -1;
@@ -5951,14 +6764,14 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__Pyx_InitCachedConstants", 0);
 
-  /* "foolysh/taskmanager.pyx":93
+  /* "foolysh/taskmanager.pyx":80
  *         if isinstance(value, (float, int)):
  *             if value < 0:
  *                 raise ValueError('delay must be >= 0')             # <<<<<<<<<<<<<<
  *             self._task_manager.set_delay(self._name, <double> value)
  *         else:
  */
-  __pyx_tuple_ = PyTuple_Pack(1, __pyx_kp_u_delay_must_be_0); if (unlikely(!__pyx_tuple_)) __PYX_ERR(0, 93, __pyx_L1_error)
+  __pyx_tuple_ = PyTuple_Pack(1, __pyx_kp_u_delay_must_be_0); if (unlikely(!__pyx_tuple_)) __PYX_ERR(0, 80, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple_);
   __Pyx_GIVEREF(__pyx_tuple_);
 
@@ -5987,18 +6800,18 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  * def __setstate_cython__(self, __pyx_state):
  *     raise TypeError("no default __reduce__ due to non-trivial __cinit__")
  */
-  __pyx_tuple__8 = PyTuple_Pack(1, __pyx_kp_s_no_default___reduce___due_to_non); if (unlikely(!__pyx_tuple__8)) __PYX_ERR(1, 2, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__8);
-  __Pyx_GIVEREF(__pyx_tuple__8);
+  __pyx_tuple__9 = PyTuple_Pack(1, __pyx_kp_s_no_default___reduce___due_to_non); if (unlikely(!__pyx_tuple__9)) __PYX_ERR(1, 2, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__9);
+  __Pyx_GIVEREF(__pyx_tuple__9);
 
   /* "(tree fragment)":4
  *     raise TypeError("no default __reduce__ due to non-trivial __cinit__")
  * def __setstate_cython__(self, __pyx_state):
  *     raise TypeError("no default __reduce__ due to non-trivial __cinit__")             # <<<<<<<<<<<<<<
  */
-  __pyx_tuple__9 = PyTuple_Pack(1, __pyx_kp_s_no_default___reduce___due_to_non); if (unlikely(!__pyx_tuple__9)) __PYX_ERR(1, 4, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__9);
-  __Pyx_GIVEREF(__pyx_tuple__9);
+  __pyx_tuple__10 = PyTuple_Pack(1, __pyx_kp_s_no_default___reduce___due_to_non); if (unlikely(!__pyx_tuple__10)) __PYX_ERR(1, 4, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__10);
+  __Pyx_GIVEREF(__pyx_tuple__10);
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -6052,7 +6865,9 @@ static int __Pyx_modinit_type_init_code(void) {
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__Pyx_modinit_type_init_code", 0);
   /*--- Type init code ---*/
-  if (PyType_Ready(&__pyx_type_7foolysh_11taskmanager_Task) < 0) __PYX_ERR(0, 58, __pyx_L1_error)
+  __pyx_vtabptr_7foolysh_11taskmanager_Task = &__pyx_vtable_7foolysh_11taskmanager_Task;
+  __pyx_vtable_7foolysh_11taskmanager_Task.get_callback = (PyObject *(*)(struct __pyx_obj_7foolysh_11taskmanager_Task *))__pyx_f_7foolysh_11taskmanager_4Task_get_callback;
+  if (PyType_Ready(&__pyx_type_7foolysh_11taskmanager_Task) < 0) __PYX_ERR(0, 41, __pyx_L1_error)
   #if PY_VERSION_HEX < 0x030800B1
   __pyx_type_7foolysh_11taskmanager_Task.tp_print = 0;
   #endif
@@ -6061,7 +6876,7 @@ static int __Pyx_modinit_type_init_code(void) {
   }
   #if CYTHON_COMPILING_IN_CPYTHON
   {
-    PyObject *wrapper = PyObject_GetAttrString((PyObject *)&__pyx_type_7foolysh_11taskmanager_Task, "__call__"); if (unlikely(!wrapper)) __PYX_ERR(0, 58, __pyx_L1_error)
+    PyObject *wrapper = PyObject_GetAttrString((PyObject *)&__pyx_type_7foolysh_11taskmanager_Task, "__call__"); if (unlikely(!wrapper)) __PYX_ERR(0, 41, __pyx_L1_error)
     if (Py_TYPE(wrapper) == &PyWrapperDescr_Type) {
       __pyx_wrapperbase_7foolysh_11taskmanager_4Task_6__call__ = *((PyWrapperDescrObject *)wrapper)->d_base;
       __pyx_wrapperbase_7foolysh_11taskmanager_4Task_6__call__.doc = __pyx_doc_7foolysh_11taskmanager_4Task_6__call__;
@@ -6069,11 +6884,14 @@ static int __Pyx_modinit_type_init_code(void) {
     }
   }
   #endif
-  if (PyObject_SetAttr(__pyx_m, __pyx_n_s_Task, (PyObject *)&__pyx_type_7foolysh_11taskmanager_Task) < 0) __PYX_ERR(0, 58, __pyx_L1_error)
-  if (__Pyx_setup_reduce((PyObject*)&__pyx_type_7foolysh_11taskmanager_Task) < 0) __PYX_ERR(0, 58, __pyx_L1_error)
+  if (__Pyx_SetVtable(__pyx_type_7foolysh_11taskmanager_Task.tp_dict, __pyx_vtabptr_7foolysh_11taskmanager_Task) < 0) __PYX_ERR(0, 41, __pyx_L1_error)
+  if (PyObject_SetAttr(__pyx_m, __pyx_n_s_Task, (PyObject *)&__pyx_type_7foolysh_11taskmanager_Task) < 0) __PYX_ERR(0, 41, __pyx_L1_error)
+  if (__Pyx_setup_reduce((PyObject*)&__pyx_type_7foolysh_11taskmanager_Task) < 0) __PYX_ERR(0, 41, __pyx_L1_error)
   __pyx_ptype_7foolysh_11taskmanager_Task = &__pyx_type_7foolysh_11taskmanager_Task;
   __pyx_vtabptr_7foolysh_11taskmanager_TaskManager = &__pyx_vtable_7foolysh_11taskmanager_TaskManager;
+  __pyx_vtable_7foolysh_11taskmanager_TaskManager._run_callback = (void (*)(struct __pyx_obj_7foolysh_11taskmanager_TaskManager *, std::string, double const , bool const ))__pyx_f_7foolysh_11taskmanager_11TaskManager__run_callback;
   __pyx_vtable_7foolysh_11taskmanager_TaskManager.add_task = (struct __pyx_obj_7foolysh_11taskmanager_Task *(*)(struct __pyx_obj_7foolysh_11taskmanager_TaskManager *, PyObject *, PyObject *, int __pyx_skip_dispatch, struct __pyx_opt_args_7foolysh_11taskmanager_11TaskManager_add_task *__pyx_optional_args))__pyx_f_7foolysh_11taskmanager_11TaskManager_add_task;
+  __pyx_vtable_7foolysh_11taskmanager_TaskManager._add_task = (PyObject *(*)(struct __pyx_obj_7foolysh_11taskmanager_TaskManager *, std::string, double, bool))__pyx_f_7foolysh_11taskmanager_11TaskManager__add_task;
   __pyx_vtable_7foolysh_11taskmanager_TaskManager.remove_task = (void (*)(struct __pyx_obj_7foolysh_11taskmanager_TaskManager *, PyObject *, int __pyx_skip_dispatch))__pyx_f_7foolysh_11taskmanager_11TaskManager_remove_task;
   __pyx_vtable_7foolysh_11taskmanager_TaskManager.execute = (void (*)(struct __pyx_obj_7foolysh_11taskmanager_TaskManager *, double const , int __pyx_skip_dispatch))__pyx_f_7foolysh_11taskmanager_11TaskManager_execute;
   __pyx_vtable_7foolysh_11taskmanager_TaskManager.set_delay = (void (*)(struct __pyx_obj_7foolysh_11taskmanager_TaskManager *, PyObject *, double const , int __pyx_skip_dispatch))__pyx_f_7foolysh_11taskmanager_11TaskManager_set_delay;
@@ -6081,16 +6899,16 @@ static int __Pyx_modinit_type_init_code(void) {
   __pyx_vtable_7foolysh_11taskmanager_TaskManager.resume = (void (*)(struct __pyx_obj_7foolysh_11taskmanager_TaskManager *, PyObject *, int __pyx_skip_dispatch))__pyx_f_7foolysh_11taskmanager_11TaskManager_resume;
   __pyx_vtable_7foolysh_11taskmanager_TaskManager.state = (bool (*)(struct __pyx_obj_7foolysh_11taskmanager_TaskManager *, PyObject *, int __pyx_skip_dispatch))__pyx_f_7foolysh_11taskmanager_11TaskManager_state;
   __pyx_vtable_7foolysh_11taskmanager_TaskManager.get_delay = (double (*)(struct __pyx_obj_7foolysh_11taskmanager_TaskManager *, PyObject *, int __pyx_skip_dispatch))__pyx_f_7foolysh_11taskmanager_11TaskManager_get_delay;
-  if (PyType_Ready(&__pyx_type_7foolysh_11taskmanager_TaskManager) < 0) __PYX_ERR(0, 133, __pyx_L1_error)
+  if (PyType_Ready(&__pyx_type_7foolysh_11taskmanager_TaskManager) < 0) __PYX_ERR(0, 120, __pyx_L1_error)
   #if PY_VERSION_HEX < 0x030800B1
   __pyx_type_7foolysh_11taskmanager_TaskManager.tp_print = 0;
   #endif
   if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_type_7foolysh_11taskmanager_TaskManager.tp_dictoffset && __pyx_type_7foolysh_11taskmanager_TaskManager.tp_getattro == PyObject_GenericGetAttr)) {
     __pyx_type_7foolysh_11taskmanager_TaskManager.tp_getattro = __Pyx_PyObject_GenericGetAttr;
   }
-  if (__Pyx_SetVtable(__pyx_type_7foolysh_11taskmanager_TaskManager.tp_dict, __pyx_vtabptr_7foolysh_11taskmanager_TaskManager) < 0) __PYX_ERR(0, 133, __pyx_L1_error)
-  if (PyObject_SetAttr(__pyx_m, __pyx_n_s_TaskManager, (PyObject *)&__pyx_type_7foolysh_11taskmanager_TaskManager) < 0) __PYX_ERR(0, 133, __pyx_L1_error)
-  if (__Pyx_setup_reduce((PyObject*)&__pyx_type_7foolysh_11taskmanager_TaskManager) < 0) __PYX_ERR(0, 133, __pyx_L1_error)
+  if (__Pyx_SetVtable(__pyx_type_7foolysh_11taskmanager_TaskManager.tp_dict, __pyx_vtabptr_7foolysh_11taskmanager_TaskManager) < 0) __PYX_ERR(0, 120, __pyx_L1_error)
+  if (PyObject_SetAttr(__pyx_m, __pyx_n_s_TaskManager, (PyObject *)&__pyx_type_7foolysh_11taskmanager_TaskManager) < 0) __PYX_ERR(0, 120, __pyx_L1_error)
+  if (__Pyx_setup_reduce((PyObject*)&__pyx_type_7foolysh_11taskmanager_TaskManager) < 0) __PYX_ERR(0, 120, __pyx_L1_error)
   __pyx_ptype_7foolysh_11taskmanager_TaskManager = &__pyx_type_7foolysh_11taskmanager_TaskManager;
   __Pyx_RefNannyFinishContext();
   return 0;
@@ -6444,92 +7262,6 @@ static PyObject *__Pyx_GetBuiltinName(PyObject *name) {
     return result;
 }
 
-/* PyObjectCall */
-#if CYTHON_COMPILING_IN_CPYTHON
-static CYTHON_INLINE PyObject* __Pyx_PyObject_Call(PyObject *func, PyObject *arg, PyObject *kw) {
-    PyObject *result;
-    ternaryfunc call = func->ob_type->tp_call;
-    if (unlikely(!call))
-        return PyObject_Call(func, arg, kw);
-    if (unlikely(Py_EnterRecursiveCall((char*)" while calling a Python object")))
-        return NULL;
-    result = (*call)(func, arg, kw);
-    Py_LeaveRecursiveCall();
-    if (unlikely(!result) && unlikely(!PyErr_Occurred())) {
-        PyErr_SetString(
-            PyExc_SystemError,
-            "NULL result without error in PyObject_Call");
-    }
-    return result;
-}
-#endif
-
-/* PyErrFetchRestore */
-#if CYTHON_FAST_THREAD_STATE
-static CYTHON_INLINE void __Pyx_ErrRestoreInState(PyThreadState *tstate, PyObject *type, PyObject *value, PyObject *tb) {
-    PyObject *tmp_type, *tmp_value, *tmp_tb;
-    tmp_type = tstate->curexc_type;
-    tmp_value = tstate->curexc_value;
-    tmp_tb = tstate->curexc_traceback;
-    tstate->curexc_type = type;
-    tstate->curexc_value = value;
-    tstate->curexc_traceback = tb;
-    Py_XDECREF(tmp_type);
-    Py_XDECREF(tmp_value);
-    Py_XDECREF(tmp_tb);
-}
-static CYTHON_INLINE void __Pyx_ErrFetchInState(PyThreadState *tstate, PyObject **type, PyObject **value, PyObject **tb) {
-    *type = tstate->curexc_type;
-    *value = tstate->curexc_value;
-    *tb = tstate->curexc_traceback;
-    tstate->curexc_type = 0;
-    tstate->curexc_value = 0;
-    tstate->curexc_traceback = 0;
-}
-#endif
-
-/* WriteUnraisableException */
-static void __Pyx_WriteUnraisable(const char *name, CYTHON_UNUSED int clineno,
-                                  CYTHON_UNUSED int lineno, CYTHON_UNUSED const char *filename,
-                                  int full_traceback, CYTHON_UNUSED int nogil) {
-    PyObject *old_exc, *old_val, *old_tb;
-    PyObject *ctx;
-    __Pyx_PyThreadState_declare
-#ifdef WITH_THREAD
-    PyGILState_STATE state;
-    if (nogil)
-        state = PyGILState_Ensure();
-#ifdef _MSC_VER
-    else state = (PyGILState_STATE)-1;
-#endif
-#endif
-    __Pyx_PyThreadState_assign
-    __Pyx_ErrFetch(&old_exc, &old_val, &old_tb);
-    if (full_traceback) {
-        Py_XINCREF(old_exc);
-        Py_XINCREF(old_val);
-        Py_XINCREF(old_tb);
-        __Pyx_ErrRestore(old_exc, old_val, old_tb);
-        PyErr_PrintEx(1);
-    }
-    #if PY_MAJOR_VERSION < 3
-    ctx = PyString_FromString(name);
-    #else
-    ctx = PyUnicode_FromString(name);
-    #endif
-    __Pyx_ErrRestore(old_exc, old_val, old_tb);
-    if (!ctx) {
-        PyErr_WriteUnraisable(Py_None);
-    } else {
-        PyErr_WriteUnraisable(ctx);
-        Py_DECREF(ctx);
-    }
-#ifdef WITH_THREAD
-    if (nogil)
-        PyGILState_Release(state);
-#endif
-}
-
 /* RaiseArgTupleInvalid */
 static void __Pyx_RaiseArgtupleInvalid(
     const char* func_name,
@@ -6684,6 +7416,50 @@ static CYTHON_INLINE int __Pyx_TypeTest(PyObject *obj, PyTypeObject *type) {
                  Py_TYPE(obj)->tp_name, type->tp_name);
     return 0;
 }
+
+/* PyObjectCall */
+#if CYTHON_COMPILING_IN_CPYTHON
+static CYTHON_INLINE PyObject* __Pyx_PyObject_Call(PyObject *func, PyObject *arg, PyObject *kw) {
+    PyObject *result;
+    ternaryfunc call = func->ob_type->tp_call;
+    if (unlikely(!call))
+        return PyObject_Call(func, arg, kw);
+    if (unlikely(Py_EnterRecursiveCall((char*)" while calling a Python object")))
+        return NULL;
+    result = (*call)(func, arg, kw);
+    Py_LeaveRecursiveCall();
+    if (unlikely(!result) && unlikely(!PyErr_Occurred())) {
+        PyErr_SetString(
+            PyExc_SystemError,
+            "NULL result without error in PyObject_Call");
+    }
+    return result;
+}
+#endif
+
+/* PyErrFetchRestore */
+#if CYTHON_FAST_THREAD_STATE
+static CYTHON_INLINE void __Pyx_ErrRestoreInState(PyThreadState *tstate, PyObject *type, PyObject *value, PyObject *tb) {
+    PyObject *tmp_type, *tmp_value, *tmp_tb;
+    tmp_type = tstate->curexc_type;
+    tmp_value = tstate->curexc_value;
+    tmp_tb = tstate->curexc_traceback;
+    tstate->curexc_type = type;
+    tstate->curexc_value = value;
+    tstate->curexc_traceback = tb;
+    Py_XDECREF(tmp_type);
+    Py_XDECREF(tmp_value);
+    Py_XDECREF(tmp_tb);
+}
+static CYTHON_INLINE void __Pyx_ErrFetchInState(PyThreadState *tstate, PyObject **type, PyObject **value, PyObject **tb) {
+    *type = tstate->curexc_type;
+    *value = tstate->curexc_value;
+    *tb = tstate->curexc_traceback;
+    tstate->curexc_type = 0;
+    tstate->curexc_value = 0;
+    tstate->curexc_traceback = 0;
+}
+#endif
 
 /* RaiseException */
 #if PY_MAJOR_VERSION < 3
@@ -6844,6 +7620,237 @@ bad:
 }
 #endif
 
+/* PyCFunctionFastCall */
+#if CYTHON_FAST_PYCCALL
+static CYTHON_INLINE PyObject * __Pyx_PyCFunction_FastCall(PyObject *func_obj, PyObject **args, Py_ssize_t nargs) {
+    PyCFunctionObject *func = (PyCFunctionObject*)func_obj;
+    PyCFunction meth = PyCFunction_GET_FUNCTION(func);
+    PyObject *self = PyCFunction_GET_SELF(func);
+    int flags = PyCFunction_GET_FLAGS(func);
+    assert(PyCFunction_Check(func));
+    assert(METH_FASTCALL == (flags & ~(METH_CLASS | METH_STATIC | METH_COEXIST | METH_KEYWORDS | METH_STACKLESS)));
+    assert(nargs >= 0);
+    assert(nargs == 0 || args != NULL);
+    /* _PyCFunction_FastCallDict() must not be called with an exception set,
+       because it may clear it (directly or indirectly) and so the
+       caller loses its exception */
+    assert(!PyErr_Occurred());
+    if ((PY_VERSION_HEX < 0x030700A0) || unlikely(flags & METH_KEYWORDS)) {
+        return (*((__Pyx_PyCFunctionFastWithKeywords)(void*)meth)) (self, args, nargs, NULL);
+    } else {
+        return (*((__Pyx_PyCFunctionFast)(void*)meth)) (self, args, nargs);
+    }
+}
+#endif
+
+/* PyFunctionFastCall */
+#if CYTHON_FAST_PYCALL
+static PyObject* __Pyx_PyFunction_FastCallNoKw(PyCodeObject *co, PyObject **args, Py_ssize_t na,
+                                               PyObject *globals) {
+    PyFrameObject *f;
+    PyThreadState *tstate = __Pyx_PyThreadState_Current;
+    PyObject **fastlocals;
+    Py_ssize_t i;
+    PyObject *result;
+    assert(globals != NULL);
+    /* XXX Perhaps we should create a specialized
+       PyFrame_New() that doesn't take locals, but does
+       take builtins without sanity checking them.
+       */
+    assert(tstate != NULL);
+    f = PyFrame_New(tstate, co, globals, NULL);
+    if (f == NULL) {
+        return NULL;
+    }
+    fastlocals = __Pyx_PyFrame_GetLocalsplus(f);
+    for (i = 0; i < na; i++) {
+        Py_INCREF(*args);
+        fastlocals[i] = *args++;
+    }
+    result = PyEval_EvalFrameEx(f,0);
+    ++tstate->recursion_depth;
+    Py_DECREF(f);
+    --tstate->recursion_depth;
+    return result;
+}
+#if 1 || PY_VERSION_HEX < 0x030600B1
+static PyObject *__Pyx_PyFunction_FastCallDict(PyObject *func, PyObject **args, Py_ssize_t nargs, PyObject *kwargs) {
+    PyCodeObject *co = (PyCodeObject *)PyFunction_GET_CODE(func);
+    PyObject *globals = PyFunction_GET_GLOBALS(func);
+    PyObject *argdefs = PyFunction_GET_DEFAULTS(func);
+    PyObject *closure;
+#if PY_MAJOR_VERSION >= 3
+    PyObject *kwdefs;
+#endif
+    PyObject *kwtuple, **k;
+    PyObject **d;
+    Py_ssize_t nd;
+    Py_ssize_t nk;
+    PyObject *result;
+    assert(kwargs == NULL || PyDict_Check(kwargs));
+    nk = kwargs ? PyDict_Size(kwargs) : 0;
+    if (Py_EnterRecursiveCall((char*)" while calling a Python object")) {
+        return NULL;
+    }
+    if (
+#if PY_MAJOR_VERSION >= 3
+            co->co_kwonlyargcount == 0 &&
+#endif
+            likely(kwargs == NULL || nk == 0) &&
+            co->co_flags == (CO_OPTIMIZED | CO_NEWLOCALS | CO_NOFREE)) {
+        if (argdefs == NULL && co->co_argcount == nargs) {
+            result = __Pyx_PyFunction_FastCallNoKw(co, args, nargs, globals);
+            goto done;
+        }
+        else if (nargs == 0 && argdefs != NULL
+                 && co->co_argcount == Py_SIZE(argdefs)) {
+            /* function called with no arguments, but all parameters have
+               a default value: use default values as arguments .*/
+            args = &PyTuple_GET_ITEM(argdefs, 0);
+            result =__Pyx_PyFunction_FastCallNoKw(co, args, Py_SIZE(argdefs), globals);
+            goto done;
+        }
+    }
+    if (kwargs != NULL) {
+        Py_ssize_t pos, i;
+        kwtuple = PyTuple_New(2 * nk);
+        if (kwtuple == NULL) {
+            result = NULL;
+            goto done;
+        }
+        k = &PyTuple_GET_ITEM(kwtuple, 0);
+        pos = i = 0;
+        while (PyDict_Next(kwargs, &pos, &k[i], &k[i+1])) {
+            Py_INCREF(k[i]);
+            Py_INCREF(k[i+1]);
+            i += 2;
+        }
+        nk = i / 2;
+    }
+    else {
+        kwtuple = NULL;
+        k = NULL;
+    }
+    closure = PyFunction_GET_CLOSURE(func);
+#if PY_MAJOR_VERSION >= 3
+    kwdefs = PyFunction_GET_KW_DEFAULTS(func);
+#endif
+    if (argdefs != NULL) {
+        d = &PyTuple_GET_ITEM(argdefs, 0);
+        nd = Py_SIZE(argdefs);
+    }
+    else {
+        d = NULL;
+        nd = 0;
+    }
+#if PY_MAJOR_VERSION >= 3
+    result = PyEval_EvalCodeEx((PyObject*)co, globals, (PyObject *)NULL,
+                               args, (int)nargs,
+                               k, (int)nk,
+                               d, (int)nd, kwdefs, closure);
+#else
+    result = PyEval_EvalCodeEx(co, globals, (PyObject *)NULL,
+                               args, (int)nargs,
+                               k, (int)nk,
+                               d, (int)nd, closure);
+#endif
+    Py_XDECREF(kwtuple);
+done:
+    Py_LeaveRecursiveCall();
+    return result;
+}
+#endif
+#endif
+
+/* PyObjectCall2Args */
+static CYTHON_UNUSED PyObject* __Pyx_PyObject_Call2Args(PyObject* function, PyObject* arg1, PyObject* arg2) {
+    PyObject *args, *result = NULL;
+    #if CYTHON_FAST_PYCALL
+    if (PyFunction_Check(function)) {
+        PyObject *args[2] = {arg1, arg2};
+        return __Pyx_PyFunction_FastCall(function, args, 2);
+    }
+    #endif
+    #if CYTHON_FAST_PYCCALL
+    if (__Pyx_PyFastCFunction_Check(function)) {
+        PyObject *args[2] = {arg1, arg2};
+        return __Pyx_PyCFunction_FastCall(function, args, 2);
+    }
+    #endif
+    args = PyTuple_New(2);
+    if (unlikely(!args)) goto done;
+    Py_INCREF(arg1);
+    PyTuple_SET_ITEM(args, 0, arg1);
+    Py_INCREF(arg2);
+    PyTuple_SET_ITEM(args, 1, arg2);
+    Py_INCREF(function);
+    result = __Pyx_PyObject_Call(function, args, NULL);
+    Py_DECREF(args);
+    Py_DECREF(function);
+done:
+    return result;
+}
+
+/* PyObjectCallMethO */
+#if CYTHON_COMPILING_IN_CPYTHON
+static CYTHON_INLINE PyObject* __Pyx_PyObject_CallMethO(PyObject *func, PyObject *arg) {
+    PyObject *self, *result;
+    PyCFunction cfunc;
+    cfunc = PyCFunction_GET_FUNCTION(func);
+    self = PyCFunction_GET_SELF(func);
+    if (unlikely(Py_EnterRecursiveCall((char*)" while calling a Python object")))
+        return NULL;
+    result = cfunc(self, arg);
+    Py_LeaveRecursiveCall();
+    if (unlikely(!result) && unlikely(!PyErr_Occurred())) {
+        PyErr_SetString(
+            PyExc_SystemError,
+            "NULL result without error in PyObject_Call");
+    }
+    return result;
+}
+#endif
+
+/* PyObjectCallOneArg */
+#if CYTHON_COMPILING_IN_CPYTHON
+static PyObject* __Pyx__PyObject_CallOneArg(PyObject *func, PyObject *arg) {
+    PyObject *result;
+    PyObject *args = PyTuple_New(1);
+    if (unlikely(!args)) return NULL;
+    Py_INCREF(arg);
+    PyTuple_SET_ITEM(args, 0, arg);
+    result = __Pyx_PyObject_Call(func, args, NULL);
+    Py_DECREF(args);
+    return result;
+}
+static CYTHON_INLINE PyObject* __Pyx_PyObject_CallOneArg(PyObject *func, PyObject *arg) {
+#if CYTHON_FAST_PYCALL
+    if (PyFunction_Check(func)) {
+        return __Pyx_PyFunction_FastCall(func, &arg, 1);
+    }
+#endif
+    if (likely(PyCFunction_Check(func))) {
+        if (likely(PyCFunction_GET_FLAGS(func) & METH_O)) {
+            return __Pyx_PyObject_CallMethO(func, arg);
+#if CYTHON_FAST_PYCCALL
+        } else if (PyCFunction_GET_FLAGS(func) & METH_FASTCALL) {
+            return __Pyx_PyCFunction_FastCall(func, &arg, 1);
+#endif
+        }
+    }
+    return __Pyx__PyObject_CallOneArg(func, arg);
+}
+#else
+static CYTHON_INLINE PyObject* __Pyx_PyObject_CallOneArg(PyObject *func, PyObject *arg) {
+    PyObject *result;
+    PyObject *args = PyTuple_Pack(1, arg);
+    if (unlikely(!args)) return NULL;
+    result = __Pyx_PyObject_Call(func, args, NULL);
+    Py_DECREF(args);
+    return result;
+}
+#endif
+
 /* KeywordStringCheck */
 static int __Pyx_CheckKeywordStrings(
     PyObject *kwdict,
@@ -6982,145 +7989,6 @@ bad:
 #endif
 }
 
-/* PyFunctionFastCall */
-#if CYTHON_FAST_PYCALL
-static PyObject* __Pyx_PyFunction_FastCallNoKw(PyCodeObject *co, PyObject **args, Py_ssize_t na,
-                                               PyObject *globals) {
-    PyFrameObject *f;
-    PyThreadState *tstate = __Pyx_PyThreadState_Current;
-    PyObject **fastlocals;
-    Py_ssize_t i;
-    PyObject *result;
-    assert(globals != NULL);
-    /* XXX Perhaps we should create a specialized
-       PyFrame_New() that doesn't take locals, but does
-       take builtins without sanity checking them.
-       */
-    assert(tstate != NULL);
-    f = PyFrame_New(tstate, co, globals, NULL);
-    if (f == NULL) {
-        return NULL;
-    }
-    fastlocals = __Pyx_PyFrame_GetLocalsplus(f);
-    for (i = 0; i < na; i++) {
-        Py_INCREF(*args);
-        fastlocals[i] = *args++;
-    }
-    result = PyEval_EvalFrameEx(f,0);
-    ++tstate->recursion_depth;
-    Py_DECREF(f);
-    --tstate->recursion_depth;
-    return result;
-}
-#if 1 || PY_VERSION_HEX < 0x030600B1
-static PyObject *__Pyx_PyFunction_FastCallDict(PyObject *func, PyObject **args, Py_ssize_t nargs, PyObject *kwargs) {
-    PyCodeObject *co = (PyCodeObject *)PyFunction_GET_CODE(func);
-    PyObject *globals = PyFunction_GET_GLOBALS(func);
-    PyObject *argdefs = PyFunction_GET_DEFAULTS(func);
-    PyObject *closure;
-#if PY_MAJOR_VERSION >= 3
-    PyObject *kwdefs;
-#endif
-    PyObject *kwtuple, **k;
-    PyObject **d;
-    Py_ssize_t nd;
-    Py_ssize_t nk;
-    PyObject *result;
-    assert(kwargs == NULL || PyDict_Check(kwargs));
-    nk = kwargs ? PyDict_Size(kwargs) : 0;
-    if (Py_EnterRecursiveCall((char*)" while calling a Python object")) {
-        return NULL;
-    }
-    if (
-#if PY_MAJOR_VERSION >= 3
-            co->co_kwonlyargcount == 0 &&
-#endif
-            likely(kwargs == NULL || nk == 0) &&
-            co->co_flags == (CO_OPTIMIZED | CO_NEWLOCALS | CO_NOFREE)) {
-        if (argdefs == NULL && co->co_argcount == nargs) {
-            result = __Pyx_PyFunction_FastCallNoKw(co, args, nargs, globals);
-            goto done;
-        }
-        else if (nargs == 0 && argdefs != NULL
-                 && co->co_argcount == Py_SIZE(argdefs)) {
-            /* function called with no arguments, but all parameters have
-               a default value: use default values as arguments .*/
-            args = &PyTuple_GET_ITEM(argdefs, 0);
-            result =__Pyx_PyFunction_FastCallNoKw(co, args, Py_SIZE(argdefs), globals);
-            goto done;
-        }
-    }
-    if (kwargs != NULL) {
-        Py_ssize_t pos, i;
-        kwtuple = PyTuple_New(2 * nk);
-        if (kwtuple == NULL) {
-            result = NULL;
-            goto done;
-        }
-        k = &PyTuple_GET_ITEM(kwtuple, 0);
-        pos = i = 0;
-        while (PyDict_Next(kwargs, &pos, &k[i], &k[i+1])) {
-            Py_INCREF(k[i]);
-            Py_INCREF(k[i+1]);
-            i += 2;
-        }
-        nk = i / 2;
-    }
-    else {
-        kwtuple = NULL;
-        k = NULL;
-    }
-    closure = PyFunction_GET_CLOSURE(func);
-#if PY_MAJOR_VERSION >= 3
-    kwdefs = PyFunction_GET_KW_DEFAULTS(func);
-#endif
-    if (argdefs != NULL) {
-        d = &PyTuple_GET_ITEM(argdefs, 0);
-        nd = Py_SIZE(argdefs);
-    }
-    else {
-        d = NULL;
-        nd = 0;
-    }
-#if PY_MAJOR_VERSION >= 3
-    result = PyEval_EvalCodeEx((PyObject*)co, globals, (PyObject *)NULL,
-                               args, (int)nargs,
-                               k, (int)nk,
-                               d, (int)nd, kwdefs, closure);
-#else
-    result = PyEval_EvalCodeEx(co, globals, (PyObject *)NULL,
-                               args, (int)nargs,
-                               k, (int)nk,
-                               d, (int)nd, closure);
-#endif
-    Py_XDECREF(kwtuple);
-done:
-    Py_LeaveRecursiveCall();
-    return result;
-}
-#endif
-#endif
-
-/* PyObjectCallMethO */
-#if CYTHON_COMPILING_IN_CPYTHON
-static CYTHON_INLINE PyObject* __Pyx_PyObject_CallMethO(PyObject *func, PyObject *arg) {
-    PyObject *self, *result;
-    PyCFunction cfunc;
-    cfunc = PyCFunction_GET_FUNCTION(func);
-    self = PyCFunction_GET_SELF(func);
-    if (unlikely(Py_EnterRecursiveCall((char*)" while calling a Python object")))
-        return NULL;
-    result = cfunc(self, arg);
-    Py_LeaveRecursiveCall();
-    if (unlikely(!result) && unlikely(!PyErr_Occurred())) {
-        PyErr_SetString(
-            PyExc_SystemError,
-            "NULL result without error in PyObject_Call");
-    }
-    return result;
-}
-#endif
-
 /* PyObjectCallNoArg */
 #if CYTHON_COMPILING_IN_CPYTHON
 static CYTHON_INLINE PyObject* __Pyx_PyObject_CallNoArg(PyObject *func) {
@@ -7143,68 +8011,279 @@ static CYTHON_INLINE PyObject* __Pyx_PyObject_CallNoArg(PyObject *func) {
 }
 #endif
 
-/* PyCFunctionFastCall */
-#if CYTHON_FAST_PYCCALL
-static CYTHON_INLINE PyObject * __Pyx_PyCFunction_FastCall(PyObject *func_obj, PyObject **args, Py_ssize_t nargs) {
-    PyCFunctionObject *func = (PyCFunctionObject*)func_obj;
-    PyCFunction meth = PyCFunction_GET_FUNCTION(func);
-    PyObject *self = PyCFunction_GET_SELF(func);
-    int flags = PyCFunction_GET_FLAGS(func);
-    assert(PyCFunction_Check(func));
-    assert(METH_FASTCALL == (flags & ~(METH_CLASS | METH_STATIC | METH_COEXIST | METH_KEYWORDS | METH_STACKLESS)));
-    assert(nargs >= 0);
-    assert(nargs == 0 || args != NULL);
-    /* _PyCFunction_FastCallDict() must not be called with an exception set,
-       because it may clear it (directly or indirectly) and so the
-       caller loses its exception */
-    assert(!PyErr_Occurred());
-    if ((PY_VERSION_HEX < 0x030700A0) || unlikely(flags & METH_KEYWORDS)) {
-        return (*((__Pyx_PyCFunctionFastWithKeywords)(void*)meth)) (self, args, nargs, NULL);
-    } else {
-        return (*((__Pyx_PyCFunctionFast)(void*)meth)) (self, args, nargs);
+/* DictGetItem */
+#if PY_MAJOR_VERSION >= 3 && !CYTHON_COMPILING_IN_PYPY
+static PyObject *__Pyx_PyDict_GetItem(PyObject *d, PyObject* key) {
+    PyObject *value;
+    value = PyDict_GetItemWithError(d, key);
+    if (unlikely(!value)) {
+        if (!PyErr_Occurred()) {
+            if (unlikely(PyTuple_Check(key))) {
+                PyObject* args = PyTuple_Pack(1, key);
+                if (likely(args)) {
+                    PyErr_SetObject(PyExc_KeyError, args);
+                    Py_DECREF(args);
+                }
+            } else {
+                PyErr_SetObject(PyExc_KeyError, key);
+            }
+        }
+        return NULL;
     }
+    Py_INCREF(value);
+    return value;
 }
 #endif
 
-/* PyObjectCallOneArg */
-#if CYTHON_COMPILING_IN_CPYTHON
-static PyObject* __Pyx__PyObject_CallOneArg(PyObject *func, PyObject *arg) {
-    PyObject *result;
-    PyObject *args = PyTuple_New(1);
-    if (unlikely(!args)) return NULL;
-    Py_INCREF(arg);
-    PyTuple_SET_ITEM(args, 0, arg);
-    result = __Pyx_PyObject_Call(func, args, NULL);
-    Py_DECREF(args);
-    return result;
+/* RaiseTooManyValuesToUnpack */
+static CYTHON_INLINE void __Pyx_RaiseTooManyValuesError(Py_ssize_t expected) {
+    PyErr_Format(PyExc_ValueError,
+                 "too many values to unpack (expected %" CYTHON_FORMAT_SSIZE_T "d)", expected);
 }
-static CYTHON_INLINE PyObject* __Pyx_PyObject_CallOneArg(PyObject *func, PyObject *arg) {
-#if CYTHON_FAST_PYCALL
-    if (PyFunction_Check(func)) {
-        return __Pyx_PyFunction_FastCall(func, &arg, 1);
+
+/* RaiseNeedMoreValuesToUnpack */
+static CYTHON_INLINE void __Pyx_RaiseNeedMoreValuesError(Py_ssize_t index) {
+    PyErr_Format(PyExc_ValueError,
+                 "need more than %" CYTHON_FORMAT_SSIZE_T "d value%.1s to unpack",
+                 index, (index == 1) ? "" : "s");
+}
+
+/* RaiseNoneIterError */
+static CYTHON_INLINE void __Pyx_RaiseNoneNotIterableError(void) {
+    PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
+}
+
+/* GetTopmostException */
+#if CYTHON_USE_EXC_INFO_STACK
+static _PyErr_StackItem *
+__Pyx_PyErr_GetTopmostException(PyThreadState *tstate)
+{
+    _PyErr_StackItem *exc_info = tstate->exc_info;
+    while ((exc_info->exc_type == NULL || exc_info->exc_type == Py_None) &&
+           exc_info->previous_item != NULL)
+    {
+        exc_info = exc_info->previous_item;
+    }
+    return exc_info;
+}
+#endif
+
+/* SaveResetException */
+#if CYTHON_FAST_THREAD_STATE
+static CYTHON_INLINE void __Pyx__ExceptionSave(PyThreadState *tstate, PyObject **type, PyObject **value, PyObject **tb) {
+    #if CYTHON_USE_EXC_INFO_STACK
+    _PyErr_StackItem *exc_info = __Pyx_PyErr_GetTopmostException(tstate);
+    *type = exc_info->exc_type;
+    *value = exc_info->exc_value;
+    *tb = exc_info->exc_traceback;
+    #else
+    *type = tstate->exc_type;
+    *value = tstate->exc_value;
+    *tb = tstate->exc_traceback;
+    #endif
+    Py_XINCREF(*type);
+    Py_XINCREF(*value);
+    Py_XINCREF(*tb);
+}
+static CYTHON_INLINE void __Pyx__ExceptionReset(PyThreadState *tstate, PyObject *type, PyObject *value, PyObject *tb) {
+    PyObject *tmp_type, *tmp_value, *tmp_tb;
+    #if CYTHON_USE_EXC_INFO_STACK
+    _PyErr_StackItem *exc_info = tstate->exc_info;
+    tmp_type = exc_info->exc_type;
+    tmp_value = exc_info->exc_value;
+    tmp_tb = exc_info->exc_traceback;
+    exc_info->exc_type = type;
+    exc_info->exc_value = value;
+    exc_info->exc_traceback = tb;
+    #else
+    tmp_type = tstate->exc_type;
+    tmp_value = tstate->exc_value;
+    tmp_tb = tstate->exc_traceback;
+    tstate->exc_type = type;
+    tstate->exc_value = value;
+    tstate->exc_traceback = tb;
+    #endif
+    Py_XDECREF(tmp_type);
+    Py_XDECREF(tmp_value);
+    Py_XDECREF(tmp_tb);
+}
+#endif
+
+/* PyErrExceptionMatches */
+#if CYTHON_FAST_THREAD_STATE
+static int __Pyx_PyErr_ExceptionMatchesTuple(PyObject *exc_type, PyObject *tuple) {
+    Py_ssize_t i, n;
+    n = PyTuple_GET_SIZE(tuple);
+#if PY_MAJOR_VERSION >= 3
+    for (i=0; i<n; i++) {
+        if (exc_type == PyTuple_GET_ITEM(tuple, i)) return 1;
     }
 #endif
-    if (likely(PyCFunction_Check(func))) {
-        if (likely(PyCFunction_GET_FLAGS(func) & METH_O)) {
-            return __Pyx_PyObject_CallMethO(func, arg);
-#if CYTHON_FAST_PYCCALL
-        } else if (PyCFunction_GET_FLAGS(func) & METH_FASTCALL) {
-            return __Pyx_PyCFunction_FastCall(func, &arg, 1);
-#endif
-        }
+    for (i=0; i<n; i++) {
+        if (__Pyx_PyErr_GivenExceptionMatches(exc_type, PyTuple_GET_ITEM(tuple, i))) return 1;
     }
-    return __Pyx__PyObject_CallOneArg(func, arg);
+    return 0;
+}
+static CYTHON_INLINE int __Pyx_PyErr_ExceptionMatchesInState(PyThreadState* tstate, PyObject* err) {
+    PyObject *exc_type = tstate->curexc_type;
+    if (exc_type == err) return 1;
+    if (unlikely(!exc_type)) return 0;
+    if (unlikely(PyTuple_Check(err)))
+        return __Pyx_PyErr_ExceptionMatchesTuple(exc_type, err);
+    return __Pyx_PyErr_GivenExceptionMatches(exc_type, err);
+}
+#endif
+
+/* GetException */
+#if CYTHON_FAST_THREAD_STATE
+static int __Pyx__GetException(PyThreadState *tstate, PyObject **type, PyObject **value, PyObject **tb)
+#else
+static int __Pyx_GetException(PyObject **type, PyObject **value, PyObject **tb)
+#endif
+{
+    PyObject *local_type, *local_value, *local_tb;
+#if CYTHON_FAST_THREAD_STATE
+    PyObject *tmp_type, *tmp_value, *tmp_tb;
+    local_type = tstate->curexc_type;
+    local_value = tstate->curexc_value;
+    local_tb = tstate->curexc_traceback;
+    tstate->curexc_type = 0;
+    tstate->curexc_value = 0;
+    tstate->curexc_traceback = 0;
+#else
+    PyErr_Fetch(&local_type, &local_value, &local_tb);
+#endif
+    PyErr_NormalizeException(&local_type, &local_value, &local_tb);
+#if CYTHON_FAST_THREAD_STATE
+    if (unlikely(tstate->curexc_type))
+#else
+    if (unlikely(PyErr_Occurred()))
+#endif
+        goto bad;
+    #if PY_MAJOR_VERSION >= 3
+    if (local_tb) {
+        if (unlikely(PyException_SetTraceback(local_value, local_tb) < 0))
+            goto bad;
+    }
+    #endif
+    Py_XINCREF(local_tb);
+    Py_XINCREF(local_type);
+    Py_XINCREF(local_value);
+    *type = local_type;
+    *value = local_value;
+    *tb = local_tb;
+#if CYTHON_FAST_THREAD_STATE
+    #if CYTHON_USE_EXC_INFO_STACK
+    {
+        _PyErr_StackItem *exc_info = tstate->exc_info;
+        tmp_type = exc_info->exc_type;
+        tmp_value = exc_info->exc_value;
+        tmp_tb = exc_info->exc_traceback;
+        exc_info->exc_type = local_type;
+        exc_info->exc_value = local_value;
+        exc_info->exc_traceback = local_tb;
+    }
+    #else
+    tmp_type = tstate->exc_type;
+    tmp_value = tstate->exc_value;
+    tmp_tb = tstate->exc_traceback;
+    tstate->exc_type = local_type;
+    tstate->exc_value = local_value;
+    tstate->exc_traceback = local_tb;
+    #endif
+    Py_XDECREF(tmp_type);
+    Py_XDECREF(tmp_value);
+    Py_XDECREF(tmp_tb);
+#else
+    PyErr_SetExcInfo(local_type, local_value, local_tb);
+#endif
+    return 0;
+bad:
+    *type = 0;
+    *value = 0;
+    *tb = 0;
+    Py_XDECREF(local_type);
+    Py_XDECREF(local_value);
+    Py_XDECREF(local_tb);
+    return -1;
+}
+
+/* SwapException */
+#if CYTHON_FAST_THREAD_STATE
+static CYTHON_INLINE void __Pyx__ExceptionSwap(PyThreadState *tstate, PyObject **type, PyObject **value, PyObject **tb) {
+    PyObject *tmp_type, *tmp_value, *tmp_tb;
+    #if CYTHON_USE_EXC_INFO_STACK
+    _PyErr_StackItem *exc_info = tstate->exc_info;
+    tmp_type = exc_info->exc_type;
+    tmp_value = exc_info->exc_value;
+    tmp_tb = exc_info->exc_traceback;
+    exc_info->exc_type = *type;
+    exc_info->exc_value = *value;
+    exc_info->exc_traceback = *tb;
+    #else
+    tmp_type = tstate->exc_type;
+    tmp_value = tstate->exc_value;
+    tmp_tb = tstate->exc_traceback;
+    tstate->exc_type = *type;
+    tstate->exc_value = *value;
+    tstate->exc_traceback = *tb;
+    #endif
+    *type = tmp_type;
+    *value = tmp_value;
+    *tb = tmp_tb;
 }
 #else
-static CYTHON_INLINE PyObject* __Pyx_PyObject_CallOneArg(PyObject *func, PyObject *arg) {
-    PyObject *result;
-    PyObject *args = PyTuple_Pack(1, arg);
-    if (unlikely(!args)) return NULL;
-    result = __Pyx_PyObject_Call(func, args, NULL);
-    Py_DECREF(args);
-    return result;
+static CYTHON_INLINE void __Pyx_ExceptionSwap(PyObject **type, PyObject **value, PyObject **tb) {
+    PyObject *tmp_type, *tmp_value, *tmp_tb;
+    PyErr_GetExcInfo(&tmp_type, &tmp_value, &tmp_tb);
+    PyErr_SetExcInfo(*type, *value, *tb);
+    *type = tmp_type;
+    *value = tmp_value;
+    *tb = tmp_tb;
 }
 #endif
+
+/* WriteUnraisableException */
+static void __Pyx_WriteUnraisable(const char *name, CYTHON_UNUSED int clineno,
+                                  CYTHON_UNUSED int lineno, CYTHON_UNUSED const char *filename,
+                                  int full_traceback, CYTHON_UNUSED int nogil) {
+    PyObject *old_exc, *old_val, *old_tb;
+    PyObject *ctx;
+    __Pyx_PyThreadState_declare
+#ifdef WITH_THREAD
+    PyGILState_STATE state;
+    if (nogil)
+        state = PyGILState_Ensure();
+#ifdef _MSC_VER
+    else state = (PyGILState_STATE)-1;
+#endif
+#endif
+    __Pyx_PyThreadState_assign
+    __Pyx_ErrFetch(&old_exc, &old_val, &old_tb);
+    if (full_traceback) {
+        Py_XINCREF(old_exc);
+        Py_XINCREF(old_val);
+        Py_XINCREF(old_tb);
+        __Pyx_ErrRestore(old_exc, old_val, old_tb);
+        PyErr_PrintEx(1);
+    }
+    #if PY_MAJOR_VERSION < 3
+    ctx = PyString_FromString(name);
+    #else
+    ctx = PyUnicode_FromString(name);
+    #endif
+    __Pyx_ErrRestore(old_exc, old_val, old_tb);
+    if (!ctx) {
+        PyErr_WriteUnraisable(Py_None);
+    } else {
+        PyErr_WriteUnraisable(ctx);
+        Py_DECREF(ctx);
+    }
+#ifdef WITH_THREAD
+    if (nogil)
+        PyGILState_Release(state);
+#endif
+}
 
 /* PyDictVersioning */
 #if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_TYPE_SLOTS
@@ -7231,35 +8310,6 @@ static CYTHON_INLINE int __Pyx_object_dict_version_matches(PyObject* obj, PY_UIN
     return obj_dict_version == __Pyx_get_object_dict_version(obj);
 }
 #endif
-
-/* PyObjectCall2Args */
-static CYTHON_UNUSED PyObject* __Pyx_PyObject_Call2Args(PyObject* function, PyObject* arg1, PyObject* arg2) {
-    PyObject *args, *result = NULL;
-    #if CYTHON_FAST_PYCALL
-    if (PyFunction_Check(function)) {
-        PyObject *args[2] = {arg1, arg2};
-        return __Pyx_PyFunction_FastCall(function, args, 2);
-    }
-    #endif
-    #if CYTHON_FAST_PYCCALL
-    if (__Pyx_PyFastCFunction_Check(function)) {
-        PyObject *args[2] = {arg1, arg2};
-        return __Pyx_PyCFunction_FastCall(function, args, 2);
-    }
-    #endif
-    args = PyTuple_New(2);
-    if (unlikely(!args)) goto done;
-    Py_INCREF(arg1);
-    PyTuple_SET_ITEM(args, 0, arg1);
-    Py_INCREF(arg2);
-    PyTuple_SET_ITEM(args, 1, arg2);
-    Py_INCREF(function);
-    result = __Pyx_PyObject_Call(function, args, NULL);
-    Py_DECREF(args);
-    Py_DECREF(function);
-done:
-    return result;
-}
 
 /* UnpackUnboundCMethod */
 static int __Pyx_TryUnpackUnboundCMethod(__Pyx_CachedCFunction* target) {
@@ -7551,30 +8601,6 @@ static CYTHON_INLINE PyObject* __Pyx_PyList_Pop(PyObject* L) {
 }
 #endif
 
-/* DictGetItem */
-#if PY_MAJOR_VERSION >= 3 && !CYTHON_COMPILING_IN_PYPY
-static PyObject *__Pyx_PyDict_GetItem(PyObject *d, PyObject* key) {
-    PyObject *value;
-    value = PyDict_GetItemWithError(d, key);
-    if (unlikely(!value)) {
-        if (!PyErr_Occurred()) {
-            if (unlikely(PyTuple_Check(key))) {
-                PyObject* args = PyTuple_Pack(1, key);
-                if (likely(args)) {
-                    PyErr_SetObject(PyExc_KeyError, args);
-                    Py_DECREF(args);
-                }
-            } else {
-                PyErr_SetObject(PyExc_KeyError, key);
-            }
-        }
-        return NULL;
-    }
-    Py_INCREF(value);
-    return value;
-}
-#endif
-
 /* CIntToDigits */
 static const char DIGIT_PAIRS_10[2*10*10+1] = {
     "00010203040506070809"
@@ -7816,6 +8842,24 @@ static PyObject* __Pyx_PyObject_GenericGetAttr(PyObject* obj, PyObject* attr_nam
 }
 #endif
 
+/* SetVTable */
+static int __Pyx_SetVtable(PyObject *dict, void *vtable) {
+#if PY_VERSION_HEX >= 0x02070000
+    PyObject *ob = PyCapsule_New(vtable, 0, 0);
+#else
+    PyObject *ob = PyCObject_FromVoidPtr(vtable, 0);
+#endif
+    if (!ob)
+        goto bad;
+    if (PyDict_SetItem(dict, __pyx_n_s_pyx_vtable, ob) < 0)
+        goto bad;
+    Py_DECREF(ob);
+    return 0;
+bad:
+    Py_XDECREF(ob);
+    return -1;
+}
+
 /* SetupReduce */
 static int __Pyx_setup_reduce_is_named(PyObject* meth, PyObject* name) {
   int ret;
@@ -7890,24 +8934,6 @@ __PYX_GOOD:
     Py_XDECREF(setstate);
     Py_XDECREF(setstate_cython);
     return ret;
-}
-
-/* SetVTable */
-static int __Pyx_SetVtable(PyObject *dict, void *vtable) {
-#if PY_VERSION_HEX >= 0x02070000
-    PyObject *ob = PyCapsule_New(vtable, 0, 0);
-#else
-    PyObject *ob = PyCObject_FromVoidPtr(vtable, 0);
-#endif
-    if (!ob)
-        goto bad;
-    if (PyDict_SetItem(dict, __pyx_n_s_pyx_vtable, ob) < 0)
-        goto bad;
-    Py_DECREF(ob);
-    return 0;
-bad:
-    Py_XDECREF(ob);
-    return -1;
 }
 
 /* CLineInTraceback */
