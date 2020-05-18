@@ -14,6 +14,9 @@ from libcpp.memory cimport unique_ptr
 from libcpp.string cimport string
 from libcpp cimport bool
 
+import traceback
+import warnings
+
 __author__ = 'Tiziano Bettio'
 __license__ = 'MIT'
 __version__ = '0.1'
@@ -161,7 +164,9 @@ cdef class TaskManager:
         try:
             cb(*a, **kw)
         except Exception as err:
-            print(f'Error occurred while trying to execute task {name}: {err}')
+            warnings.warn(
+                f'Error occurred while trying to execute task {name}: {err}\n'
+                + traceback.format_exc())
 
     cpdef Task add_task(self, name, cb, double delay=0.0, bool with_dt=True,
                         args=None, kwargs=None):
@@ -206,7 +211,7 @@ cdef class TaskManager:
         """
         name = name.encode('UTF-8')
         if name not in self._tasks:
-            raise ValueError(f'No task named "{name}"')
+            warnings.warn(f'No task named "{name}"', RuntimeWarning)
         deref(self.thisptr).remove_task(name)
         self._remove.append(name)
 
