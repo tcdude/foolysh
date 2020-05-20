@@ -505,6 +505,7 @@ class App(FSM):
         self.__systems.renderer.asset_pixel_ratio = \
             self.__cfg.getint('base', 'asset_pixel_ratio')
         self.__systems.renderer.sprite_loader = self.__systems.sprite_loader
+        self.__systems.ui_handler.set_window(self.__systems.window)
 
     def __del__(self):
         """Make sure, ``sdl2.ext.quit()`` gets called latest on destruction."""

@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Any, Callable, Dict, Optional, Tuple, Union
 import sdl2
+import sdl2.ext
 
 from .uinode import UINode
 from .. import eventhandler
@@ -83,6 +84,10 @@ class UIHandler:
         self._callbacks: CallbackDict = {}
         self._state: HandlerState = HandlerState()
         self._clock: clock.Clock = clock.Clock()
+        self._window: sdl2.ext.Window = None
+
+    def set_window(self, window: sdl2.ext.Window) -> None:
+        self._window = window
 
     def add_node(self, nd: node.Node) -> None:
         """Add a :class:`~foolysh.ui.uinode.UINode` to be handled."""
@@ -234,6 +239,13 @@ class UIHandler:
                     self._try_cb_exec(k)
                 self._state.current_focus = node_id
                 if (node_id, EventType.INPUT) in self._callbacks:
+                    nd = self._nodes[node_id]
+                    wrl = min(self._window.size)
+                    x, y = nd.pos * wrl
+                    x, y = int(x + 0.5), int(y + 0.5)
+                    w, h = nd.relative_size
+                    w, h = int(w * wrl + 0.5), int(w * wrl + 0.5)
+                    sdl2.SDL_SetTextInputRect(sdl2.SDL_Rect(x, y, w, h))
                     sdl2.SDL_StartTextInput()
                 new_focus = True
                 click = False  # Prevents further click callbacks
