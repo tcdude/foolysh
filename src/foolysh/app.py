@@ -377,7 +377,7 @@ class App(FSM):
         units_y = new_res[1] / min(new_res)
         half_x, half_y = units_x / 2, units_y / 2
         self.__nodes.ui.top_center.pos = half_x, 0
-        self.__nodes.ui.top_center.pos = units_x, 0
+        self.__nodes.ui.top_right.pos = units_x, 0
         self.__nodes.ui.center_left.pos = 0, half_y
         self.__nodes.ui.center.pos = half_x, half_y
         self.__nodes.ui.center_right.pos = units_x, half_y
