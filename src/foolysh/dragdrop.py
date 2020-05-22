@@ -9,6 +9,7 @@ from typing import Optional
 from typing import Tuple
 from uuid import uuid4
 
+from foolysh.tools import vec2
 import sdl2
 
 from .tools import aabb
@@ -39,6 +40,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE."""
 
 
+MAX_SPEED = 4.0  # To identify illegal drags happening on android
+
+
 @dataclass
 class DragEntry:
     """
@@ -49,6 +53,14 @@ class DragEntry:
     drag_args: Tuple
     drop_callback: Callable
     drop_args: Tuple
+
+
+@dataclass
+class DragInfo:
+    """Information stored about a drag operation."""
+    start_pos: vec2.Vec2 = None
+    last_mouse: vec2.Vec2 = None
+    active: int = -1
 
 
 class DragDrop:
@@ -73,9 +85,7 @@ class DragDrop:
         self._app = app_instance
         self._drag_threshold = drag_threshold
         self._drag_nodes: Dict[int, DragEntry] = {}
-        self._active = -1
-        self._last_mouse = None
-        self._start_pos = None
+        self._info: DragInfo = DragInfo()
         self._ids = uuid4().hex, uuid4().hex, uuid4().hex
         if self._app.isandroid:
             self._watch_button = None
@@ -101,7 +111,8 @@ class DragDrop:
                 sdl2.SDL_MOUSEBUTTONUP,
                 self._mouse_up
             )
-        self._app.task_manager.add_task(self._ids[2], self._process, 0, False)
+        self._app.task_manager.add_task(self._ids[2], self._process, 0, True)
+        self._app.task_manager[self._ids[2]].pause()
 
     def enable(self, drag_node: node.Node,
                drag_callback: Optional[Callable] = None,
@@ -123,6 +134,8 @@ class DragDrop:
             drop_args: ``Optional[Tuple]`` positional arguments for the
                 drop_callback callable.
         """
+        if not self._drag_nodes:
+            self._app.task_manager[self._ids[2]].resume()
         self._drag_nodes[drag_node.node_id] = DragEntry(
             node=drag_node,
             drag_callback=drag_callback,
@@ -141,23 +154,29 @@ class DragDrop:
         node_id = drag_node.node_id
         if node_id in self._drag_nodes:
             self._drag_nodes.pop(node_id)
+        if not self._drag_nodes:
+            self._app.task_manager[self._ids[2]].pause()
 
-    def _process(self):
+    def _process(self, dt: float):
         """Process active drag operations."""
-        if self._active > -1:
-            if self._last_mouse is None:
-                self._last_mouse = self._app.mouse_pos
-            delta = self._app.mouse_pos - self._last_mouse
-            drag_node = self._drag_nodes[self._active].node
-            drag_node.pos = drag_node, delta
-        self._last_mouse = self._app.mouse_pos
+        if self._info.active > -1:
+            if self._info.last_mouse is None:
+                self._info.last_mouse = self._app.mouse_pos
+            delta = self._app.mouse_pos - self._info.last_mouse
+            drag_node = self._drag_nodes[self._info.active].node
+            if delta.length / dt > MAX_SPEED:
+                drag_node.pos = self._info.start_pos
+                self._info.active = -1
+            else:
+                drag_node.pos = drag_node, delta
+        self._info.last_mouse = self._app.mouse_pos
 
     def _mouse_down(self, event: sdl2.SDL_Event) -> None:
         """
         Drag event callback.
         """
-        self._last_mouse = self._app.mouse_pos
-        if self._active == -1 and (self._watch_button is None or \
+        self._info.last_mouse = self._app.mouse_pos
+        if self._info.active == -1 and (self._watch_button is None or \
              event.button.button == self._watch_button):
             mouse_pos = self._app.mouse_pos + self._app.renderer.view_pos
             mouse_aabb = aabb.AABB(mouse_pos.x, mouse_pos.y, 0, 0)
@@ -177,8 +196,8 @@ class DragDrop:
                     res = click_node.drag_callback(*click_node.drag_args)
                     if res is False:
                         return
-                self._active = click_node.node.node_id
-                self._start_pos = click_node.node.pos
+                self._info.active = click_node.node.node_id
+                self._info.start_pos = click_node.node.pos
                 return
 
     def _mouse_up(self, event: sdl2.SDL_Event) -> None:
@@ -188,17 +207,12 @@ class DragDrop:
         if not self._app.isandroid and \
              event.button.button != self._watch_button:
             return
-        if self._active > -1:
-            drag_node = self._drag_nodes[self._active]
-            drag_len = (self._start_pos - drag_node.node.pos).length
+        if self._info.active > -1:
+            drag_node = self._drag_nodes[self._info.active]
+            drag_len = (self._info.start_pos - drag_node.node.pos).length
             if drag_len >= self._drag_threshold:
                 if drag_node.drop_callback is not None:
                     drag_node.drop_callback(*drag_node.drop_args)
             else:
-                drag_node.node.pos = self._start_pos
-            self._active = -1
-
-    def __del__(self):
-        self._app.event_handler.forget(self._ids[0])
-        self._app.event_handler.forget(self._ids[1])
-        self._app.task_manager.remove_task(self._ids[2])
+                drag_node.node.pos = self._info.start_pos
+            self._info.active = -1
