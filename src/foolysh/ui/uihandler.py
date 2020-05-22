@@ -275,6 +275,14 @@ class UIHandler:
 
     def _blink_events(self) -> None:
         self._clock.tick()
+        curfoc = self._state.current_focus
+        if self._state.text_input_active and curfoc is not None \
+              and self._nodes[curfoc].hidden:
+            if (curfoc, EventType.ENTER_FOCUS) in self._callbacks:
+                callback, args, kwargs = self \
+                    ._callbacks[(curfoc, EventType.ENTER_FOCUS)]
+                callback(*args, **kwargs)
+            self._state.current_focus = None
         for node_id, event_t in self._callbacks:
             if event_t == EventType.BLINK:
                 func, args, kwargs = self._callbacks[(node_id, event_t)]
