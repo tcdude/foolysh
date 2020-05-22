@@ -110,9 +110,9 @@ def test_delay_change():
     tm(CLK.get_dt())
     task = tm.add_task(
         'delay_change',
+        callback,
         0,
         False,
-        callback,
         (time.perf_counter(), )
     )
     task.delay = 0.5
@@ -129,8 +129,8 @@ def test_subscriptable():
     tm = taskmanager.TaskManager()
     task = tm.add_task(
         'subscriptable',
+        callback,
         0,
-        False,
-        callback
+        False
     )
     assert task == tm['subscriptable']

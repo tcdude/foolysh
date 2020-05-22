@@ -97,15 +97,15 @@ cdef class Task:
         """
         ``bool``
         """
-        return not self._task_manager.state(self._name.decode('UTF-8'))
+        return not self._task_manager.state(self._name)
 
     def pause(self):
         """Pauses the execution of :class:`~foolysh.taskmanager.Task`."""
-        self._task_manager.pause(self._name.decode('UTF-8'))
+        self._task_manager.pause(self._name)
 
     def resume(self):
         """Resumes the execution of :class:`~foolysh.taskmanager.Task`."""
-        self._task_manager.resume(self._name.decode('UTF-8'))
+        self._task_manager.resume(self._name)
 
     def __call__(self):
         """
@@ -191,7 +191,8 @@ cdef class TaskManager:
             args = tuple()
         if kwargs is None:
             kwargs = dict()
-        name = name.encode('UTF-8')
+        if not isinstance(name, bytes):
+            name = name.encode('UTF-8')
         t = Task.__new__(Task, name, cb, args, kwargs, self)
         self._tasks[name] = t
         self._add_task(name, delay, with_dt)
@@ -209,7 +210,8 @@ cdef class TaskManager:
         Args:
             name: ``str``
         """
-        name = name.encode('UTF-8')
+        if not isinstance(name, bytes):
+            name = name.encode('UTF-8')
         if name not in self._tasks:
             warnings.warn(f'No task named "{name}"', RuntimeWarning)
         deref(self.thisptr).remove_task(name)
@@ -232,7 +234,8 @@ cdef class TaskManager:
             name: ``str``
             delay: ``float`` new value of the delay.
         """
-        name = name.encode('UTF-8')
+        if not isinstance(name, bytes):
+            name = name.encode('UTF-8')
         if name not in self._tasks:
             raise ValueError(f'No task named "{name}"')
         deref(self.thisptr).set_delay(name, delay)
@@ -244,7 +247,8 @@ cdef class TaskManager:
         Args:
             name: ``str``
         """
-        name = name.encode('UTF-8')
+        if not isinstance(name, bytes):
+            name = name.encode('UTF-8')
         if name not in self._tasks:
             raise ValueError(f'No task named "{name}"')
         deref(self.thisptr).pause(name)
@@ -256,7 +260,8 @@ cdef class TaskManager:
         Args:
             name: ``str``
         """
-        name = name.encode('UTF-8')
+        if not isinstance(name, bytes):
+            name = name.encode('UTF-8')
         if name not in self._tasks:
             raise ValueError(f'No task named "{name}"')
         deref(self.thisptr).resume(name)
@@ -271,7 +276,8 @@ cdef class TaskManager:
         Returns:
             ``bool`` ``True`` if the task is running, otherwise ``False``.
         """
-        name = name.encode('UTF-8')
+        if not isinstance(name, bytes):
+            name = name.encode('UTF-8')
         if name not in self._tasks:
             raise ValueError(f'No task named "{name}"')
         return deref(self.thisptr).state(name)
@@ -292,7 +298,8 @@ cdef class TaskManager:
         return deref(self.thisptr).get_delay(name)
 
     def __getitem__(self, item):
-        item = item.encode('UTF-8')
+        if not isinstance(item, bytes):
+            item = item.encode('UTF-8')
         if item in self._tasks:
             return self._tasks[item]
         raise IndexError
