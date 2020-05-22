@@ -278,10 +278,7 @@ class UIHandler:
         curfoc = self._state.current_focus
         if self._state.text_input_active and curfoc is not None \
               and self._nodes[curfoc].hidden:
-            if (curfoc, EventType.ENTER_FOCUS) in self._callbacks:
-                callback, args, kwargs = self \
-                    ._callbacks[(curfoc, EventType.ENTER_FOCUS)]
-                callback(*args, **kwargs)
+            self._try_cb_exec((curfoc, EventType.ENTER_FOCUS))
             self._state.current_focus = None
             self._state.text_input_active = False
             sdl2.SDL_StopTextInput()
