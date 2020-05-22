@@ -282,6 +282,7 @@ class UIHandler:
             self._state.current_focus = None
             self._state.text_input_active = False
             sdl2.SDL_StopTextInput()
+            print('INFO: Lost focus -> Stopped text input')
         for node_id, event_t in self._callbacks:
             if event_t == EventType.BLINK:
                 func, args, kwargs = self._callbacks[(node_id, event_t)]
