@@ -283,6 +283,8 @@ class UIHandler:
                     ._callbacks[(curfoc, EventType.ENTER_FOCUS)]
                 callback(*args, **kwargs)
             self._state.current_focus = None
+            self._state.text_input_active = False
+            sdl2.SDL_StopTextInput()
         for node_id, event_t in self._callbacks:
             if event_t == EventType.BLINK:
                 func, args, kwargs = self._callbacks[(node_id, event_t)]
