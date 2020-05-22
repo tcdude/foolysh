@@ -4,6 +4,8 @@ Provides the FSM class, a rudimentary implementation of a Finite State Machine.
 
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
+import sdl2
+
 from .tools.common import to_snake_case
 
 __author__ = 'Tiziano Bettio'
@@ -91,6 +93,7 @@ class FSM:
                 self.__history.append(self.__active_state)
         self.__active_state = state_name
         self.__states[state_name][0]()
+        sdl2.SDL_StopTextInput()  # Ensure on-screen kbd gets hidden
 
     def fsm_back(self) -> None:
         """

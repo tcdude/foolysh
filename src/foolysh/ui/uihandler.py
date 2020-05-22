@@ -87,6 +87,7 @@ class UIHandler:
         self._window: sdl2.ext.Window = None
 
     def set_window(self, window: sdl2.ext.Window) -> None:
+        """Setter for the SDL2 window"""
         self._window = window
 
     def add_node(self, nd: node.Node) -> None:
@@ -247,6 +248,7 @@ class UIHandler:
                     w, h = int(w * wrl + 0.5), int(w * wrl + 0.5)
                     sdl2.SDL_SetTextInputRect(sdl2.SDL_Rect(x, y, w, h))
                     sdl2.SDL_StartTextInput()
+                    self._state.text_input_active = True
                 new_focus = True
                 click = False  # Prevents further click callbacks
             else:
@@ -275,14 +277,6 @@ class UIHandler:
 
     def _blink_events(self) -> None:
         self._clock.tick()
-        curfoc = self._state.current_focus
-        if self._state.text_input_active and curfoc is not None \
-              and self._nodes[curfoc].hidden:
-            self._try_cb_exec((curfoc, EventType.ENTER_FOCUS))
-            self._state.current_focus = None
-            self._state.text_input_active = False
-            sdl2.SDL_StopTextInput()
-            print('INFO: Lost focus -> Stopped text input')
         for node_id, event_t in self._callbacks:
             if event_t == EventType.BLINK:
                 func, args, kwargs = self._callbacks[(node_id, event_t)]
