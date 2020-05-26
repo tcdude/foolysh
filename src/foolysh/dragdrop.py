@@ -40,9 +40,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE."""
 
 
-MAX_SPEED = 4.0  # To identify illegal drags happening on android
-
-
 @dataclass
 class DragEntry:
     """
@@ -164,18 +161,16 @@ class DragDrop:
                 self._info.last_mouse = self._app.mouse_pos
             delta = self._app.mouse_pos - self._info.last_mouse
             drag_node = self._drag_nodes[self._info.active].node
-            if delta.length / dt > MAX_SPEED:
-                drag_node.pos = self._info.start_pos
-                self._info.active = -1
-            else:
-                drag_node.pos = drag_node, delta
+            drag_node.pos = drag_node, delta
         self._info.last_mouse = self._app.mouse_pos
 
     def _mouse_down(self, event: sdl2.SDL_Event) -> None:
         """
         Drag event callback.
         """
-        self._info.last_mouse = self._app.mouse_pos
+        world_unit = 1 / min(self._app.screen_size)
+        self._info.last_mouse = vec2.Vec2(event.button.x * world_unit,
+                                          event.button.y * world_unit)
         if self._info.active == -1 and (self._watch_button is None or \
              event.button.button == self._watch_button):
             mouse_pos = self._app.mouse_pos + self._app.renderer.view_pos
