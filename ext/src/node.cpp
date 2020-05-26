@@ -264,7 +264,7 @@ query(AABB& aabb, const bool depth_sorted) {
     to_process.push_back(node_id);
     while(to_process.size()) {
         const size_t pid = to_process.pop_back();
-        if (sgdh.flag_vec[pid] & HIDDEN) {
+        if (sgdh.flag_vec[pid] & HIDDEN || sgdh.flag_vec[pid] & FREE) {
             continue;
         }
         Node n(sgdh, pid);

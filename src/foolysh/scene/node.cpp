@@ -2945,7 +2945,7 @@ static PyObject *__pyx_pf_7foolysh_5scene_4node_4Node_9parent_id___get__(struct 
  *         """
  *         return deref(self.thisptr).get_parent_id()             # <<<<<<<<<<<<<<
  * 
- *     cpdef void remove(self):
+ *     cpdef void remove(self):  # TODO: Fix removing of nodes
  */
   __Pyx_XDECREF(__pyx_r);
   __pyx_t_1 = __Pyx_PyInt_FromSize_t((*__pyx_v_self->thisptr).get_parent_id()); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 130, __pyx_L1_error)
@@ -2976,7 +2976,7 @@ static PyObject *__pyx_pf_7foolysh_5scene_4node_4Node_9parent_id___get__(struct 
 /* "foolysh/scene/node.pyx":132
  *         return deref(self.thisptr).get_parent_id()
  * 
- *     cpdef void remove(self):             # <<<<<<<<<<<<<<
+ *     cpdef void remove(self):  # TODO: Fix removing of nodes             # <<<<<<<<<<<<<<
  *         """
  *         Removes the cyclic reference to the wrapped Node so it can get garbage
  */
@@ -3055,7 +3055,7 @@ static void __pyx_f_7foolysh_5scene_4node_4Node_remove(struct __pyx_obj_7foolysh
   /* "foolysh/scene/node.pyx":132
  *         return deref(self.thisptr).get_parent_id()
  * 
- *     cpdef void remove(self):             # <<<<<<<<<<<<<<
+ *     cpdef void remove(self):  # TODO: Fix removing of nodes             # <<<<<<<<<<<<<<
  *         """
  *         Removes the cyclic reference to the wrapped Node so it can get garbage
  */

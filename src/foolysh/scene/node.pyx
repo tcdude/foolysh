@@ -129,7 +129,7 @@ cdef class Node:
         """
         return deref(self.thisptr).get_parent_id()
 
-    cpdef void remove(self):
+    cpdef void remove(self):  # TODO: Fix removing of nodes
         """
         Removes the cyclic reference to the wrapped Node so it can get garbage
         collected.
