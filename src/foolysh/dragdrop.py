@@ -41,6 +41,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE."""
 
 
+def get_mouse_pos(app_instance: app.App) -> vec2.Vec2:
+    """Returns the current mouse_position."""
+    world_unit = 1 / min(app_instance.screen_size)
+    x, y = ctypes.c_int(0), ctypes.c_int(0)
+    _ = sdl2.mouse.SDL_GetMouseState(ctypes.byref(x), ctypes.byref(y))
+    return vec2.Vec2(x.value * world_unit, y.value * world_unit)
+
+
 @dataclass
 class DragEntry:
     """
@@ -158,26 +166,23 @@ class DragDrop:
     def _process(self, dt: float):
         """Process active drag operations."""
         if self._info.active > -1:
+            mouse_pos = get_mouse_pos(self._app)
             if self._info.last_mouse is None:
-                self._info.last_mouse = self._app.mouse_pos
-            delta = self._app.mouse_pos - self._info.last_mouse
+                self._info.last_mouse = mouse_pos
+            delta = mouse_pos - self._info.last_mouse
             drag_node = self._drag_nodes[self._info.active].node
             drag_node.pos = drag_node, delta
-        self._info.last_mouse = self._app.mouse_pos
+        self._info.last_mouse = mouse_pos
 
     def _mouse_down(self, event: sdl2.SDL_Event) -> None:
         """
         Drag event callback.
         """
         # Ensure correct starting position
-        world_unit = 1 / min(self._app.screen_size)
-        x, y = ctypes.c_int(0), ctypes.c_int(0)
-        _ = sdl2.mouse.SDL_GetMouseState(ctypes.byref(x), ctypes.byref(y))
-        self._info.last_mouse = vec2.Vec2(x.value * world_unit,
-                                          y.value * world_unit)
+        self._info.last_mouse = get_mouse_pos(self._app)
         if self._info.active == -1 and (self._watch_button is None or \
              event.button.button == self._watch_button):
-            mouse_pos = self._app.mouse_pos + self._app.renderer.view_pos
+            mouse_pos = self._info.last_mouse + self._app.renderer.view_pos
             mouse_aabb = aabb.AABB(mouse_pos.x, mouse_pos.y, 0, 0)
             click_node = None
             d_max = None
