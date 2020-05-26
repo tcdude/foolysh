@@ -165,8 +165,8 @@ class DragDrop:
 
     def _process(self, dt: float):
         """Process active drag operations."""
+        mouse_pos = get_mouse_pos(self._app)
         if self._info.active > -1:
-            mouse_pos = get_mouse_pos(self._app)
             if self._info.last_mouse is None:
                 self._info.last_mouse = mouse_pos
             delta = mouse_pos - self._info.last_mouse
