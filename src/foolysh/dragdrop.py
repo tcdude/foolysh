@@ -169,8 +169,12 @@ class DragDrop:
         Drag event callback.
         """
         world_unit = 1 / min(self._app.screen_size)
-        self._info.last_mouse = vec2.Vec2(event.button.x * world_unit,
-                                          event.button.y * world_unit)
+        if app.ISANDROID:
+            self._info.last_mouse = vec2.Vec2(event.tfinger.x * world_unit,
+                                              event.tfinger.y * world_unit)
+        else:
+            self._info.last_mouse = vec2.Vec2(event.button.x * world_unit,
+                                              event.button.y * world_unit)
         if self._info.active == -1 and (self._watch_button is None or \
              event.button.button == self._watch_button):
             mouse_pos = self._app.mouse_pos + self._app.renderer.view_pos
