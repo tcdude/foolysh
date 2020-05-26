@@ -966,7 +966,7 @@ struct __pyx_obj_7foolysh_5scene_4node_ImageNode {
 };
 
 
-/* "foolysh/scene/node.pyx":865
+/* "foolysh/scene/node.pyx":874
  * 
  * 
  * cdef class TextNode(Node):             # <<<<<<<<<<<<<<
@@ -1094,7 +1094,7 @@ struct __pyx_vtabstruct_7foolysh_5scene_4node_ImageNode {
 static struct __pyx_vtabstruct_7foolysh_5scene_4node_ImageNode *__pyx_vtabptr_7foolysh_5scene_4node_ImageNode;
 
 
-/* "foolysh/scene/node.pyx":865
+/* "foolysh/scene/node.pyx":874
  * 
  * 
  * cdef class TextNode(Node):             # <<<<<<<<<<<<<<
@@ -1559,6 +1559,13 @@ static PyObject* __Pyx__PyList_PopIndex(PyObject* L, PyObject* py_ix, Py_ssize_t
 /* JoinPyUnicode.proto */
 static PyObject* __Pyx_PyUnicode_Join(PyObject* value_tuple, Py_ssize_t value_count, Py_ssize_t result_ulength,
                                       Py_UCS4 max_char);
+
+/* ObjectGetItem.proto */
+#if CYTHON_USE_TYPE_SLOTS
+static CYTHON_INLINE PyObject *__Pyx_PyObject_GetItem(PyObject *obj, PyObject* key);
+#else
+#define __Pyx_PyObject_GetItem(obj, key)  PyObject_GetItem(obj, key)
+#endif
 
 /* PyUnicode_Unicode.proto */
 static CYTHON_INLINE PyObject* __Pyx_PyUnicode_Unicode(PyObject *obj);
@@ -2047,8 +2054,10 @@ static PyObject *__pyx_pf_7foolysh_5scene_4node_9ImageNode_5tiled___get__(struct
 static int __pyx_pf_7foolysh_5scene_4node_9ImageNode_5tiled_2__set__(struct __pyx_obj_7foolysh_5scene_4node_ImageNode *__pyx_v_self, PyObject *__pyx_v_value); /* proto */
 static PyObject *__pyx_pf_7foolysh_5scene_4node_9ImageNode_2add_image(struct __pyx_obj_7foolysh_5scene_4node_ImageNode *__pyx_v_self, PyObject *__pyx_v_image); /* proto */
 static PyObject *__pyx_pf_7foolysh_5scene_4node_9ImageNode_4clear_images(struct __pyx_obj_7foolysh_5scene_4node_ImageNode *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_7foolysh_5scene_4node_9ImageNode_6__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_7foolysh_5scene_4node_ImageNode *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_7foolysh_5scene_4node_9ImageNode_8__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_7foolysh_5scene_4node_ImageNode *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state); /* proto */
+static PyObject *__pyx_pf_7foolysh_5scene_4node_9ImageNode_6__getitem__(struct __pyx_obj_7foolysh_5scene_4node_ImageNode *__pyx_v_self, PyObject *__pyx_v_item); /* proto */
+static int __pyx_pf_7foolysh_5scene_4node_9ImageNode_8__setitem__(struct __pyx_obj_7foolysh_5scene_4node_ImageNode *__pyx_v_self, PyObject *__pyx_v_item, PyObject *__pyx_v_value); /* proto */
+static PyObject *__pyx_pf_7foolysh_5scene_4node_9ImageNode_10__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_7foolysh_5scene_4node_ImageNode *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_7foolysh_5scene_4node_9ImageNode_12__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_7foolysh_5scene_4node_ImageNode *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state); /* proto */
 static int __pyx_pf_7foolysh_5scene_4node_8TextNode___init__(struct __pyx_obj_7foolysh_5scene_4node_TextNode *__pyx_v_self, PyObject *__pyx_v_name, PyObject *__pyx_v_text, PyObject *__pyx_v_font, PyObject *__pyx_v_font_size, PyObject *__pyx_v_text_color, PyObject *__pyx_v_align, PyObject *__pyx_v_spacing, PyObject *__pyx_v_multiline, CYTHON_UNUSED PyObject *__pyx_v_args, CYTHON_UNUSED PyObject *__pyx_v_kwargs); /* proto */
 static PyObject *__pyx_pf_7foolysh_5scene_4node_8TextNode_7hashkey___get__(struct __pyx_obj_7foolysh_5scene_4node_TextNode *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_7foolysh_5scene_4node_8TextNode_4text___get__(struct __pyx_obj_7foolysh_5scene_4node_TextNode *__pyx_v_self); /* proto */
@@ -11427,7 +11436,7 @@ static PyObject *__pyx_pf_7foolysh_5scene_4node_9ImageNode_4clear_images(struct 
  *         self._images = []
  *         self._current_index = -1             # <<<<<<<<<<<<<<
  * 
- * 
+ *     def __getitem__(self, item):
  */
   __pyx_v_self->_current_index = -1;
 
@@ -11452,6 +11461,213 @@ static PyObject *__pyx_pf_7foolysh_5scene_4node_9ImageNode_4clear_images(struct 
   return __pyx_r;
 }
 
+/* "foolysh/scene/node.pyx":864
+ *         self._current_index = -1
+ * 
+ *     def __getitem__(self, item):             # <<<<<<<<<<<<<<
+ *         return self._images[item]
+ * 
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_7foolysh_5scene_4node_9ImageNode_7__getitem__(PyObject *__pyx_v_self, PyObject *__pyx_v_item); /*proto*/
+static PyObject *__pyx_pw_7foolysh_5scene_4node_9ImageNode_7__getitem__(PyObject *__pyx_v_self, PyObject *__pyx_v_item) {
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__getitem__ (wrapper)", 0);
+  __pyx_r = __pyx_pf_7foolysh_5scene_4node_9ImageNode_6__getitem__(((struct __pyx_obj_7foolysh_5scene_4node_ImageNode *)__pyx_v_self), ((PyObject *)__pyx_v_item));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_7foolysh_5scene_4node_9ImageNode_6__getitem__(struct __pyx_obj_7foolysh_5scene_4node_ImageNode *__pyx_v_self, PyObject *__pyx_v_item) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  __Pyx_RefNannySetupContext("__getitem__", 0);
+
+  /* "foolysh/scene/node.pyx":865
+ * 
+ *     def __getitem__(self, item):
+ *         return self._images[item]             # <<<<<<<<<<<<<<
+ * 
+ *     def __setitem__(self, item, value):
+ */
+  __Pyx_XDECREF(__pyx_r);
+  if (unlikely(__pyx_v_self->_images == Py_None)) {
+    PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
+    __PYX_ERR(1, 865, __pyx_L1_error)
+  }
+  __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_v_self->_images, __pyx_v_item); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 865, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
+  goto __pyx_L0;
+
+  /* "foolysh/scene/node.pyx":864
+ *         self._current_index = -1
+ * 
+ *     def __getitem__(self, item):             # <<<<<<<<<<<<<<
+ *         return self._images[item]
+ * 
+ */
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("foolysh.scene.node.ImageNode.__getitem__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "foolysh/scene/node.pyx":867
+ *         return self._images[item]
+ * 
+ *     def __setitem__(self, item, value):             # <<<<<<<<<<<<<<
+ *         if self._images[item] != value:
+ *             self._images[item] = value
+ */
+
+/* Python wrapper */
+static int __pyx_pw_7foolysh_5scene_4node_9ImageNode_9__setitem__(PyObject *__pyx_v_self, PyObject *__pyx_v_item, PyObject *__pyx_v_value); /*proto*/
+static int __pyx_pw_7foolysh_5scene_4node_9ImageNode_9__setitem__(PyObject *__pyx_v_self, PyObject *__pyx_v_item, PyObject *__pyx_v_value) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__setitem__ (wrapper)", 0);
+  __pyx_r = __pyx_pf_7foolysh_5scene_4node_9ImageNode_8__setitem__(((struct __pyx_obj_7foolysh_5scene_4node_ImageNode *)__pyx_v_self), ((PyObject *)__pyx_v_item), ((PyObject *)__pyx_v_value));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static int __pyx_pf_7foolysh_5scene_4node_9ImageNode_8__setitem__(struct __pyx_obj_7foolysh_5scene_4node_ImageNode *__pyx_v_self, PyObject *__pyx_v_item, PyObject *__pyx_v_value) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  PyObject *__pyx_t_2 = NULL;
+  int __pyx_t_3;
+  PyObject *__pyx_t_4 = NULL;
+  __Pyx_RefNannySetupContext("__setitem__", 0);
+
+  /* "foolysh/scene/node.pyx":868
+ * 
+ *     def __setitem__(self, item, value):
+ *         if self._images[item] != value:             # <<<<<<<<<<<<<<
+ *             self._images[item] = value
+ *             if item == self._current_index:
+ */
+  if (unlikely(__pyx_v_self->_images == Py_None)) {
+    PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
+    __PYX_ERR(1, 868, __pyx_L1_error)
+  }
+  __pyx_t_1 = __Pyx_PyObject_GetItem(__pyx_v_self->_images, __pyx_v_item); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 868, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_2 = PyObject_RichCompare(__pyx_t_1, __pyx_v_value, Py_NE); __Pyx_XGOTREF(__pyx_t_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 868, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(1, 868, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  if (__pyx_t_3) {
+
+    /* "foolysh/scene/node.pyx":869
+ *     def __setitem__(self, item, value):
+ *         if self._images[item] != value:
+ *             self._images[item] = value             # <<<<<<<<<<<<<<
+ *             if item == self._current_index:
+ *                 self.propagate_dirty()
+ */
+    if (unlikely(__pyx_v_self->_images == Py_None)) {
+      PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
+      __PYX_ERR(1, 869, __pyx_L1_error)
+    }
+    if (unlikely(PyObject_SetItem(__pyx_v_self->_images, __pyx_v_item, __pyx_v_value) < 0)) __PYX_ERR(1, 869, __pyx_L1_error)
+
+    /* "foolysh/scene/node.pyx":870
+ *         if self._images[item] != value:
+ *             self._images[item] = value
+ *             if item == self._current_index:             # <<<<<<<<<<<<<<
+ *                 self.propagate_dirty()
+ * 
+ */
+    __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_self->_current_index); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 870, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __pyx_t_1 = PyObject_RichCompare(__pyx_v_item, __pyx_t_2, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 870, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(1, 870, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+    if (__pyx_t_3) {
+
+      /* "foolysh/scene/node.pyx":871
+ *             self._images[item] = value
+ *             if item == self._current_index:
+ *                 self.propagate_dirty()             # <<<<<<<<<<<<<<
+ * 
+ * 
+ */
+      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_propagate_dirty); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 871, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_2);
+      __pyx_t_4 = NULL;
+      if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
+        __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_2);
+        if (likely(__pyx_t_4)) {
+          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
+          __Pyx_INCREF(__pyx_t_4);
+          __Pyx_INCREF(function);
+          __Pyx_DECREF_SET(__pyx_t_2, function);
+        }
+      }
+      __pyx_t_1 = (__pyx_t_4) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_4) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
+      __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+      if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 871, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_1);
+      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+      /* "foolysh/scene/node.pyx":870
+ *         if self._images[item] != value:
+ *             self._images[item] = value
+ *             if item == self._current_index:             # <<<<<<<<<<<<<<
+ *                 self.propagate_dirty()
+ * 
+ */
+    }
+
+    /* "foolysh/scene/node.pyx":868
+ * 
+ *     def __setitem__(self, item, value):
+ *         if self._images[item] != value:             # <<<<<<<<<<<<<<
+ *             self._images[item] = value
+ *             if item == self._current_index:
+ */
+  }
+
+  /* "foolysh/scene/node.pyx":867
+ *         return self._images[item]
+ * 
+ *     def __setitem__(self, item, value):             # <<<<<<<<<<<<<<
+ *         if self._images[item] != value:
+ *             self._images[item] = value
+ */
+
+  /* function exit code */
+  __pyx_r = 0;
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_4);
+  __Pyx_AddTraceback("foolysh.scene.node.ImageNode.__setitem__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = -1;
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
 /* "(tree fragment)":1
  * def __reduce_cython__(self):             # <<<<<<<<<<<<<<
  *     raise TypeError("no default __reduce__ due to non-trivial __cinit__")
@@ -11459,20 +11675,20 @@ static PyObject *__pyx_pf_7foolysh_5scene_4node_9ImageNode_4clear_images(struct 
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_7foolysh_5scene_4node_9ImageNode_7__reduce_cython__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
-static char __pyx_doc_7foolysh_5scene_4node_9ImageNode_6__reduce_cython__[] = "ImageNode.__reduce_cython__(self)";
-static PyObject *__pyx_pw_7foolysh_5scene_4node_9ImageNode_7__reduce_cython__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
+static PyObject *__pyx_pw_7foolysh_5scene_4node_9ImageNode_11__reduce_cython__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static char __pyx_doc_7foolysh_5scene_4node_9ImageNode_10__reduce_cython__[] = "ImageNode.__reduce_cython__(self)";
+static PyObject *__pyx_pw_7foolysh_5scene_4node_9ImageNode_11__reduce_cython__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__reduce_cython__ (wrapper)", 0);
-  __pyx_r = __pyx_pf_7foolysh_5scene_4node_9ImageNode_6__reduce_cython__(((struct __pyx_obj_7foolysh_5scene_4node_ImageNode *)__pyx_v_self));
+  __pyx_r = __pyx_pf_7foolysh_5scene_4node_9ImageNode_10__reduce_cython__(((struct __pyx_obj_7foolysh_5scene_4node_ImageNode *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7foolysh_5scene_4node_9ImageNode_6__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_7foolysh_5scene_4node_ImageNode *__pyx_v_self) {
+static PyObject *__pyx_pf_7foolysh_5scene_4node_9ImageNode_10__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_7foolysh_5scene_4node_ImageNode *__pyx_v_self) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -11514,20 +11730,20 @@ static PyObject *__pyx_pf_7foolysh_5scene_4node_9ImageNode_6__reduce_cython__(CY
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_7foolysh_5scene_4node_9ImageNode_9__setstate_cython__(PyObject *__pyx_v_self, PyObject *__pyx_v___pyx_state); /*proto*/
-static char __pyx_doc_7foolysh_5scene_4node_9ImageNode_8__setstate_cython__[] = "ImageNode.__setstate_cython__(self, __pyx_state)";
-static PyObject *__pyx_pw_7foolysh_5scene_4node_9ImageNode_9__setstate_cython__(PyObject *__pyx_v_self, PyObject *__pyx_v___pyx_state) {
+static PyObject *__pyx_pw_7foolysh_5scene_4node_9ImageNode_13__setstate_cython__(PyObject *__pyx_v_self, PyObject *__pyx_v___pyx_state); /*proto*/
+static char __pyx_doc_7foolysh_5scene_4node_9ImageNode_12__setstate_cython__[] = "ImageNode.__setstate_cython__(self, __pyx_state)";
+static PyObject *__pyx_pw_7foolysh_5scene_4node_9ImageNode_13__setstate_cython__(PyObject *__pyx_v_self, PyObject *__pyx_v___pyx_state) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__setstate_cython__ (wrapper)", 0);
-  __pyx_r = __pyx_pf_7foolysh_5scene_4node_9ImageNode_8__setstate_cython__(((struct __pyx_obj_7foolysh_5scene_4node_ImageNode *)__pyx_v_self), ((PyObject *)__pyx_v___pyx_state));
+  __pyx_r = __pyx_pf_7foolysh_5scene_4node_9ImageNode_12__setstate_cython__(((struct __pyx_obj_7foolysh_5scene_4node_ImageNode *)__pyx_v_self), ((PyObject *)__pyx_v___pyx_state));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7foolysh_5scene_4node_9ImageNode_8__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_7foolysh_5scene_4node_ImageNode *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state) {
+static PyObject *__pyx_pf_7foolysh_5scene_4node_9ImageNode_12__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_7foolysh_5scene_4node_ImageNode *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -11561,7 +11777,7 @@ static PyObject *__pyx_pf_7foolysh_5scene_4node_9ImageNode_8__setstate_cython__(
   return __pyx_r;
 }
 
-/* "foolysh/scene/node.pyx":888
+/* "foolysh/scene/node.pyx":897
  *     cdef bint _multiline
  * 
  *     def __init__(self, name=None, text='', font=None, font_size=0.05,             # <<<<<<<<<<<<<<
@@ -11606,7 +11822,7 @@ static int __pyx_pw_7foolysh_5scene_4node_8TextNode_1__init__(PyObject *__pyx_v_
     values[2] = ((PyObject *)Py_None);
     values[3] = ((PyObject *)__pyx_float_0_05);
 
-    /* "foolysh/scene/node.pyx":889
+    /* "foolysh/scene/node.pyx":898
  * 
  *     def __init__(self, name=None, text='', font=None, font_size=0.05,
  *                  text_color=(255, 255, 255, 255), align='left', spacing=0,             # <<<<<<<<<<<<<<
@@ -11617,7 +11833,7 @@ static int __pyx_pw_7foolysh_5scene_4node_8TextNode_1__init__(PyObject *__pyx_v_
     values[5] = ((PyObject *)__pyx_n_u_left);
     values[6] = ((PyObject *)__pyx_int_0);
 
-    /* "foolysh/scene/node.pyx":890
+    /* "foolysh/scene/node.pyx":899
  *     def __init__(self, name=None, text='', font=None, font_size=0.05,
  *                  text_color=(255, 255, 255, 255), align='left', spacing=0,
  *                  multiline=False, *args, **kwargs):             # <<<<<<<<<<<<<<
@@ -11700,7 +11916,7 @@ static int __pyx_pw_7foolysh_5scene_4node_8TextNode_1__init__(PyObject *__pyx_v_
       }
       if (unlikely(kw_args > 0)) {
         const Py_ssize_t used_pos_args = (pos_args < 8) ? pos_args : 8;
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, __pyx_v_kwargs, values, used_pos_args, "__init__") < 0)) __PYX_ERR(1, 888, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, __pyx_v_kwargs, values, used_pos_args, "__init__") < 0)) __PYX_ERR(1, 897, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -11743,7 +11959,7 @@ static int __pyx_pw_7foolysh_5scene_4node_8TextNode_1__init__(PyObject *__pyx_v_
   __pyx_L4_argument_unpacking_done:;
   __pyx_r = __pyx_pf_7foolysh_5scene_4node_8TextNode___init__(((struct __pyx_obj_7foolysh_5scene_4node_TextNode *)__pyx_v_self), __pyx_v_name, __pyx_v_text, __pyx_v_font, __pyx_v_font_size, __pyx_v_text_color, __pyx_v_align, __pyx_v_spacing, __pyx_v_multiline, __pyx_v_args, __pyx_v_kwargs);
 
-  /* "foolysh/scene/node.pyx":888
+  /* "foolysh/scene/node.pyx":897
  *     cdef bint _multiline
  * 
  *     def __init__(self, name=None, text='', font=None, font_size=0.05,             # <<<<<<<<<<<<<<
@@ -11768,14 +11984,14 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode___init__(struct __pyx_obj_7f
   int __pyx_t_5;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "foolysh/scene/node.pyx":891
+  /* "foolysh/scene/node.pyx":900
  *                  text_color=(255, 255, 255, 255), align='left', spacing=0,
  *                  multiline=False, *args, **kwargs):
  *         super(TextNode, self).__init__(name=name)             # <<<<<<<<<<<<<<
  *         self._text = ''
  *         self._font = ''
  */
-  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 891, __pyx_L1_error)
+  __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 900, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_INCREF(((PyObject *)__pyx_ptype_7foolysh_5scene_4node_TextNode));
   __Pyx_GIVEREF(((PyObject *)__pyx_ptype_7foolysh_5scene_4node_TextNode));
@@ -11783,22 +11999,22 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode___init__(struct __pyx_obj_7f
   __Pyx_INCREF(((PyObject *)__pyx_v_self));
   __Pyx_GIVEREF(((PyObject *)__pyx_v_self));
   PyTuple_SET_ITEM(__pyx_t_1, 1, ((PyObject *)__pyx_v_self));
-  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_super, __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 891, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_super, __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 900, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_init); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 891, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_init); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 900, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 891, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 900, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_name, __pyx_v_name) < 0) __PYX_ERR(1, 891, __pyx_L1_error)
-  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_empty_tuple, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 891, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_name, __pyx_v_name) < 0) __PYX_ERR(1, 900, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_empty_tuple, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 900, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "foolysh/scene/node.pyx":892
+  /* "foolysh/scene/node.pyx":901
  *                  multiline=False, *args, **kwargs):
  *         super(TextNode, self).__init__(name=name)
  *         self._text = ''             # <<<<<<<<<<<<<<
@@ -11811,7 +12027,7 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode___init__(struct __pyx_obj_7f
   __Pyx_DECREF(__pyx_v_self->_text);
   __pyx_v_self->_text = __pyx_kp_u__3;
 
-  /* "foolysh/scene/node.pyx":893
+  /* "foolysh/scene/node.pyx":902
  *         super(TextNode, self).__init__(name=name)
  *         self._text = ''
  *         self._font = ''             # <<<<<<<<<<<<<<
@@ -11824,7 +12040,7 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode___init__(struct __pyx_obj_7f
   __Pyx_DECREF(__pyx_v_self->_font);
   __pyx_v_self->_font = __pyx_kp_u__3;
 
-  /* "foolysh/scene/node.pyx":894
+  /* "foolysh/scene/node.pyx":903
  *         self._text = ''
  *         self._font = ''
  *         self._font_size = 0             # <<<<<<<<<<<<<<
@@ -11833,7 +12049,7 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode___init__(struct __pyx_obj_7f
  */
   __pyx_v_self->_font_size = 0.0;
 
-  /* "foolysh/scene/node.pyx":895
+  /* "foolysh/scene/node.pyx":904
  *         self._font = ''
  *         self._font_size = 0
  *         self._text_color = ()             # <<<<<<<<<<<<<<
@@ -11846,7 +12062,7 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode___init__(struct __pyx_obj_7f
   __Pyx_DECREF(__pyx_v_self->_text_color);
   __pyx_v_self->_text_color = __pyx_empty_tuple;
 
-  /* "foolysh/scene/node.pyx":896
+  /* "foolysh/scene/node.pyx":905
  *         self._font_size = 0
  *         self._text_color = ()
  *         self._align = ''             # <<<<<<<<<<<<<<
@@ -11859,7 +12075,7 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode___init__(struct __pyx_obj_7f
   __Pyx_DECREF(__pyx_v_self->_align);
   __pyx_v_self->_align = __pyx_kp_u__3;
 
-  /* "foolysh/scene/node.pyx":897
+  /* "foolysh/scene/node.pyx":906
  *         self._text_color = ()
  *         self._align = ''
  *         self._spacing = 0             # <<<<<<<<<<<<<<
@@ -11868,7 +12084,7 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode___init__(struct __pyx_obj_7f
  */
   __pyx_v_self->_spacing = 0;
 
-  /* "foolysh/scene/node.pyx":898
+  /* "foolysh/scene/node.pyx":907
  *         self._align = ''
  *         self._spacing = 0
  *         self._multiline = False             # <<<<<<<<<<<<<<
@@ -11877,23 +12093,23 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode___init__(struct __pyx_obj_7f
  */
   __pyx_v_self->_multiline = 0;
 
-  /* "foolysh/scene/node.pyx":899
+  /* "foolysh/scene/node.pyx":908
  *         self._spacing = 0
  *         self._multiline = False
  *         self.text = text             # <<<<<<<<<<<<<<
  *         self.font = font or ''
  *         self.font_size = font_size
  */
-  if (__Pyx_PyObject_SetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_text, __pyx_v_text) < 0) __PYX_ERR(1, 899, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_text, __pyx_v_text) < 0) __PYX_ERR(1, 908, __pyx_L1_error)
 
-  /* "foolysh/scene/node.pyx":900
+  /* "foolysh/scene/node.pyx":909
  *         self._multiline = False
  *         self.text = text
  *         self.font = font or ''             # <<<<<<<<<<<<<<
  *         self.font_size = font_size
  *         self.text_color = text_color
  */
-  __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_v_font); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(1, 900, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_v_font); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(1, 909, __pyx_L1_error)
   if (!__pyx_t_4) {
   } else {
     __Pyx_INCREF(__pyx_v_font);
@@ -11903,55 +12119,55 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode___init__(struct __pyx_obj_7f
   __Pyx_INCREF(__pyx_kp_u__3);
   __pyx_t_3 = __pyx_kp_u__3;
   __pyx_L3_bool_binop_done:;
-  if (__Pyx_PyObject_SetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_font, __pyx_t_3) < 0) __PYX_ERR(1, 900, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_font, __pyx_t_3) < 0) __PYX_ERR(1, 909, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "foolysh/scene/node.pyx":901
+  /* "foolysh/scene/node.pyx":910
  *         self.text = text
  *         self.font = font or ''
  *         self.font_size = font_size             # <<<<<<<<<<<<<<
  *         self.text_color = text_color
  *         self.align = align
  */
-  if (__Pyx_PyObject_SetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_font_size, __pyx_v_font_size) < 0) __PYX_ERR(1, 901, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_font_size, __pyx_v_font_size) < 0) __PYX_ERR(1, 910, __pyx_L1_error)
 
-  /* "foolysh/scene/node.pyx":902
+  /* "foolysh/scene/node.pyx":911
  *         self.font = font or ''
  *         self.font_size = font_size
  *         self.text_color = text_color             # <<<<<<<<<<<<<<
  *         self.align = align
  *         self.spacing = spacing
  */
-  if (__Pyx_PyObject_SetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_text_color, __pyx_v_text_color) < 0) __PYX_ERR(1, 902, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_text_color, __pyx_v_text_color) < 0) __PYX_ERR(1, 911, __pyx_L1_error)
 
-  /* "foolysh/scene/node.pyx":903
+  /* "foolysh/scene/node.pyx":912
  *         self.font_size = font_size
  *         self.text_color = text_color
  *         self.align = align             # <<<<<<<<<<<<<<
  *         self.spacing = spacing
  *         self.multiline = multiline
  */
-  if (__Pyx_PyObject_SetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_align, __pyx_v_align) < 0) __PYX_ERR(1, 903, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_align, __pyx_v_align) < 0) __PYX_ERR(1, 912, __pyx_L1_error)
 
-  /* "foolysh/scene/node.pyx":904
+  /* "foolysh/scene/node.pyx":913
  *         self.text_color = text_color
  *         self.align = align
  *         self.spacing = spacing             # <<<<<<<<<<<<<<
  *         self.multiline = multiline
  *         _need_size.append(self.node_id)
  */
-  if (__Pyx_PyObject_SetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_spacing, __pyx_v_spacing) < 0) __PYX_ERR(1, 904, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_spacing, __pyx_v_spacing) < 0) __PYX_ERR(1, 913, __pyx_L1_error)
 
-  /* "foolysh/scene/node.pyx":905
+  /* "foolysh/scene/node.pyx":914
  *         self.align = align
  *         self.spacing = spacing
  *         self.multiline = multiline             # <<<<<<<<<<<<<<
  *         _need_size.append(self.node_id)
  * 
  */
-  if (__Pyx_PyObject_SetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_multiline, __pyx_v_multiline) < 0) __PYX_ERR(1, 905, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_multiline, __pyx_v_multiline) < 0) __PYX_ERR(1, 914, __pyx_L1_error)
 
-  /* "foolysh/scene/node.pyx":906
+  /* "foolysh/scene/node.pyx":915
  *         self.spacing = spacing
  *         self.multiline = multiline
  *         _need_size.append(self.node_id)             # <<<<<<<<<<<<<<
@@ -11960,14 +12176,14 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode___init__(struct __pyx_obj_7f
  */
   if (unlikely(__pyx_v_7foolysh_5scene_4node__need_size == Py_None)) {
     PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "append");
-    __PYX_ERR(1, 906, __pyx_L1_error)
+    __PYX_ERR(1, 915, __pyx_L1_error)
   }
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_node_id); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 906, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_node_id); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 915, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_5 = __Pyx_PyList_Append(__pyx_v_7foolysh_5scene_4node__need_size, __pyx_t_3); if (unlikely(__pyx_t_5 == ((int)-1))) __PYX_ERR(1, 906, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyList_Append(__pyx_v_7foolysh_5scene_4node__need_size, __pyx_t_3); if (unlikely(__pyx_t_5 == ((int)-1))) __PYX_ERR(1, 915, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "foolysh/scene/node.pyx":888
+  /* "foolysh/scene/node.pyx":897
  *     cdef bint _multiline
  * 
  *     def __init__(self, name=None, text='', font=None, font_size=0.05,             # <<<<<<<<<<<<<<
@@ -11989,7 +12205,7 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode___init__(struct __pyx_obj_7f
   return __pyx_r;
 }
 
-/* "foolysh/scene/node.pyx":909
+/* "foolysh/scene/node.pyx":918
  * 
  *     @property
  *     def hashkey(self):             # <<<<<<<<<<<<<<
@@ -12021,7 +12237,7 @@ static PyObject *__pyx_pf_7foolysh_5scene_4node_8TextNode_7hashkey___get__(struc
   Py_hash_t __pyx_t_6;
   __Pyx_RefNannySetupContext("__get__", 0);
 
-  /* "foolysh/scene/node.pyx":910
+  /* "foolysh/scene/node.pyx":919
  *     @property
  *     def hashkey(self):
  *         return hash(f'{self._text}{self._font}{self._font_size}{self._text_color}'             # <<<<<<<<<<<<<<
@@ -12029,27 +12245,27 @@ static PyObject *__pyx_pf_7foolysh_5scene_4node_8TextNode_7hashkey___get__(struc
  * 
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyTuple_New(7); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 910, __pyx_L1_error)
+  __pyx_t_1 = PyTuple_New(7); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 919, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_t_2 = 0;
   __pyx_t_3 = 127;
-  __pyx_t_4 = __Pyx_PyUnicode_Unicode(__pyx_v_self->_text); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 910, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyUnicode_Unicode(__pyx_v_self->_text); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 919, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_t_3 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_4) > __pyx_t_3) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_4) : __pyx_t_3;
   __pyx_t_2 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_4);
   __Pyx_GIVEREF(__pyx_t_4);
   PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_4);
   __pyx_t_4 = 0;
-  __pyx_t_4 = __Pyx_PyUnicode_Unicode(__pyx_v_self->_font); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 910, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyUnicode_Unicode(__pyx_v_self->_font); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 919, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_t_3 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_4) > __pyx_t_3) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_4) : __pyx_t_3;
   __pyx_t_2 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_4);
   __Pyx_GIVEREF(__pyx_t_4);
   PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_t_4);
   __pyx_t_4 = 0;
-  __pyx_t_4 = PyFloat_FromDouble(__pyx_v_self->_font_size); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 910, __pyx_L1_error)
+  __pyx_t_4 = PyFloat_FromDouble(__pyx_v_self->_font_size); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 919, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = __Pyx_PyObject_FormatSimple(__pyx_t_4, __pyx_empty_unicode); if (unlikely(!__pyx_t_5)) __PYX_ERR(1, 910, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_FormatSimple(__pyx_t_4, __pyx_empty_unicode); if (unlikely(!__pyx_t_5)) __PYX_ERR(1, 919, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_t_3 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_5) > __pyx_t_3) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_5) : __pyx_t_3;
@@ -12057,7 +12273,7 @@ static PyObject *__pyx_pf_7foolysh_5scene_4node_8TextNode_7hashkey___get__(struc
   __Pyx_GIVEREF(__pyx_t_5);
   PyTuple_SET_ITEM(__pyx_t_1, 2, __pyx_t_5);
   __pyx_t_5 = 0;
-  __pyx_t_5 = __Pyx_PyObject_FormatSimple(__pyx_v_self->_text_color, __pyx_empty_unicode); if (unlikely(!__pyx_t_5)) __PYX_ERR(1, 910, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_FormatSimple(__pyx_v_self->_text_color, __pyx_empty_unicode); if (unlikely(!__pyx_t_5)) __PYX_ERR(1, 919, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __pyx_t_3 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_5) > __pyx_t_3) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_5) : __pyx_t_3;
   __pyx_t_2 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_5);
@@ -12065,52 +12281,52 @@ static PyObject *__pyx_pf_7foolysh_5scene_4node_8TextNode_7hashkey___get__(struc
   PyTuple_SET_ITEM(__pyx_t_1, 3, __pyx_t_5);
   __pyx_t_5 = 0;
 
-  /* "foolysh/scene/node.pyx":911
+  /* "foolysh/scene/node.pyx":920
  *     def hashkey(self):
  *         return hash(f'{self._text}{self._font}{self._font_size}{self._text_color}'
  *                     f'{self._align}{self._spacing}{self._multiline}')             # <<<<<<<<<<<<<<
  * 
  *     @property
  */
-  __pyx_t_5 = __Pyx_PyUnicode_Unicode(__pyx_v_self->_align); if (unlikely(!__pyx_t_5)) __PYX_ERR(1, 911, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyUnicode_Unicode(__pyx_v_self->_align); if (unlikely(!__pyx_t_5)) __PYX_ERR(1, 920, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __pyx_t_3 = (__Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_5) > __pyx_t_3) ? __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_5) : __pyx_t_3;
   __pyx_t_2 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_5);
   __Pyx_GIVEREF(__pyx_t_5);
   PyTuple_SET_ITEM(__pyx_t_1, 4, __pyx_t_5);
   __pyx_t_5 = 0;
-  __pyx_t_5 = __Pyx_PyUnicode_From_int(__pyx_v_self->_spacing, 0, ' ', 'd'); if (unlikely(!__pyx_t_5)) __PYX_ERR(1, 911, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyUnicode_From_int(__pyx_v_self->_spacing, 0, ' ', 'd'); if (unlikely(!__pyx_t_5)) __PYX_ERR(1, 920, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __pyx_t_2 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_5);
   __Pyx_GIVEREF(__pyx_t_5);
   PyTuple_SET_ITEM(__pyx_t_1, 5, __pyx_t_5);
   __pyx_t_5 = 0;
-  __pyx_t_5 = __Pyx_PyUnicode_FromBInt_int(__pyx_v_self->_multiline); if (unlikely(!__pyx_t_5)) __PYX_ERR(1, 911, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyUnicode_FromBInt_int(__pyx_v_self->_multiline); if (unlikely(!__pyx_t_5)) __PYX_ERR(1, 920, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __pyx_t_2 += __Pyx_PyUnicode_GET_LENGTH(__pyx_t_5);
   __Pyx_GIVEREF(__pyx_t_5);
   PyTuple_SET_ITEM(__pyx_t_1, 6, __pyx_t_5);
   __pyx_t_5 = 0;
 
-  /* "foolysh/scene/node.pyx":910
+  /* "foolysh/scene/node.pyx":919
  *     @property
  *     def hashkey(self):
  *         return hash(f'{self._text}{self._font}{self._font_size}{self._text_color}'             # <<<<<<<<<<<<<<
  *                     f'{self._align}{self._spacing}{self._multiline}')
  * 
  */
-  __pyx_t_5 = __Pyx_PyUnicode_Join(__pyx_t_1, 7, __pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_5)) __PYX_ERR(1, 910, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyUnicode_Join(__pyx_t_1, 7, __pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_5)) __PYX_ERR(1, 919, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_6 = PyObject_Hash(__pyx_t_5); if (unlikely(__pyx_t_6 == ((Py_hash_t)-1))) __PYX_ERR(1, 910, __pyx_L1_error)
+  __pyx_t_6 = PyObject_Hash(__pyx_t_5); if (unlikely(__pyx_t_6 == ((Py_hash_t)-1))) __PYX_ERR(1, 919, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_t_5 = __Pyx_PyInt_FromHash_t(__pyx_t_6); if (unlikely(!__pyx_t_5)) __PYX_ERR(1, 910, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyInt_FromHash_t(__pyx_t_6); if (unlikely(!__pyx_t_5)) __PYX_ERR(1, 919, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __pyx_r = __pyx_t_5;
   __pyx_t_5 = 0;
   goto __pyx_L0;
 
-  /* "foolysh/scene/node.pyx":909
+  /* "foolysh/scene/node.pyx":918
  * 
  *     @property
  *     def hashkey(self):             # <<<<<<<<<<<<<<
@@ -12131,7 +12347,7 @@ static PyObject *__pyx_pf_7foolysh_5scene_4node_8TextNode_7hashkey___get__(struc
   return __pyx_r;
 }
 
-/* "foolysh/scene/node.pyx":914
+/* "foolysh/scene/node.pyx":923
  * 
  *     @property
  *     def text(self):             # <<<<<<<<<<<<<<
@@ -12157,7 +12373,7 @@ static PyObject *__pyx_pf_7foolysh_5scene_4node_8TextNode_4text___get__(struct _
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__get__", 0);
 
-  /* "foolysh/scene/node.pyx":917
+  /* "foolysh/scene/node.pyx":926
  *         # type: () -> str
  *         """The current text."""
  *         return self._text             # <<<<<<<<<<<<<<
@@ -12169,7 +12385,7 @@ static PyObject *__pyx_pf_7foolysh_5scene_4node_8TextNode_4text___get__(struct _
   __pyx_r = __pyx_v_self->_text;
   goto __pyx_L0;
 
-  /* "foolysh/scene/node.pyx":914
+  /* "foolysh/scene/node.pyx":923
  * 
  *     @property
  *     def text(self):             # <<<<<<<<<<<<<<
@@ -12184,7 +12400,7 @@ static PyObject *__pyx_pf_7foolysh_5scene_4node_8TextNode_4text___get__(struct _
   return __pyx_r;
 }
 
-/* "foolysh/scene/node.pyx":920
+/* "foolysh/scene/node.pyx":929
  * 
  *     @text.setter
  *     def text(self, value):             # <<<<<<<<<<<<<<
@@ -12216,7 +12432,7 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode_4text_2__set__(struct __pyx_
   int __pyx_t_6;
   __Pyx_RefNannySetupContext("__set__", 0);
 
-  /* "foolysh/scene/node.pyx":922
+  /* "foolysh/scene/node.pyx":931
  *     def text(self, value):
  *         # type: (str) -> None
  *         if not isinstance(value, str):             # <<<<<<<<<<<<<<
@@ -12227,7 +12443,7 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode_4text_2__set__(struct __pyx_
   __pyx_t_2 = ((!(__pyx_t_1 != 0)) != 0);
   if (unlikely(__pyx_t_2)) {
 
-    /* "foolysh/scene/node.pyx":923
+    /* "foolysh/scene/node.pyx":932
  *         # type: (str) -> None
  *         if not isinstance(value, str):
  *             raise TypeError             # <<<<<<<<<<<<<<
@@ -12235,9 +12451,9 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode_4text_2__set__(struct __pyx_
  *             self._text = value
  */
     __Pyx_Raise(__pyx_builtin_TypeError, 0, 0, 0);
-    __PYX_ERR(1, 923, __pyx_L1_error)
+    __PYX_ERR(1, 932, __pyx_L1_error)
 
-    /* "foolysh/scene/node.pyx":922
+    /* "foolysh/scene/node.pyx":931
  *     def text(self, value):
  *         # type: (str) -> None
  *         if not isinstance(value, str):             # <<<<<<<<<<<<<<
@@ -12246,24 +12462,24 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode_4text_2__set__(struct __pyx_
  */
   }
 
-  /* "foolysh/scene/node.pyx":924
+  /* "foolysh/scene/node.pyx":933
  *         if not isinstance(value, str):
  *             raise TypeError
  *         if self._text != value:             # <<<<<<<<<<<<<<
  *             self._text = value
  *             self.propagate_dirty()
  */
-  __pyx_t_2 = (__Pyx_PyUnicode_Equals(__pyx_v_self->_text, __pyx_v_value, Py_NE)); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(1, 924, __pyx_L1_error)
+  __pyx_t_2 = (__Pyx_PyUnicode_Equals(__pyx_v_self->_text, __pyx_v_value, Py_NE)); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(1, 933, __pyx_L1_error)
   if (__pyx_t_2) {
 
-    /* "foolysh/scene/node.pyx":925
+    /* "foolysh/scene/node.pyx":934
  *             raise TypeError
  *         if self._text != value:
  *             self._text = value             # <<<<<<<<<<<<<<
  *             self.propagate_dirty()
  *             if self.node_id not in _need_size:
  */
-    if (!(likely(PyUnicode_CheckExact(__pyx_v_value))||((__pyx_v_value) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "unicode", Py_TYPE(__pyx_v_value)->tp_name), 0))) __PYX_ERR(1, 925, __pyx_L1_error)
+    if (!(likely(PyUnicode_CheckExact(__pyx_v_value))||((__pyx_v_value) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "unicode", Py_TYPE(__pyx_v_value)->tp_name), 0))) __PYX_ERR(1, 934, __pyx_L1_error)
     __pyx_t_3 = __pyx_v_value;
     __Pyx_INCREF(__pyx_t_3);
     __Pyx_GIVEREF(__pyx_t_3);
@@ -12272,14 +12488,14 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode_4text_2__set__(struct __pyx_
     __pyx_v_self->_text = ((PyObject*)__pyx_t_3);
     __pyx_t_3 = 0;
 
-    /* "foolysh/scene/node.pyx":926
+    /* "foolysh/scene/node.pyx":935
  *         if self._text != value:
  *             self._text = value
  *             self.propagate_dirty()             # <<<<<<<<<<<<<<
  *             if self.node_id not in _need_size:
  *                 _need_size.append(self.node_id)
  */
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_propagate_dirty); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 926, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_propagate_dirty); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 935, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __pyx_t_5 = NULL;
     if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_4))) {
@@ -12293,26 +12509,26 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode_4text_2__set__(struct __pyx_
     }
     __pyx_t_3 = (__pyx_t_5) ? __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_5) : __Pyx_PyObject_CallNoArg(__pyx_t_4);
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 926, __pyx_L1_error)
+    if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 935, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-    /* "foolysh/scene/node.pyx":927
+    /* "foolysh/scene/node.pyx":936
  *             self._text = value
  *             self.propagate_dirty()
  *             if self.node_id not in _need_size:             # <<<<<<<<<<<<<<
  *                 _need_size.append(self.node_id)
  * 
  */
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_node_id); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 927, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_node_id); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 936, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_2 = (__Pyx_PySequence_ContainsTF(__pyx_t_3, __pyx_v_7foolysh_5scene_4node__need_size, Py_NE)); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(1, 927, __pyx_L1_error)
+    __pyx_t_2 = (__Pyx_PySequence_ContainsTF(__pyx_t_3, __pyx_v_7foolysh_5scene_4node__need_size, Py_NE)); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(1, 936, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_t_1 = (__pyx_t_2 != 0);
     if (__pyx_t_1) {
 
-      /* "foolysh/scene/node.pyx":928
+      /* "foolysh/scene/node.pyx":937
  *             self.propagate_dirty()
  *             if self.node_id not in _need_size:
  *                 _need_size.append(self.node_id)             # <<<<<<<<<<<<<<
@@ -12321,14 +12537,14 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode_4text_2__set__(struct __pyx_
  */
       if (unlikely(__pyx_v_7foolysh_5scene_4node__need_size == Py_None)) {
         PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "append");
-        __PYX_ERR(1, 928, __pyx_L1_error)
+        __PYX_ERR(1, 937, __pyx_L1_error)
       }
-      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_node_id); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 928, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_node_id); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 937, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_6 = __Pyx_PyList_Append(__pyx_v_7foolysh_5scene_4node__need_size, __pyx_t_3); if (unlikely(__pyx_t_6 == ((int)-1))) __PYX_ERR(1, 928, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_PyList_Append(__pyx_v_7foolysh_5scene_4node__need_size, __pyx_t_3); if (unlikely(__pyx_t_6 == ((int)-1))) __PYX_ERR(1, 937, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-      /* "foolysh/scene/node.pyx":927
+      /* "foolysh/scene/node.pyx":936
  *             self._text = value
  *             self.propagate_dirty()
  *             if self.node_id not in _need_size:             # <<<<<<<<<<<<<<
@@ -12337,7 +12553,7 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode_4text_2__set__(struct __pyx_
  */
     }
 
-    /* "foolysh/scene/node.pyx":924
+    /* "foolysh/scene/node.pyx":933
  *         if not isinstance(value, str):
  *             raise TypeError
  *         if self._text != value:             # <<<<<<<<<<<<<<
@@ -12346,7 +12562,7 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode_4text_2__set__(struct __pyx_
  */
   }
 
-  /* "foolysh/scene/node.pyx":920
+  /* "foolysh/scene/node.pyx":929
  * 
  *     @text.setter
  *     def text(self, value):             # <<<<<<<<<<<<<<
@@ -12368,7 +12584,7 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode_4text_2__set__(struct __pyx_
   return __pyx_r;
 }
 
-/* "foolysh/scene/node.pyx":931
+/* "foolysh/scene/node.pyx":940
  * 
  *     @property
  *     def font(self):             # <<<<<<<<<<<<<<
@@ -12397,31 +12613,31 @@ static PyObject *__pyx_pf_7foolysh_5scene_4node_8TextNode_4font___get__(struct _
   PyObject *__pyx_t_3 = NULL;
   __Pyx_RefNannySetupContext("__get__", 0);
 
-  /* "foolysh/scene/node.pyx":934
+  /* "foolysh/scene/node.pyx":943
  *         # type: () -> str
  *         """The current asset path to the font."""
  *         if self._font == '':             # <<<<<<<<<<<<<<
  *             raise RuntimeError('No font set yet.')
  *         return self._font
  */
-  __pyx_t_1 = (__Pyx_PyUnicode_Equals(__pyx_v_self->_font, __pyx_kp_u__3, Py_EQ)); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(1, 934, __pyx_L1_error)
+  __pyx_t_1 = (__Pyx_PyUnicode_Equals(__pyx_v_self->_font, __pyx_kp_u__3, Py_EQ)); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(1, 943, __pyx_L1_error)
   __pyx_t_2 = (__pyx_t_1 != 0);
   if (unlikely(__pyx_t_2)) {
 
-    /* "foolysh/scene/node.pyx":935
+    /* "foolysh/scene/node.pyx":944
  *         """The current asset path to the font."""
  *         if self._font == '':
  *             raise RuntimeError('No font set yet.')             # <<<<<<<<<<<<<<
  *         return self._font
  * 
  */
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_RuntimeError, __pyx_tuple__16, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 935, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_RuntimeError, __pyx_tuple__16, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 944, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_Raise(__pyx_t_3, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __PYX_ERR(1, 935, __pyx_L1_error)
+    __PYX_ERR(1, 944, __pyx_L1_error)
 
-    /* "foolysh/scene/node.pyx":934
+    /* "foolysh/scene/node.pyx":943
  *         # type: () -> str
  *         """The current asset path to the font."""
  *         if self._font == '':             # <<<<<<<<<<<<<<
@@ -12430,7 +12646,7 @@ static PyObject *__pyx_pf_7foolysh_5scene_4node_8TextNode_4font___get__(struct _
  */
   }
 
-  /* "foolysh/scene/node.pyx":936
+  /* "foolysh/scene/node.pyx":945
  *         if self._font == '':
  *             raise RuntimeError('No font set yet.')
  *         return self._font             # <<<<<<<<<<<<<<
@@ -12442,7 +12658,7 @@ static PyObject *__pyx_pf_7foolysh_5scene_4node_8TextNode_4font___get__(struct _
   __pyx_r = __pyx_v_self->_font;
   goto __pyx_L0;
 
-  /* "foolysh/scene/node.pyx":931
+  /* "foolysh/scene/node.pyx":940
  * 
  *     @property
  *     def font(self):             # <<<<<<<<<<<<<<
@@ -12461,7 +12677,7 @@ static PyObject *__pyx_pf_7foolysh_5scene_4node_8TextNode_4font___get__(struct _
   return __pyx_r;
 }
 
-/* "foolysh/scene/node.pyx":939
+/* "foolysh/scene/node.pyx":948
  * 
  *     @font.setter
  *     def font(self, value):             # <<<<<<<<<<<<<<
@@ -12490,7 +12706,7 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode_4font_2__set__(struct __pyx_
   PyObject *__pyx_t_3 = NULL;
   __Pyx_RefNannySetupContext("__set__", 0);
 
-  /* "foolysh/scene/node.pyx":941
+  /* "foolysh/scene/node.pyx":950
  *     def font(self, value):
  *         # type: (str) -> None
  *         if not isinstance(value, str):             # <<<<<<<<<<<<<<
@@ -12501,7 +12717,7 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode_4font_2__set__(struct __pyx_
   __pyx_t_2 = ((!(__pyx_t_1 != 0)) != 0);
   if (unlikely(__pyx_t_2)) {
 
-    /* "foolysh/scene/node.pyx":942
+    /* "foolysh/scene/node.pyx":951
  *         # type: (str) -> None
  *         if not isinstance(value, str):
  *             raise TypeError             # <<<<<<<<<<<<<<
@@ -12509,9 +12725,9 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode_4font_2__set__(struct __pyx_
  * 
  */
     __Pyx_Raise(__pyx_builtin_TypeError, 0, 0, 0);
-    __PYX_ERR(1, 942, __pyx_L1_error)
+    __PYX_ERR(1, 951, __pyx_L1_error)
 
-    /* "foolysh/scene/node.pyx":941
+    /* "foolysh/scene/node.pyx":950
  *     def font(self, value):
  *         # type: (str) -> None
  *         if not isinstance(value, str):             # <<<<<<<<<<<<<<
@@ -12520,14 +12736,14 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode_4font_2__set__(struct __pyx_
  */
   }
 
-  /* "foolysh/scene/node.pyx":943
+  /* "foolysh/scene/node.pyx":952
  *         if not isinstance(value, str):
  *             raise TypeError
  *         self._font = value             # <<<<<<<<<<<<<<
  * 
  *     @property
  */
-  if (!(likely(PyUnicode_CheckExact(__pyx_v_value))||((__pyx_v_value) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "unicode", Py_TYPE(__pyx_v_value)->tp_name), 0))) __PYX_ERR(1, 943, __pyx_L1_error)
+  if (!(likely(PyUnicode_CheckExact(__pyx_v_value))||((__pyx_v_value) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "unicode", Py_TYPE(__pyx_v_value)->tp_name), 0))) __PYX_ERR(1, 952, __pyx_L1_error)
   __pyx_t_3 = __pyx_v_value;
   __Pyx_INCREF(__pyx_t_3);
   __Pyx_GIVEREF(__pyx_t_3);
@@ -12536,7 +12752,7 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode_4font_2__set__(struct __pyx_
   __pyx_v_self->_font = ((PyObject*)__pyx_t_3);
   __pyx_t_3 = 0;
 
-  /* "foolysh/scene/node.pyx":939
+  /* "foolysh/scene/node.pyx":948
  * 
  *     @font.setter
  *     def font(self, value):             # <<<<<<<<<<<<<<
@@ -12556,7 +12772,7 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode_4font_2__set__(struct __pyx_
   return __pyx_r;
 }
 
-/* "foolysh/scene/node.pyx":946
+/* "foolysh/scene/node.pyx":955
  * 
  *     @property
  *     def font_size(self):             # <<<<<<<<<<<<<<
@@ -12583,7 +12799,7 @@ static PyObject *__pyx_pf_7foolysh_5scene_4node_8TextNode_9font_size___get__(str
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("__get__", 0);
 
-  /* "foolysh/scene/node.pyx":949
+  /* "foolysh/scene/node.pyx":958
  *         # type: () -> float
  *         """The font size."""
  *         return self._font_size             # <<<<<<<<<<<<<<
@@ -12591,13 +12807,13 @@ static PyObject *__pyx_pf_7foolysh_5scene_4node_8TextNode_9font_size___get__(str
  *     @font_size.setter
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->_font_size); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 949, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->_font_size); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 958, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "foolysh/scene/node.pyx":946
+  /* "foolysh/scene/node.pyx":955
  * 
  *     @property
  *     def font_size(self):             # <<<<<<<<<<<<<<
@@ -12616,7 +12832,7 @@ static PyObject *__pyx_pf_7foolysh_5scene_4node_8TextNode_9font_size___get__(str
   return __pyx_r;
 }
 
-/* "foolysh/scene/node.pyx":952
+/* "foolysh/scene/node.pyx":961
  * 
  *     @font_size.setter
  *     def font_size(self, value):             # <<<<<<<<<<<<<<
@@ -12647,7 +12863,7 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode_9font_size_2__set__(struct _
   double __pyx_t_5;
   __Pyx_RefNannySetupContext("__set__", 0);
 
-  /* "foolysh/scene/node.pyx":954
+  /* "foolysh/scene/node.pyx":963
  *     def font_size(self, value):
  *         # type: (float) -> None
  *         if not isinstance(value, (float, int)):             # <<<<<<<<<<<<<<
@@ -12668,7 +12884,7 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode_9font_size_2__set__(struct _
   __pyx_t_2 = ((!(__pyx_t_1 != 0)) != 0);
   if (unlikely(__pyx_t_2)) {
 
-    /* "foolysh/scene/node.pyx":955
+    /* "foolysh/scene/node.pyx":964
  *         # type: (float) -> None
  *         if not isinstance(value, (float, int)):
  *             raise TypeError             # <<<<<<<<<<<<<<
@@ -12676,9 +12892,9 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode_9font_size_2__set__(struct _
  *             raise ValueError('Expected positive, non zero float.')
  */
     __Pyx_Raise(__pyx_builtin_TypeError, 0, 0, 0);
-    __PYX_ERR(1, 955, __pyx_L1_error)
+    __PYX_ERR(1, 964, __pyx_L1_error)
 
-    /* "foolysh/scene/node.pyx":954
+    /* "foolysh/scene/node.pyx":963
  *     def font_size(self, value):
  *         # type: (float) -> None
  *         if not isinstance(value, (float, int)):             # <<<<<<<<<<<<<<
@@ -12687,32 +12903,32 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode_9font_size_2__set__(struct _
  */
   }
 
-  /* "foolysh/scene/node.pyx":956
+  /* "foolysh/scene/node.pyx":965
  *         if not isinstance(value, (float, int)):
  *             raise TypeError
  *         if value <= 0.0:             # <<<<<<<<<<<<<<
  *             raise ValueError('Expected positive, non zero float.')
  *         self._font_size = float(value)
  */
-  __pyx_t_4 = PyObject_RichCompare(__pyx_v_value, __pyx_float_0_0, Py_LE); __Pyx_XGOTREF(__pyx_t_4); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 956, __pyx_L1_error)
-  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(1, 956, __pyx_L1_error)
+  __pyx_t_4 = PyObject_RichCompare(__pyx_v_value, __pyx_float_0_0, Py_LE); __Pyx_XGOTREF(__pyx_t_4); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 965, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(1, 965, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   if (unlikely(__pyx_t_2)) {
 
-    /* "foolysh/scene/node.pyx":957
+    /* "foolysh/scene/node.pyx":966
  *             raise TypeError
  *         if value <= 0.0:
  *             raise ValueError('Expected positive, non zero float.')             # <<<<<<<<<<<<<<
  *         self._font_size = float(value)
  * 
  */
-    __pyx_t_4 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__17, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 957, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__17, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 966, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_Raise(__pyx_t_4, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __PYX_ERR(1, 957, __pyx_L1_error)
+    __PYX_ERR(1, 966, __pyx_L1_error)
 
-    /* "foolysh/scene/node.pyx":956
+    /* "foolysh/scene/node.pyx":965
  *         if not isinstance(value, (float, int)):
  *             raise TypeError
  *         if value <= 0.0:             # <<<<<<<<<<<<<<
@@ -12721,17 +12937,17 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode_9font_size_2__set__(struct _
  */
   }
 
-  /* "foolysh/scene/node.pyx":958
+  /* "foolysh/scene/node.pyx":967
  *         if value <= 0.0:
  *             raise ValueError('Expected positive, non zero float.')
  *         self._font_size = float(value)             # <<<<<<<<<<<<<<
  * 
  *     @property
  */
-  __pyx_t_5 = __Pyx_PyObject_AsDouble(__pyx_v_value); if (unlikely(__pyx_t_5 == ((double)((double)-1)) && PyErr_Occurred())) __PYX_ERR(1, 958, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_AsDouble(__pyx_v_value); if (unlikely(__pyx_t_5 == ((double)((double)-1)) && PyErr_Occurred())) __PYX_ERR(1, 967, __pyx_L1_error)
   __pyx_v_self->_font_size = __pyx_t_5;
 
-  /* "foolysh/scene/node.pyx":952
+  /* "foolysh/scene/node.pyx":961
  * 
  *     @font_size.setter
  *     def font_size(self, value):             # <<<<<<<<<<<<<<
@@ -12751,7 +12967,7 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode_9font_size_2__set__(struct _
   return __pyx_r;
 }
 
-/* "foolysh/scene/node.pyx":961
+/* "foolysh/scene/node.pyx":970
  * 
  *     @property
  *     def text_color(self):             # <<<<<<<<<<<<<<
@@ -12777,7 +12993,7 @@ static PyObject *__pyx_pf_7foolysh_5scene_4node_8TextNode_10text_color___get__(s
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__get__", 0);
 
-  /* "foolysh/scene/node.pyx":972
+  /* "foolysh/scene/node.pyx":981
  *                 defaults to 255, if RGB only is provided.
  *         """
  *         return self._text_color             # <<<<<<<<<<<<<<
@@ -12789,7 +13005,7 @@ static PyObject *__pyx_pf_7foolysh_5scene_4node_8TextNode_10text_color___get__(s
   __pyx_r = __pyx_v_self->_text_color;
   goto __pyx_L0;
 
-  /* "foolysh/scene/node.pyx":961
+  /* "foolysh/scene/node.pyx":970
  * 
  *     @property
  *     def text_color(self):             # <<<<<<<<<<<<<<
@@ -12804,7 +13020,7 @@ static PyObject *__pyx_pf_7foolysh_5scene_4node_8TextNode_10text_color___get__(s
   return __pyx_r;
 }
 
-/* "foolysh/scene/node.pyx":975
+/* "foolysh/scene/node.pyx":984
  * 
  *     @text_color.setter
  *     def text_color(self, value):             # <<<<<<<<<<<<<<
@@ -12839,7 +13055,7 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode_10text_color_2__set__(struct
   __Pyx_RefNannySetupContext("__set__", 0);
   __Pyx_INCREF(__pyx_v_value);
 
-  /* "foolysh/scene/node.pyx":977
+  /* "foolysh/scene/node.pyx":986
  *     def text_color(self, value):
  *         # type: (Union[int, Tuple[int, ...]]) -> None
  *         if isinstance(value, int):             # <<<<<<<<<<<<<<
@@ -12850,14 +13066,14 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode_10text_color_2__set__(struct
   __pyx_t_2 = (__pyx_t_1 != 0);
   if (__pyx_t_2) {
 
-    /* "foolysh/scene/node.pyx":978
+    /* "foolysh/scene/node.pyx":987
  *         # type: (Union[int, Tuple[int, ...]]) -> None
  *         if isinstance(value, int):
  *             value = (value, ) * 3 + (255, )             # <<<<<<<<<<<<<<
  *         elif isinstance(value, tuple):
  *             components = len(value)
  */
-    __pyx_t_3 = PyTuple_New(1 * 3); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 978, __pyx_L1_error)
+    __pyx_t_3 = PyTuple_New(1 * 3); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 987, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     { Py_ssize_t __pyx_temp;
       for (__pyx_temp=0; __pyx_temp < 3; __pyx_temp++) {
@@ -12866,13 +13082,13 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode_10text_color_2__set__(struct
         PyTuple_SET_ITEM(__pyx_t_3, __pyx_temp, __pyx_v_value);
       }
     }
-    __pyx_t_4 = PyNumber_Add(__pyx_t_3, __pyx_tuple__18); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 978, __pyx_L1_error)
+    __pyx_t_4 = PyNumber_Add(__pyx_t_3, __pyx_tuple__18); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 987, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF_SET(__pyx_v_value, __pyx_t_4);
     __pyx_t_4 = 0;
 
-    /* "foolysh/scene/node.pyx":977
+    /* "foolysh/scene/node.pyx":986
  *     def text_color(self, value):
  *         # type: (Union[int, Tuple[int, ...]]) -> None
  *         if isinstance(value, int):             # <<<<<<<<<<<<<<
@@ -12882,7 +13098,7 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode_10text_color_2__set__(struct
     goto __pyx_L3;
   }
 
-  /* "foolysh/scene/node.pyx":979
+  /* "foolysh/scene/node.pyx":988
  *         if isinstance(value, int):
  *             value = (value, ) * 3 + (255, )
  *         elif isinstance(value, tuple):             # <<<<<<<<<<<<<<
@@ -12893,17 +13109,17 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode_10text_color_2__set__(struct
   __pyx_t_1 = (__pyx_t_2 != 0);
   if (likely(__pyx_t_1)) {
 
-    /* "foolysh/scene/node.pyx":980
+    /* "foolysh/scene/node.pyx":989
  *             value = (value, ) * 3 + (255, )
  *         elif isinstance(value, tuple):
  *             components = len(value)             # <<<<<<<<<<<<<<
  *             if components == 3:
  *                 value = value + (255, )
  */
-    __pyx_t_5 = PyObject_Length(__pyx_v_value); if (unlikely(__pyx_t_5 == ((Py_ssize_t)-1))) __PYX_ERR(1, 980, __pyx_L1_error)
+    __pyx_t_5 = PyObject_Length(__pyx_v_value); if (unlikely(__pyx_t_5 == ((Py_ssize_t)-1))) __PYX_ERR(1, 989, __pyx_L1_error)
     __pyx_v_components = __pyx_t_5;
 
-    /* "foolysh/scene/node.pyx":981
+    /* "foolysh/scene/node.pyx":990
  *         elif isinstance(value, tuple):
  *             components = len(value)
  *             if components == 3:             # <<<<<<<<<<<<<<
@@ -12913,19 +13129,19 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode_10text_color_2__set__(struct
     __pyx_t_1 = ((__pyx_v_components == 3) != 0);
     if (__pyx_t_1) {
 
-      /* "foolysh/scene/node.pyx":982
+      /* "foolysh/scene/node.pyx":991
  *             components = len(value)
  *             if components == 3:
  *                 value = value + (255, )             # <<<<<<<<<<<<<<
  *             elif components != 4:
  *                 raise ValueError('Expected tuple of length 3 or 4.')
  */
-      __pyx_t_4 = PyNumber_Add(__pyx_v_value, __pyx_tuple__18); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 982, __pyx_L1_error)
+      __pyx_t_4 = PyNumber_Add(__pyx_v_value, __pyx_tuple__18); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 991, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF_SET(__pyx_v_value, __pyx_t_4);
       __pyx_t_4 = 0;
 
-      /* "foolysh/scene/node.pyx":981
+      /* "foolysh/scene/node.pyx":990
  *         elif isinstance(value, tuple):
  *             components = len(value)
  *             if components == 3:             # <<<<<<<<<<<<<<
@@ -12935,7 +13151,7 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode_10text_color_2__set__(struct
       goto __pyx_L4;
     }
 
-    /* "foolysh/scene/node.pyx":983
+    /* "foolysh/scene/node.pyx":992
  *             if components == 3:
  *                 value = value + (255, )
  *             elif components != 4:             # <<<<<<<<<<<<<<
@@ -12945,20 +13161,20 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode_10text_color_2__set__(struct
     __pyx_t_1 = ((__pyx_v_components != 4) != 0);
     if (unlikely(__pyx_t_1)) {
 
-      /* "foolysh/scene/node.pyx":984
+      /* "foolysh/scene/node.pyx":993
  *                 value = value + (255, )
  *             elif components != 4:
  *                 raise ValueError('Expected tuple of length 3 or 4.')             # <<<<<<<<<<<<<<
  *             for c in value:
  *                 if not isinstance(c, int):
  */
-      __pyx_t_4 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__19, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 984, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__19, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 993, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_Raise(__pyx_t_4, 0, 0, 0);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      __PYX_ERR(1, 984, __pyx_L1_error)
+      __PYX_ERR(1, 993, __pyx_L1_error)
 
-      /* "foolysh/scene/node.pyx":983
+      /* "foolysh/scene/node.pyx":992
  *             if components == 3:
  *                 value = value + (255, )
  *             elif components != 4:             # <<<<<<<<<<<<<<
@@ -12968,7 +13184,7 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode_10text_color_2__set__(struct
     }
     __pyx_L4:;
 
-    /* "foolysh/scene/node.pyx":985
+    /* "foolysh/scene/node.pyx":994
  *             elif components != 4:
  *                 raise ValueError('Expected tuple of length 3 or 4.')
  *             for c in value:             # <<<<<<<<<<<<<<
@@ -12979,26 +13195,26 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode_10text_color_2__set__(struct
       __pyx_t_4 = __pyx_v_value; __Pyx_INCREF(__pyx_t_4); __pyx_t_5 = 0;
       __pyx_t_6 = NULL;
     } else {
-      __pyx_t_5 = -1; __pyx_t_4 = PyObject_GetIter(__pyx_v_value); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 985, __pyx_L1_error)
+      __pyx_t_5 = -1; __pyx_t_4 = PyObject_GetIter(__pyx_v_value); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 994, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
-      __pyx_t_6 = Py_TYPE(__pyx_t_4)->tp_iternext; if (unlikely(!__pyx_t_6)) __PYX_ERR(1, 985, __pyx_L1_error)
+      __pyx_t_6 = Py_TYPE(__pyx_t_4)->tp_iternext; if (unlikely(!__pyx_t_6)) __PYX_ERR(1, 994, __pyx_L1_error)
     }
     for (;;) {
       if (likely(!__pyx_t_6)) {
         if (likely(PyList_CheckExact(__pyx_t_4))) {
           if (__pyx_t_5 >= PyList_GET_SIZE(__pyx_t_4)) break;
           #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-          __pyx_t_3 = PyList_GET_ITEM(__pyx_t_4, __pyx_t_5); __Pyx_INCREF(__pyx_t_3); __pyx_t_5++; if (unlikely(0 < 0)) __PYX_ERR(1, 985, __pyx_L1_error)
+          __pyx_t_3 = PyList_GET_ITEM(__pyx_t_4, __pyx_t_5); __Pyx_INCREF(__pyx_t_3); __pyx_t_5++; if (unlikely(0 < 0)) __PYX_ERR(1, 994, __pyx_L1_error)
           #else
-          __pyx_t_3 = PySequence_ITEM(__pyx_t_4, __pyx_t_5); __pyx_t_5++; if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 985, __pyx_L1_error)
+          __pyx_t_3 = PySequence_ITEM(__pyx_t_4, __pyx_t_5); __pyx_t_5++; if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 994, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_3);
           #endif
         } else {
           if (__pyx_t_5 >= PyTuple_GET_SIZE(__pyx_t_4)) break;
           #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-          __pyx_t_3 = PyTuple_GET_ITEM(__pyx_t_4, __pyx_t_5); __Pyx_INCREF(__pyx_t_3); __pyx_t_5++; if (unlikely(0 < 0)) __PYX_ERR(1, 985, __pyx_L1_error)
+          __pyx_t_3 = PyTuple_GET_ITEM(__pyx_t_4, __pyx_t_5); __Pyx_INCREF(__pyx_t_3); __pyx_t_5++; if (unlikely(0 < 0)) __PYX_ERR(1, 994, __pyx_L1_error)
           #else
-          __pyx_t_3 = PySequence_ITEM(__pyx_t_4, __pyx_t_5); __pyx_t_5++; if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 985, __pyx_L1_error)
+          __pyx_t_3 = PySequence_ITEM(__pyx_t_4, __pyx_t_5); __pyx_t_5++; if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 994, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_3);
           #endif
         }
@@ -13008,7 +13224,7 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode_10text_color_2__set__(struct
           PyObject* exc_type = PyErr_Occurred();
           if (exc_type) {
             if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-            else __PYX_ERR(1, 985, __pyx_L1_error)
+            else __PYX_ERR(1, 994, __pyx_L1_error)
           }
           break;
         }
@@ -13017,7 +13233,7 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode_10text_color_2__set__(struct
       __Pyx_XDECREF_SET(__pyx_v_c, __pyx_t_3);
       __pyx_t_3 = 0;
 
-      /* "foolysh/scene/node.pyx":986
+      /* "foolysh/scene/node.pyx":995
  *                 raise ValueError('Expected tuple of length 3 or 4.')
  *             for c in value:
  *                 if not isinstance(c, int):             # <<<<<<<<<<<<<<
@@ -13028,7 +13244,7 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode_10text_color_2__set__(struct
       __pyx_t_2 = ((!(__pyx_t_1 != 0)) != 0);
       if (unlikely(__pyx_t_2)) {
 
-        /* "foolysh/scene/node.pyx":987
+        /* "foolysh/scene/node.pyx":996
  *             for c in value:
  *                 if not isinstance(c, int):
  *                     raise TypeError             # <<<<<<<<<<<<<<
@@ -13036,9 +13252,9 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode_10text_color_2__set__(struct
  *                     raise ValueError('Expected value in range (0..255).')
  */
         __Pyx_Raise(__pyx_builtin_TypeError, 0, 0, 0);
-        __PYX_ERR(1, 987, __pyx_L1_error)
+        __PYX_ERR(1, 996, __pyx_L1_error)
 
-        /* "foolysh/scene/node.pyx":986
+        /* "foolysh/scene/node.pyx":995
  *                 raise ValueError('Expected tuple of length 3 or 4.')
  *             for c in value:
  *                 if not isinstance(c, int):             # <<<<<<<<<<<<<<
@@ -13047,37 +13263,37 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode_10text_color_2__set__(struct
  */
       }
 
-      /* "foolysh/scene/node.pyx":988
+      /* "foolysh/scene/node.pyx":997
  *                 if not isinstance(c, int):
  *                     raise TypeError
  *                 if not 0 <= c <= 255:             # <<<<<<<<<<<<<<
  *                     raise ValueError('Expected value in range (0..255).')
  *         else:
  */
-      __pyx_t_3 = PyObject_RichCompare(__pyx_int_0, __pyx_v_c, Py_LE); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 988, __pyx_L1_error)
+      __pyx_t_3 = PyObject_RichCompare(__pyx_int_0, __pyx_v_c, Py_LE); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 997, __pyx_L1_error)
       if (__Pyx_PyObject_IsTrue(__pyx_t_3)) {
         __Pyx_DECREF(__pyx_t_3);
-        __pyx_t_3 = PyObject_RichCompare(__pyx_v_c, __pyx_int_255, Py_LE); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 988, __pyx_L1_error)
+        __pyx_t_3 = PyObject_RichCompare(__pyx_v_c, __pyx_int_255, Py_LE); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 997, __pyx_L1_error)
       }
-      __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(1, 988, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(1, 997, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __pyx_t_1 = ((!__pyx_t_2) != 0);
       if (unlikely(__pyx_t_1)) {
 
-        /* "foolysh/scene/node.pyx":989
+        /* "foolysh/scene/node.pyx":998
  *                     raise TypeError
  *                 if not 0 <= c <= 255:
  *                     raise ValueError('Expected value in range (0..255).')             # <<<<<<<<<<<<<<
  *         else:
  *             raise TypeError
  */
-        __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__20, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 989, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__20, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 998, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_Raise(__pyx_t_3, 0, 0, 0);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        __PYX_ERR(1, 989, __pyx_L1_error)
+        __PYX_ERR(1, 998, __pyx_L1_error)
 
-        /* "foolysh/scene/node.pyx":988
+        /* "foolysh/scene/node.pyx":997
  *                 if not isinstance(c, int):
  *                     raise TypeError
  *                 if not 0 <= c <= 255:             # <<<<<<<<<<<<<<
@@ -13086,7 +13302,7 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode_10text_color_2__set__(struct
  */
       }
 
-      /* "foolysh/scene/node.pyx":985
+      /* "foolysh/scene/node.pyx":994
  *             elif components != 4:
  *                 raise ValueError('Expected tuple of length 3 or 4.')
  *             for c in value:             # <<<<<<<<<<<<<<
@@ -13096,7 +13312,7 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode_10text_color_2__set__(struct
     }
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-    /* "foolysh/scene/node.pyx":979
+    /* "foolysh/scene/node.pyx":988
  *         if isinstance(value, int):
  *             value = (value, ) * 3 + (255, )
  *         elif isinstance(value, tuple):             # <<<<<<<<<<<<<<
@@ -13106,7 +13322,7 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode_10text_color_2__set__(struct
     goto __pyx_L3;
   }
 
-  /* "foolysh/scene/node.pyx":991
+  /* "foolysh/scene/node.pyx":1000
  *                     raise ValueError('Expected value in range (0..255).')
  *         else:
  *             raise TypeError             # <<<<<<<<<<<<<<
@@ -13115,18 +13331,18 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode_10text_color_2__set__(struct
  */
   /*else*/ {
     __Pyx_Raise(__pyx_builtin_TypeError, 0, 0, 0);
-    __PYX_ERR(1, 991, __pyx_L1_error)
+    __PYX_ERR(1, 1000, __pyx_L1_error)
   }
   __pyx_L3:;
 
-  /* "foolysh/scene/node.pyx":992
+  /* "foolysh/scene/node.pyx":1001
  *         else:
  *             raise TypeError
  *         self._text_color = value             # <<<<<<<<<<<<<<
  * 
  *     @property
  */
-  if (!(likely(PyTuple_CheckExact(__pyx_v_value))||((__pyx_v_value) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "tuple", Py_TYPE(__pyx_v_value)->tp_name), 0))) __PYX_ERR(1, 992, __pyx_L1_error)
+  if (!(likely(PyTuple_CheckExact(__pyx_v_value))||((__pyx_v_value) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "tuple", Py_TYPE(__pyx_v_value)->tp_name), 0))) __PYX_ERR(1, 1001, __pyx_L1_error)
   __pyx_t_4 = __pyx_v_value;
   __Pyx_INCREF(__pyx_t_4);
   __Pyx_GIVEREF(__pyx_t_4);
@@ -13135,7 +13351,7 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode_10text_color_2__set__(struct
   __pyx_v_self->_text_color = ((PyObject*)__pyx_t_4);
   __pyx_t_4 = 0;
 
-  /* "foolysh/scene/node.pyx":975
+  /* "foolysh/scene/node.pyx":984
  * 
  *     @text_color.setter
  *     def text_color(self, value):             # <<<<<<<<<<<<<<
@@ -13158,7 +13374,7 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode_10text_color_2__set__(struct
   return __pyx_r;
 }
 
-/* "foolysh/scene/node.pyx":995
+/* "foolysh/scene/node.pyx":1004
  * 
  *     @property
  *     def align(self):             # <<<<<<<<<<<<<<
@@ -13184,7 +13400,7 @@ static PyObject *__pyx_pf_7foolysh_5scene_4node_8TextNode_5align___get__(struct 
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__get__", 0);
 
-  /* "foolysh/scene/node.pyx":998
+  /* "foolysh/scene/node.pyx":1007
  *         # type: () -> str
  *         """If `multiline`, align the text 'left', 'center', 'right'."""
  *         return self._align             # <<<<<<<<<<<<<<
@@ -13196,7 +13412,7 @@ static PyObject *__pyx_pf_7foolysh_5scene_4node_8TextNode_5align___get__(struct 
   __pyx_r = __pyx_v_self->_align;
   goto __pyx_L0;
 
-  /* "foolysh/scene/node.pyx":995
+  /* "foolysh/scene/node.pyx":1004
  * 
  *     @property
  *     def align(self):             # <<<<<<<<<<<<<<
@@ -13211,7 +13427,7 @@ static PyObject *__pyx_pf_7foolysh_5scene_4node_8TextNode_5align___get__(struct 
   return __pyx_r;
 }
 
-/* "foolysh/scene/node.pyx":1001
+/* "foolysh/scene/node.pyx":1010
  * 
  *     @align.setter
  *     def align(self, value):             # <<<<<<<<<<<<<<
@@ -13240,7 +13456,7 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode_5align_2__set__(struct __pyx
   PyObject *__pyx_t_3 = NULL;
   __Pyx_RefNannySetupContext("__set__", 0);
 
-  /* "foolysh/scene/node.pyx":1003
+  /* "foolysh/scene/node.pyx":1012
  *     def align(self, value):
  *         # type: (str) -> None
  *         if not isinstance(value, str):             # <<<<<<<<<<<<<<
@@ -13251,7 +13467,7 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode_5align_2__set__(struct __pyx
   __pyx_t_2 = ((!(__pyx_t_1 != 0)) != 0);
   if (unlikely(__pyx_t_2)) {
 
-    /* "foolysh/scene/node.pyx":1004
+    /* "foolysh/scene/node.pyx":1013
  *         # type: (str) -> None
  *         if not isinstance(value, str):
  *             raise TypeError             # <<<<<<<<<<<<<<
@@ -13259,9 +13475,9 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode_5align_2__set__(struct __pyx
  *             raise ValueError('Expected one of "left", "center", "right".')
  */
     __Pyx_Raise(__pyx_builtin_TypeError, 0, 0, 0);
-    __PYX_ERR(1, 1004, __pyx_L1_error)
+    __PYX_ERR(1, 1013, __pyx_L1_error)
 
-    /* "foolysh/scene/node.pyx":1003
+    /* "foolysh/scene/node.pyx":1012
  *     def align(self, value):
  *         # type: (str) -> None
  *         if not isinstance(value, str):             # <<<<<<<<<<<<<<
@@ -13270,7 +13486,7 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode_5align_2__set__(struct __pyx
  */
   }
 
-  /* "foolysh/scene/node.pyx":1005
+  /* "foolysh/scene/node.pyx":1014
  *         if not isinstance(value, str):
  *             raise TypeError
  *         if value not in ('left', 'center', 'right'):             # <<<<<<<<<<<<<<
@@ -13279,39 +13495,39 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode_5align_2__set__(struct __pyx
  */
   __Pyx_INCREF(__pyx_v_value);
   __pyx_t_3 = __pyx_v_value;
-  __pyx_t_1 = (__Pyx_PyUnicode_Equals(__pyx_t_3, __pyx_n_u_left, Py_NE)); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(1, 1005, __pyx_L1_error)
+  __pyx_t_1 = (__Pyx_PyUnicode_Equals(__pyx_t_3, __pyx_n_u_left, Py_NE)); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(1, 1014, __pyx_L1_error)
   if (__pyx_t_1) {
   } else {
     __pyx_t_2 = __pyx_t_1;
     goto __pyx_L5_bool_binop_done;
   }
-  __pyx_t_1 = (__Pyx_PyUnicode_Equals(__pyx_t_3, __pyx_n_u_center, Py_NE)); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(1, 1005, __pyx_L1_error)
+  __pyx_t_1 = (__Pyx_PyUnicode_Equals(__pyx_t_3, __pyx_n_u_center, Py_NE)); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(1, 1014, __pyx_L1_error)
   if (__pyx_t_1) {
   } else {
     __pyx_t_2 = __pyx_t_1;
     goto __pyx_L5_bool_binop_done;
   }
-  __pyx_t_1 = (__Pyx_PyUnicode_Equals(__pyx_t_3, __pyx_n_u_right, Py_NE)); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(1, 1005, __pyx_L1_error)
+  __pyx_t_1 = (__Pyx_PyUnicode_Equals(__pyx_t_3, __pyx_n_u_right, Py_NE)); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(1, 1014, __pyx_L1_error)
   __pyx_t_2 = __pyx_t_1;
   __pyx_L5_bool_binop_done:;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_t_1 = (__pyx_t_2 != 0);
   if (unlikely(__pyx_t_1)) {
 
-    /* "foolysh/scene/node.pyx":1006
+    /* "foolysh/scene/node.pyx":1015
  *             raise TypeError
  *         if value not in ('left', 'center', 'right'):
  *             raise ValueError('Expected one of "left", "center", "right".')             # <<<<<<<<<<<<<<
  *         self._align = value
  * 
  */
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__21, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 1006, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__21, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 1015, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_Raise(__pyx_t_3, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __PYX_ERR(1, 1006, __pyx_L1_error)
+    __PYX_ERR(1, 1015, __pyx_L1_error)
 
-    /* "foolysh/scene/node.pyx":1005
+    /* "foolysh/scene/node.pyx":1014
  *         if not isinstance(value, str):
  *             raise TypeError
  *         if value not in ('left', 'center', 'right'):             # <<<<<<<<<<<<<<
@@ -13320,14 +13536,14 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode_5align_2__set__(struct __pyx
  */
   }
 
-  /* "foolysh/scene/node.pyx":1007
+  /* "foolysh/scene/node.pyx":1016
  *         if value not in ('left', 'center', 'right'):
  *             raise ValueError('Expected one of "left", "center", "right".')
  *         self._align = value             # <<<<<<<<<<<<<<
  * 
  *     @property
  */
-  if (!(likely(PyUnicode_CheckExact(__pyx_v_value))||((__pyx_v_value) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "unicode", Py_TYPE(__pyx_v_value)->tp_name), 0))) __PYX_ERR(1, 1007, __pyx_L1_error)
+  if (!(likely(PyUnicode_CheckExact(__pyx_v_value))||((__pyx_v_value) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "unicode", Py_TYPE(__pyx_v_value)->tp_name), 0))) __PYX_ERR(1, 1016, __pyx_L1_error)
   __pyx_t_3 = __pyx_v_value;
   __Pyx_INCREF(__pyx_t_3);
   __Pyx_GIVEREF(__pyx_t_3);
@@ -13336,7 +13552,7 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode_5align_2__set__(struct __pyx
   __pyx_v_self->_align = ((PyObject*)__pyx_t_3);
   __pyx_t_3 = 0;
 
-  /* "foolysh/scene/node.pyx":1001
+  /* "foolysh/scene/node.pyx":1010
  * 
  *     @align.setter
  *     def align(self, value):             # <<<<<<<<<<<<<<
@@ -13356,7 +13572,7 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode_5align_2__set__(struct __pyx
   return __pyx_r;
 }
 
-/* "foolysh/scene/node.pyx":1010
+/* "foolysh/scene/node.pyx":1019
  * 
  *     @property
  *     def spacing(self):             # <<<<<<<<<<<<<<
@@ -13383,7 +13599,7 @@ static PyObject *__pyx_pf_7foolysh_5scene_4node_8TextNode_7spacing___get__(struc
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("__get__", 0);
 
-  /* "foolysh/scene/node.pyx":1013
+  /* "foolysh/scene/node.pyx":1022
  *         # type: () -> float
  *         """If `multiline`, spacing between lines."""
  *         return self._spacing             # <<<<<<<<<<<<<<
@@ -13391,13 +13607,13 @@ static PyObject *__pyx_pf_7foolysh_5scene_4node_8TextNode_7spacing___get__(struc
  *     @spacing.setter
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_self->_spacing); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 1013, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_self->_spacing); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 1022, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "foolysh/scene/node.pyx":1010
+  /* "foolysh/scene/node.pyx":1019
  * 
  *     @property
  *     def spacing(self):             # <<<<<<<<<<<<<<
@@ -13416,7 +13632,7 @@ static PyObject *__pyx_pf_7foolysh_5scene_4node_8TextNode_7spacing___get__(struc
   return __pyx_r;
 }
 
-/* "foolysh/scene/node.pyx":1016
+/* "foolysh/scene/node.pyx":1025
  * 
  *     @spacing.setter
  *     def spacing(self, value):             # <<<<<<<<<<<<<<
@@ -13447,7 +13663,7 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode_7spacing_2__set__(struct __p
   int __pyx_t_5;
   __Pyx_RefNannySetupContext("__set__", 0);
 
-  /* "foolysh/scene/node.pyx":1018
+  /* "foolysh/scene/node.pyx":1027
  *     def spacing(self, value):
  *         # type: (float) -> None
  *         if not isinstance(value, (int, float)):             # <<<<<<<<<<<<<<
@@ -13468,7 +13684,7 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode_7spacing_2__set__(struct __p
   __pyx_t_2 = ((!(__pyx_t_1 != 0)) != 0);
   if (unlikely(__pyx_t_2)) {
 
-    /* "foolysh/scene/node.pyx":1019
+    /* "foolysh/scene/node.pyx":1028
  *         # type: (float) -> None
  *         if not isinstance(value, (int, float)):
  *             raise TypeError             # <<<<<<<<<<<<<<
@@ -13476,9 +13692,9 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode_7spacing_2__set__(struct __p
  *             raise ValueError('Expected positive float.')
  */
     __Pyx_Raise(__pyx_builtin_TypeError, 0, 0, 0);
-    __PYX_ERR(1, 1019, __pyx_L1_error)
+    __PYX_ERR(1, 1028, __pyx_L1_error)
 
-    /* "foolysh/scene/node.pyx":1018
+    /* "foolysh/scene/node.pyx":1027
  *     def spacing(self, value):
  *         # type: (float) -> None
  *         if not isinstance(value, (int, float)):             # <<<<<<<<<<<<<<
@@ -13487,32 +13703,32 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode_7spacing_2__set__(struct __p
  */
   }
 
-  /* "foolysh/scene/node.pyx":1020
+  /* "foolysh/scene/node.pyx":1029
  *         if not isinstance(value, (int, float)):
  *             raise TypeError
  *         if value < 0:             # <<<<<<<<<<<<<<
  *             raise ValueError('Expected positive float.')
  *         self._spacing = value
  */
-  __pyx_t_4 = PyObject_RichCompare(__pyx_v_value, __pyx_int_0, Py_LT); __Pyx_XGOTREF(__pyx_t_4); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 1020, __pyx_L1_error)
-  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(1, 1020, __pyx_L1_error)
+  __pyx_t_4 = PyObject_RichCompare(__pyx_v_value, __pyx_int_0, Py_LT); __Pyx_XGOTREF(__pyx_t_4); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 1029, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(1, 1029, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   if (unlikely(__pyx_t_2)) {
 
-    /* "foolysh/scene/node.pyx":1021
+    /* "foolysh/scene/node.pyx":1030
  *             raise TypeError
  *         if value < 0:
  *             raise ValueError('Expected positive float.')             # <<<<<<<<<<<<<<
  *         self._spacing = value
  * 
  */
-    __pyx_t_4 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__22, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 1021, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__22, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(1, 1030, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_Raise(__pyx_t_4, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __PYX_ERR(1, 1021, __pyx_L1_error)
+    __PYX_ERR(1, 1030, __pyx_L1_error)
 
-    /* "foolysh/scene/node.pyx":1020
+    /* "foolysh/scene/node.pyx":1029
  *         if not isinstance(value, (int, float)):
  *             raise TypeError
  *         if value < 0:             # <<<<<<<<<<<<<<
@@ -13521,17 +13737,17 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode_7spacing_2__set__(struct __p
  */
   }
 
-  /* "foolysh/scene/node.pyx":1022
+  /* "foolysh/scene/node.pyx":1031
  *         if value < 0:
  *             raise ValueError('Expected positive float.')
  *         self._spacing = value             # <<<<<<<<<<<<<<
  * 
  *     @property
  */
-  __pyx_t_5 = __Pyx_PyInt_As_int(__pyx_v_value); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) __PYX_ERR(1, 1022, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyInt_As_int(__pyx_v_value); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) __PYX_ERR(1, 1031, __pyx_L1_error)
   __pyx_v_self->_spacing = __pyx_t_5;
 
-  /* "foolysh/scene/node.pyx":1016
+  /* "foolysh/scene/node.pyx":1025
  * 
  *     @spacing.setter
  *     def spacing(self, value):             # <<<<<<<<<<<<<<
@@ -13551,7 +13767,7 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode_7spacing_2__set__(struct __p
   return __pyx_r;
 }
 
-/* "foolysh/scene/node.pyx":1025
+/* "foolysh/scene/node.pyx":1034
  * 
  *     @property
  *     def multiline(self):             # <<<<<<<<<<<<<<
@@ -13578,7 +13794,7 @@ static PyObject *__pyx_pf_7foolysh_5scene_4node_8TextNode_9multiline___get__(str
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("__get__", 0);
 
-  /* "foolysh/scene/node.pyx":1028
+  /* "foolysh/scene/node.pyx":1037
  *         # type: () -> bool
  *         """Whether the text is multi or single line"""
  *         return self._multiline             # <<<<<<<<<<<<<<
@@ -13586,13 +13802,13 @@ static PyObject *__pyx_pf_7foolysh_5scene_4node_8TextNode_9multiline___get__(str
  *     @multiline.setter
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyBool_FromLong(__pyx_v_self->_multiline); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 1028, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyBool_FromLong(__pyx_v_self->_multiline); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 1037, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "foolysh/scene/node.pyx":1025
+  /* "foolysh/scene/node.pyx":1034
  * 
  *     @property
  *     def multiline(self):             # <<<<<<<<<<<<<<
@@ -13611,7 +13827,7 @@ static PyObject *__pyx_pf_7foolysh_5scene_4node_8TextNode_9multiline___get__(str
   return __pyx_r;
 }
 
-/* "foolysh/scene/node.pyx":1031
+/* "foolysh/scene/node.pyx":1040
  * 
  *     @multiline.setter
  *     def multiline(self, value):             # <<<<<<<<<<<<<<
@@ -13640,7 +13856,7 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode_9multiline_2__set__(struct _
   int __pyx_t_3;
   __Pyx_RefNannySetupContext("__set__", 0);
 
-  /* "foolysh/scene/node.pyx":1033
+  /* "foolysh/scene/node.pyx":1042
  *     def multiline(self, value):
  *         # type: (bool) -> None
  *         if not isinstance(value, bool):             # <<<<<<<<<<<<<<
@@ -13649,21 +13865,21 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode_9multiline_2__set__(struct _
  */
   __pyx_t_1 = ((PyObject*)&PyBool_Type);
   __Pyx_INCREF(__pyx_t_1);
-  __pyx_t_2 = PyObject_IsInstance(__pyx_v_value, __pyx_t_1); if (unlikely(__pyx_t_2 == ((int)-1))) __PYX_ERR(1, 1033, __pyx_L1_error)
+  __pyx_t_2 = PyObject_IsInstance(__pyx_v_value, __pyx_t_1); if (unlikely(__pyx_t_2 == ((int)-1))) __PYX_ERR(1, 1042, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_3 = ((!(__pyx_t_2 != 0)) != 0);
   if (unlikely(__pyx_t_3)) {
 
-    /* "foolysh/scene/node.pyx":1034
+    /* "foolysh/scene/node.pyx":1043
  *         # type: (bool) -> None
  *         if not isinstance(value, bool):
  *             raise TypeError             # <<<<<<<<<<<<<<
  *         self._multiline = value
  */
     __Pyx_Raise(__pyx_builtin_TypeError, 0, 0, 0);
-    __PYX_ERR(1, 1034, __pyx_L1_error)
+    __PYX_ERR(1, 1043, __pyx_L1_error)
 
-    /* "foolysh/scene/node.pyx":1033
+    /* "foolysh/scene/node.pyx":1042
  *     def multiline(self, value):
  *         # type: (bool) -> None
  *         if not isinstance(value, bool):             # <<<<<<<<<<<<<<
@@ -13672,15 +13888,15 @@ static int __pyx_pf_7foolysh_5scene_4node_8TextNode_9multiline_2__set__(struct _
  */
   }
 
-  /* "foolysh/scene/node.pyx":1035
+  /* "foolysh/scene/node.pyx":1044
  *         if not isinstance(value, bool):
  *             raise TypeError
  *         self._multiline = value             # <<<<<<<<<<<<<<
  */
-  __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_v_value); if (unlikely((__pyx_t_3 == (int)-1) && PyErr_Occurred())) __PYX_ERR(1, 1035, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_v_value); if (unlikely((__pyx_t_3 == (int)-1) && PyErr_Occurred())) __PYX_ERR(1, 1044, __pyx_L1_error)
   __pyx_v_self->_multiline = __pyx_t_3;
 
-  /* "foolysh/scene/node.pyx":1031
+  /* "foolysh/scene/node.pyx":1040
  * 
  *     @multiline.setter
  *     def multiline(self, value):             # <<<<<<<<<<<<<<
@@ -14332,6 +14548,26 @@ static int __pyx_tp_clear_7foolysh_5scene_4node_ImageNode(PyObject *o) {
   Py_XDECREF(tmp);
   return 0;
 }
+static PyObject *__pyx_sq_item_7foolysh_5scene_4node_ImageNode(PyObject *o, Py_ssize_t i) {
+  PyObject *r;
+  PyObject *x = PyInt_FromSsize_t(i); if(!x) return 0;
+  r = Py_TYPE(o)->tp_as_mapping->mp_subscript(o, x);
+  Py_DECREF(x);
+  return r;
+}
+
+static int __pyx_mp_ass_subscript_7foolysh_5scene_4node_ImageNode(PyObject *o, PyObject *i, PyObject *v) {
+  if (v) {
+    return __pyx_pw_7foolysh_5scene_4node_9ImageNode_9__setitem__(o, i, v);
+  }
+  else {
+    if (__pyx_ptype_7foolysh_5scene_4node_Node->tp_as_mapping && __pyx_ptype_7foolysh_5scene_4node_Node->tp_as_mapping->mp_ass_subscript)
+      return __pyx_ptype_7foolysh_5scene_4node_Node->tp_as_mapping->mp_ass_subscript(o, i, v);
+    PyErr_Format(PyExc_NotImplementedError,
+      "Subscript deletion not supported by %.200s", Py_TYPE(o)->tp_name);
+    return -1;
+  }
+}
 
 static PyObject *__pyx_getprop_7foolysh_5scene_4node_9ImageNode_image(PyObject *o, CYTHON_UNUSED void *x) {
   return __pyx_pw_7foolysh_5scene_4node_9ImageNode_5image_1__get__(o);
@@ -14368,8 +14604,8 @@ static int __pyx_setprop_7foolysh_5scene_4node_9ImageNode_tiled(PyObject *o, PyO
 static PyMethodDef __pyx_methods_7foolysh_5scene_4node_ImageNode[] = {
   {"add_image", (PyCFunction)__pyx_pw_7foolysh_5scene_4node_9ImageNode_3add_image, METH_O, __pyx_doc_7foolysh_5scene_4node_9ImageNode_2add_image},
   {"clear_images", (PyCFunction)__pyx_pw_7foolysh_5scene_4node_9ImageNode_5clear_images, METH_NOARGS, __pyx_doc_7foolysh_5scene_4node_9ImageNode_4clear_images},
-  {"__reduce_cython__", (PyCFunction)__pyx_pw_7foolysh_5scene_4node_9ImageNode_7__reduce_cython__, METH_NOARGS, __pyx_doc_7foolysh_5scene_4node_9ImageNode_6__reduce_cython__},
-  {"__setstate_cython__", (PyCFunction)__pyx_pw_7foolysh_5scene_4node_9ImageNode_9__setstate_cython__, METH_O, __pyx_doc_7foolysh_5scene_4node_9ImageNode_8__setstate_cython__},
+  {"__reduce_cython__", (PyCFunction)__pyx_pw_7foolysh_5scene_4node_9ImageNode_11__reduce_cython__, METH_NOARGS, __pyx_doc_7foolysh_5scene_4node_9ImageNode_10__reduce_cython__},
+  {"__setstate_cython__", (PyCFunction)__pyx_pw_7foolysh_5scene_4node_9ImageNode_13__setstate_cython__, METH_O, __pyx_doc_7foolysh_5scene_4node_9ImageNode_12__setstate_cython__},
   {0, 0, 0, 0}
 };
 
@@ -14378,6 +14614,25 @@ static struct PyGetSetDef __pyx_getsets_7foolysh_5scene_4node_ImageNode[] = {
   {(char *)"index", __pyx_getprop_7foolysh_5scene_4node_9ImageNode_index, __pyx_setprop_7foolysh_5scene_4node_9ImageNode_index, (char *)"The index of the currently active image.", 0},
   {(char *)"tiled", __pyx_getprop_7foolysh_5scene_4node_9ImageNode_tiled, __pyx_setprop_7foolysh_5scene_4node_9ImageNode_tiled, (char *)"Whether this is a tiled image that spans the screen.", 0},
   {0, 0, 0, 0, 0}
+};
+
+static PySequenceMethods __pyx_tp_as_sequence_ImageNode = {
+  0, /*sq_length*/
+  0, /*sq_concat*/
+  0, /*sq_repeat*/
+  __pyx_sq_item_7foolysh_5scene_4node_ImageNode, /*sq_item*/
+  0, /*sq_slice*/
+  0, /*sq_ass_item*/
+  0, /*sq_ass_slice*/
+  0, /*sq_contains*/
+  0, /*sq_inplace_concat*/
+  0, /*sq_inplace_repeat*/
+};
+
+static PyMappingMethods __pyx_tp_as_mapping_ImageNode = {
+  0, /*mp_length*/
+  __pyx_pw_7foolysh_5scene_4node_9ImageNode_7__getitem__, /*mp_subscript*/
+  __pyx_mp_ass_subscript_7foolysh_5scene_4node_ImageNode, /*mp_ass_subscript*/
 };
 
 static PyTypeObject __pyx_type_7foolysh_5scene_4node_ImageNode = {
@@ -14406,8 +14661,8 @@ static PyTypeObject __pyx_type_7foolysh_5scene_4node_ImageNode = {
   0, /*tp_repr*/
   #endif
   0, /*tp_as_number*/
-  0, /*tp_as_sequence*/
-  0, /*tp_as_mapping*/
+  &__pyx_tp_as_sequence_ImageNode, /*tp_as_sequence*/
+  &__pyx_tp_as_mapping_ImageNode, /*tp_as_mapping*/
   0, /*tp_hash*/
   0, /*tp_call*/
   #if CYTHON_COMPILING_IN_PYPY
@@ -14968,80 +15223,80 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__15);
   __Pyx_GIVEREF(__pyx_tuple__15);
 
-  /* "foolysh/scene/node.pyx":935
+  /* "foolysh/scene/node.pyx":944
  *         """The current asset path to the font."""
  *         if self._font == '':
  *             raise RuntimeError('No font set yet.')             # <<<<<<<<<<<<<<
  *         return self._font
  * 
  */
-  __pyx_tuple__16 = PyTuple_Pack(1, __pyx_kp_u_No_font_set_yet); if (unlikely(!__pyx_tuple__16)) __PYX_ERR(1, 935, __pyx_L1_error)
+  __pyx_tuple__16 = PyTuple_Pack(1, __pyx_kp_u_No_font_set_yet); if (unlikely(!__pyx_tuple__16)) __PYX_ERR(1, 944, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__16);
   __Pyx_GIVEREF(__pyx_tuple__16);
 
-  /* "foolysh/scene/node.pyx":957
+  /* "foolysh/scene/node.pyx":966
  *             raise TypeError
  *         if value <= 0.0:
  *             raise ValueError('Expected positive, non zero float.')             # <<<<<<<<<<<<<<
  *         self._font_size = float(value)
  * 
  */
-  __pyx_tuple__17 = PyTuple_Pack(1, __pyx_kp_u_Expected_positive_non_zero_float); if (unlikely(!__pyx_tuple__17)) __PYX_ERR(1, 957, __pyx_L1_error)
+  __pyx_tuple__17 = PyTuple_Pack(1, __pyx_kp_u_Expected_positive_non_zero_float); if (unlikely(!__pyx_tuple__17)) __PYX_ERR(1, 966, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__17);
   __Pyx_GIVEREF(__pyx_tuple__17);
 
-  /* "foolysh/scene/node.pyx":978
+  /* "foolysh/scene/node.pyx":987
  *         # type: (Union[int, Tuple[int, ...]]) -> None
  *         if isinstance(value, int):
  *             value = (value, ) * 3 + (255, )             # <<<<<<<<<<<<<<
  *         elif isinstance(value, tuple):
  *             components = len(value)
  */
-  __pyx_tuple__18 = PyTuple_Pack(1, __pyx_int_255); if (unlikely(!__pyx_tuple__18)) __PYX_ERR(1, 978, __pyx_L1_error)
+  __pyx_tuple__18 = PyTuple_Pack(1, __pyx_int_255); if (unlikely(!__pyx_tuple__18)) __PYX_ERR(1, 987, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__18);
   __Pyx_GIVEREF(__pyx_tuple__18);
 
-  /* "foolysh/scene/node.pyx":984
+  /* "foolysh/scene/node.pyx":993
  *                 value = value + (255, )
  *             elif components != 4:
  *                 raise ValueError('Expected tuple of length 3 or 4.')             # <<<<<<<<<<<<<<
  *             for c in value:
  *                 if not isinstance(c, int):
  */
-  __pyx_tuple__19 = PyTuple_Pack(1, __pyx_kp_u_Expected_tuple_of_length_3_or_4); if (unlikely(!__pyx_tuple__19)) __PYX_ERR(1, 984, __pyx_L1_error)
+  __pyx_tuple__19 = PyTuple_Pack(1, __pyx_kp_u_Expected_tuple_of_length_3_or_4); if (unlikely(!__pyx_tuple__19)) __PYX_ERR(1, 993, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__19);
   __Pyx_GIVEREF(__pyx_tuple__19);
 
-  /* "foolysh/scene/node.pyx":989
+  /* "foolysh/scene/node.pyx":998
  *                     raise TypeError
  *                 if not 0 <= c <= 255:
  *                     raise ValueError('Expected value in range (0..255).')             # <<<<<<<<<<<<<<
  *         else:
  *             raise TypeError
  */
-  __pyx_tuple__20 = PyTuple_Pack(1, __pyx_kp_u_Expected_value_in_range_0_255); if (unlikely(!__pyx_tuple__20)) __PYX_ERR(1, 989, __pyx_L1_error)
+  __pyx_tuple__20 = PyTuple_Pack(1, __pyx_kp_u_Expected_value_in_range_0_255); if (unlikely(!__pyx_tuple__20)) __PYX_ERR(1, 998, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__20);
   __Pyx_GIVEREF(__pyx_tuple__20);
 
-  /* "foolysh/scene/node.pyx":1006
+  /* "foolysh/scene/node.pyx":1015
  *             raise TypeError
  *         if value not in ('left', 'center', 'right'):
  *             raise ValueError('Expected one of "left", "center", "right".')             # <<<<<<<<<<<<<<
  *         self._align = value
  * 
  */
-  __pyx_tuple__21 = PyTuple_Pack(1, __pyx_kp_u_Expected_one_of_left_center_righ); if (unlikely(!__pyx_tuple__21)) __PYX_ERR(1, 1006, __pyx_L1_error)
+  __pyx_tuple__21 = PyTuple_Pack(1, __pyx_kp_u_Expected_one_of_left_center_righ); if (unlikely(!__pyx_tuple__21)) __PYX_ERR(1, 1015, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__21);
   __Pyx_GIVEREF(__pyx_tuple__21);
 
-  /* "foolysh/scene/node.pyx":1021
+  /* "foolysh/scene/node.pyx":1030
  *             raise TypeError
  *         if value < 0:
  *             raise ValueError('Expected positive float.')             # <<<<<<<<<<<<<<
  *         self._spacing = value
  * 
  */
-  __pyx_tuple__22 = PyTuple_Pack(1, __pyx_kp_u_Expected_positive_float); if (unlikely(!__pyx_tuple__22)) __PYX_ERR(1, 1021, __pyx_L1_error)
+  __pyx_tuple__22 = PyTuple_Pack(1, __pyx_kp_u_Expected_positive_float); if (unlikely(!__pyx_tuple__22)) __PYX_ERR(1, 1030, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__22);
   __Pyx_GIVEREF(__pyx_tuple__22);
 
@@ -15205,16 +15460,16 @@ static int __Pyx_modinit_type_init_code(void) {
   __pyx_vtabptr_7foolysh_5scene_4node_TextNode = &__pyx_vtable_7foolysh_5scene_4node_TextNode;
   __pyx_vtable_7foolysh_5scene_4node_TextNode.__pyx_base = *__pyx_vtabptr_7foolysh_5scene_4node_Node;
   __pyx_type_7foolysh_5scene_4node_TextNode.tp_base = __pyx_ptype_7foolysh_5scene_4node_Node;
-  if (PyType_Ready(&__pyx_type_7foolysh_5scene_4node_TextNode) < 0) __PYX_ERR(1, 865, __pyx_L1_error)
+  if (PyType_Ready(&__pyx_type_7foolysh_5scene_4node_TextNode) < 0) __PYX_ERR(1, 874, __pyx_L1_error)
   #if PY_VERSION_HEX < 0x030800B1
   __pyx_type_7foolysh_5scene_4node_TextNode.tp_print = 0;
   #endif
   if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_type_7foolysh_5scene_4node_TextNode.tp_dictoffset && __pyx_type_7foolysh_5scene_4node_TextNode.tp_getattro == PyObject_GenericGetAttr)) {
     __pyx_type_7foolysh_5scene_4node_TextNode.tp_getattro = __Pyx_PyObject_GenericGetAttr;
   }
-  if (__Pyx_SetVtable(__pyx_type_7foolysh_5scene_4node_TextNode.tp_dict, __pyx_vtabptr_7foolysh_5scene_4node_TextNode) < 0) __PYX_ERR(1, 865, __pyx_L1_error)
-  if (PyObject_SetAttr(__pyx_m, __pyx_n_s_TextNode, (PyObject *)&__pyx_type_7foolysh_5scene_4node_TextNode) < 0) __PYX_ERR(1, 865, __pyx_L1_error)
-  if (__Pyx_setup_reduce((PyObject*)&__pyx_type_7foolysh_5scene_4node_TextNode) < 0) __PYX_ERR(1, 865, __pyx_L1_error)
+  if (__Pyx_SetVtable(__pyx_type_7foolysh_5scene_4node_TextNode.tp_dict, __pyx_vtabptr_7foolysh_5scene_4node_TextNode) < 0) __PYX_ERR(1, 874, __pyx_L1_error)
+  if (PyObject_SetAttr(__pyx_m, __pyx_n_s_TextNode, (PyObject *)&__pyx_type_7foolysh_5scene_4node_TextNode) < 0) __PYX_ERR(1, 874, __pyx_L1_error)
+  if (__Pyx_setup_reduce((PyObject*)&__pyx_type_7foolysh_5scene_4node_TextNode) < 0) __PYX_ERR(1, 874, __pyx_L1_error)
   __pyx_ptype_7foolysh_5scene_4node_TextNode = &__pyx_type_7foolysh_5scene_4node_TextNode;
   __Pyx_RefNannyFinishContext();
   return 0;
@@ -17096,6 +17351,35 @@ bad:
     return PyUnicode_Join(__pyx_empty_unicode, value_tuple);
 #endif
 }
+
+/* ObjectGetItem */
+#if CYTHON_USE_TYPE_SLOTS
+static PyObject *__Pyx_PyObject_GetIndex(PyObject *obj, PyObject* index) {
+    PyObject *runerr;
+    Py_ssize_t key_value;
+    PySequenceMethods *m = Py_TYPE(obj)->tp_as_sequence;
+    if (unlikely(!(m && m->sq_item))) {
+        PyErr_Format(PyExc_TypeError, "'%.200s' object is not subscriptable", Py_TYPE(obj)->tp_name);
+        return NULL;
+    }
+    key_value = __Pyx_PyIndex_AsSsize_t(index);
+    if (likely(key_value != -1 || !(runerr = PyErr_Occurred()))) {
+        return __Pyx_GetItemInt_Fast(obj, key_value, 0, 1, 1);
+    }
+    if (PyErr_GivenExceptionMatches(runerr, PyExc_OverflowError)) {
+        PyErr_Clear();
+        PyErr_Format(PyExc_IndexError, "cannot fit '%.200s' into an index-sized integer", Py_TYPE(index)->tp_name);
+    }
+    return NULL;
+}
+static PyObject *__Pyx_PyObject_GetItem(PyObject *obj, PyObject* key) {
+    PyMappingMethods *m = Py_TYPE(obj)->tp_as_mapping;
+    if (likely(m && m->mp_subscript)) {
+        return m->mp_subscript(obj, key);
+    }
+    return __Pyx_PyObject_GetIndex(obj, key);
+}
+#endif
 
 /* PyUnicode_Unicode */
 static CYTHON_INLINE PyObject* __Pyx_PyUnicode_Unicode(PyObject *obj) {

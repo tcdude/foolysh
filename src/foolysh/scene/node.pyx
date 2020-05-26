@@ -861,6 +861,15 @@ cdef class ImageNode(Node):
         self._images = []
         self._current_index = -1
 
+    def __getitem__(self, item):
+        return self._images[item]
+
+    def __setitem__(self, item, value):
+        if self._images[item] != value:
+            self._images[item] = value
+            if item == self._current_index:
+                self.propagate_dirty()
+
 
 cdef class TextNode(Node):
     """
