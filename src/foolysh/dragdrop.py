@@ -2,6 +2,7 @@
 Provides drag and drop logic to :class:`~foolysh.scene.node.Node` instances.
 """
 
+import ctypes
 from dataclasses import dataclass
 from typing import Callable
 from typing import Dict
@@ -168,13 +169,11 @@ class DragDrop:
         """
         Drag event callback.
         """
+        # Ensure correct starting position
         world_unit = 1 / min(self._app.screen_size)
-        if app.ISANDROID:
-            self._info.last_mouse = vec2.Vec2(event.tfinger.x * world_unit,
-                                              event.tfinger.y * world_unit)
-        else:
-            self._info.last_mouse = vec2.Vec2(event.button.x * world_unit,
-                                              event.button.y * world_unit)
+        x, y = ctypes.c_int(0), ctypes.c_int(0)
+        _ = sdl2.mouse.SDL_GetMouseState(ctypes.byref(x), ctypes.byref(y))
+        self._info.last_mouse = x.value * world_unit, y.value * world_unit
         if self._info.active == -1 and (self._watch_button is None or \
              event.button.button == self._watch_button):
             mouse_pos = self._app.mouse_pos + self._app.renderer.view_pos

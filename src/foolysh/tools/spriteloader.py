@@ -252,7 +252,7 @@ class SpriteLoader:
                 continue
             self._assets[k] = Asset(k, self)
 
-    def load_image(self, asset_path, scale=1.0, res=None):
+    def load_image(self, asset_path, scale=1.0, res=None, retry=False):
         # type: (str, Optional[SCALE], Optional[Tuple[int, int]]) -> TextureSprite
         """
         Loads asset_path at specified scale or generates (if necessary) a SDF
@@ -279,6 +279,9 @@ class SpriteLoader:
                     self.factory
                 )
             return self._sprite_cache[k]
+        elif not retry:
+            self._refresh_assets()
+            return self.load_image(asset_path, scale, res, retry=True)
         raise ValueError(f'asset_path must be a valid path relative to '
                          f'"{self.asset_dir}" without leading "/". Got '
                          f'"{asset_path}".')
