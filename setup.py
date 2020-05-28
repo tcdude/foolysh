@@ -91,9 +91,8 @@ setup(
     author_email='tizilogic@gmail.com',
     packages=find_namespace_packages(where='src'),
     package_dir={'': 'src'},
-    package_data={'foolysh': [
-        'LICENSE.md',
-    ]},
+    package_data={'': ['LICENSE.md',],
+                  'foolysh': ['assets/*.png']},
     install_requires=['plyer', 'Pillow', 'PySDL2>=0.9.6', 'numpy>=1.18'],
     ext_modules=ext_modules(),
 )

@@ -4,10 +4,13 @@ Provides the App class to handle everything related to execution of an App.
 
 import ctypes
 from dataclasses import dataclass
+import os
+import shutil
 import time
 from typing import Optional
 from typing import Tuple
 
+from PIL import Image
 import sdl2
 import sdl2.ext
 
@@ -235,6 +238,31 @@ class App(FSM):
         sdl2.ext.init()
         self.__stats.clean_exit = False
         _update_android()
+        self.__show_loading_image()
+
+    def __show_loading_image(self):
+        asset_dir = self.__cfg.get('base', 'asset_dir', fallback='assets/')
+        orig = os.path.join(os.path.split(__file__)[0], 'assets/loading.png')
+        apr = self.__cfg.getint('base', 'asset_pixel_ratio', fallback=-1)
+        if apr < 1:
+            raise RuntimeError('asset_pixel_ratio not defined')
+        ssz = self.screen_size
+        base_scale = min(ssz) / apr
+        osz = Image.open(orig).size
+        scx, scy = ssz[0] / (osz[0] * base_scale), ssz[1] / (osz[1] * base_scale)
+        loading = os.path.join(asset_dir, '_foolysh/loading.png')
+        if not os.path.exists(loading):
+            os.makedirs(os.path.join(asset_dir, '_foolysh'), exist_ok=True)
+            shutil.copy(orig, loading)
+        self.__init_sdl()
+        self.__stats.running = True
+        self.__loading = self.ui.center \
+            .attach_image_node('Loading Node', '_foolysh/loading.png')
+        self.__loading.scale = min(scx, scy)
+        for _ in range(5):
+            self.__systems.renderer.set_dirty()
+            self.__systems.renderer.render()
+        android.remove_presplash()
 
     @property
     def isandroid(self):
@@ -393,12 +421,10 @@ class App(FSM):
             Make sure to call ``super().run()`` if you override this method
             at the end of your implementation.
         """
-        self.__init_sdl()
         self.__stats.clock.tick()
         last_time = self.__stats.clock.get_time()
         try:
             frame_clock = clock.Clock()
-            self.__stats.running = True
             last_resolution = None
             while self.__stats.running:
                 frame_clock.tick()
@@ -423,7 +449,7 @@ class App(FSM):
                 self.__systems.task_manager(self.__stats.clock.get_dt())
                 self.__systems.renderer.render()
                 if self.__stats.frames == 0:
-                    android.remove_presplash()
+                    self.__loading.hide()
                 frame_clock.tick()
                 sleep_time = max(0.0, FRAME_TIME - frame_clock.get_dt())
                 if sleep_time:
