@@ -258,10 +258,14 @@ class App(FSM):
         self.__stats.running = True
         self.__loading = self.ui.center \
             .attach_image_node('Loading Node', '_foolysh/loading.png')
+        # self.__loading.origin = node.Origin.CENTER
         self.__loading.scale = min(scx, scy)
         for _ in range(5):
+            self.__update_ui_anchors(ssz)
             self.__systems.renderer.set_dirty()
             self.__systems.renderer.render()
+            self.__loading.x = -self.__loading.size[0] / 2
+            self.__loading.y = -self.__loading.size[1] / 2
         android.remove_presplash()
 
     @property
@@ -447,9 +451,9 @@ class App(FSM):
                 self.__systems.animation_manager.animate(
                     self.__stats.clock.get_dt())
                 self.__systems.task_manager(self.__stats.clock.get_dt())
-                self.__systems.renderer.render()
                 if self.__stats.frames == 0:
                     self.__loading.hide()
+                self.__systems.renderer.render()
                 frame_clock.tick()
                 sleep_time = max(0.0, FRAME_TIME - frame_clock.get_dt())
                 if sleep_time:
