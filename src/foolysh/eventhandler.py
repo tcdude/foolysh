@@ -114,7 +114,7 @@ class EventHandler:
         ``bool`` -> If either Return or Return2 scancodes were detected on
             last call.
         """
-        return self._backspace
+        return self._enter
 
     def __call__(self, *unused_args, **unused_kwargs):
         """
