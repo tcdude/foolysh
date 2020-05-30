@@ -29,6 +29,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE."""
 
 BACKSP = sdl2.SDL_SCANCODE_DELETE, sdl2.SDL_SCANCODE_BACKSPACE
+ENTER = sdl2.SDL_SCANCODE_RETURN, sdl2.SDL_SCANCODE_RETURN2
 
 
 class EventHandler:
@@ -40,6 +41,7 @@ class EventHandler:
         self._unique = {}
         self._last_text_input = None
         self._backspace = False
+        self._enter = False
 
     def listen(self, name, sdl_event, callback, *args, **kwargs):
         """
@@ -106,18 +108,29 @@ class EventHandler:
         """
         return self._backspace
 
+    @property
+    def enter(self):
+        """
+        ``bool`` -> If either Return or Return2 scancodes were detected on
+            last call.
+        """
+        return self._backspace
+
     def __call__(self, *unused_args, **unused_kwargs):
         """
         Check and execute events.
         """
         self._last_text_input = None
         self._backspace = False
+        self._enter = False
         for event in sdl2.ext.get_events():
             if event.type in self._events:
                 self._exec_event(event)
-            elif event.type == sdl2.SDL_KEYDOWN:
+            if event.type == sdl2.SDL_KEYDOWN:
                 if event.key.keysym.scancode in BACKSP:
                     self._backspace = True
+                elif event.key.keysym.scancode in ENTER:
+                    self._enter = True
             if event.type == sdl2.SDL_TEXTINPUT:
                 self._last_text_input = event.text.text.decode('utf-8')
 

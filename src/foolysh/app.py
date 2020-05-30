@@ -441,6 +441,8 @@ class App(FSM):
                 self.__update_mouse()
                 self.__update_keyboard()
                 self.__systems.event_handler()
+                self.__stats.enter = self.__stats.enter \
+                    or self.__systems.event_handler.enter
                 backsp = self.__stats.backspace \
                     or self.__systems.event_handler.backspace
                 if self.__systems.ui_handler(self.__stats.mouse_pos,
