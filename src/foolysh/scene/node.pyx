@@ -96,8 +96,10 @@ cdef class Node:
         # Reference the Node instance to keep it alive
         _nodes[deref(self.thisptr).get_id()] = self
 
-    def __init__(self, name=None, *args, **kwargs):
+    def __init__(self, name=None, parent=None, **kwargs):
         self.__name = name or 'Unnamed Node'
+        if parent is not None and isinstance(parent, Node):
+            self.reparent_to(parent)
 
     @property
     def name(self):
@@ -787,8 +789,8 @@ cdef class ImageNode(Node):
     cdef int _current_index
     cdef bint _tiled
 
-    def __init__(self, name=None, image=None, tiled=False):
-        super(ImageNode, self).__init__(name=name)
+    def __init__(self, name=None, image=None, tiled=False, **kwargs):
+        super(ImageNode, self).__init__(name=name, **kwargs)
         self._images = []            # type: List[str]
         self._current_index = -1
         self._tiled = tiled
@@ -896,8 +898,8 @@ cdef class TextNode(Node):
 
     def __init__(self, name=None, text='', font=None, font_size=0.05,
                  text_color=(255, 255, 255, 255), align='left', spacing=0,
-                 multiline=False, *args, **kwargs):
-        super(TextNode, self).__init__(name=name)
+                 multiline=False, **kwargs):
+        super(TextNode, self).__init__(name=name, **kwargs)
         self._text = ''
         self._font = ''
         self._font_size = 0

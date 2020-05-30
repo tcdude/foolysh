@@ -63,13 +63,13 @@ class UINode(node.Node):
     """
     def __init__(self, name: str = 'Unnamed UINode',
                  size: Tuple[float, float] = (0.0, 0.0),
-                 pos: vec2.Vec2 = vec2.Vec2()) -> None:
+                 pos: vec2.Vec2 = vec2.Vec2(), **kwargs) -> None:
         if UIHANDLER_INSTANCE is None:
             raise RuntimeError('UINode objects can only be instantiated after '
                                'UIHANDLER_INSTANCE has been set (i.e. after '
                                'the __init__ method of foolysh.app.App has '
                                'been called).')
-        super().__init__(name)
+        super().__init__(name, **kwargs)
         self.size = size
         self.pos = pos
         self._has_focus = False

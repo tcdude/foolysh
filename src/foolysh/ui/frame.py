@@ -78,12 +78,12 @@ class Frame(uinode.UINode):
                  border_color: Optional[COLOR] = (255, 255, 255),
                  corner_radius: Optional[float] = 0.0,
                  multi_sampling: Optional[int] = 1,
-                 alpha: Optional[int] = 255, **unused_kwargs) -> None:
+                 alpha: Optional[int] = 255, **kwargs) -> None:
         # pylint: disable=too-many-arguments
 
         if size == (0.0, 0.0):
             raise ValueError('Expected size different to 0, 0.')
-        super().__init__(name, size, pos)
+        super().__init__(name, size, pos, **kwargs)
         self._frame_sdf: List[FrameSDF] = []
         self._im_node = self.attach_image_node(name + '_Image')
         self._im_node.depth = 0

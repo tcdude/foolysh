@@ -78,7 +78,7 @@ class Button(uinode.UINode):
                  **kwargs) -> None:
         if size == (0.0, 0.0):
             raise ValueError('Expected size different to 0, 0.')
-        super().__init__(name, size, pos)
+        super().__init__(name, size, pos, **kwargs)
         kwargs['name'] = f'Button Label {name}'
         kwargs['size'] = size
         kwargs['pos'] = 0, 0
