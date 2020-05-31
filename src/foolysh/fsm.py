@@ -45,9 +45,8 @@ class FSM:
 
     When :meth:`FSM.request` is called the following actions are performed:
 
-        * The `exit_` method from the current state gets called, if a state has
-            been previously been activated.
-        * The `enter_` method from the requested state gets called.
+        1. The `exit_` method from the current state gets called.
+        2. The `enter_` method from the requested state gets called.
 
     .. note::
         Only provide `enter_` / `exit_` methods for subclasses that should be
