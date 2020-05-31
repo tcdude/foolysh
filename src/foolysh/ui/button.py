@@ -61,10 +61,10 @@ class ButtonLabel:
 class Button(uinode.UINode):
     """
     A Button is basically a collection of three
-    :class:`~foolysh.ui.label.Label`s with only keyword arguments allowed.
-    Keyword arguments without prefix represent the default/normal state of the
-    Button, while keyword arguments prefixed with one of "down_" or "disabled_"
-    represent the respective state.
+    :class:`~foolysh.ui.label.Label` instances with only keyword arguments
+    allowed. Keyword arguments without prefix represent the default/normal state
+    of the Button, while keyword arguments prefixed with one of `down_` or
+    `disabled_` represent the respective state.
 
     Args:
         **kwargs: Any keyword argument allowed in

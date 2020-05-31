@@ -37,7 +37,7 @@ class FSM:
     Rudimentary Finite State Machine to organize state changes. If both a
     `enter_[my_class_name]` and `exit_[my_class_name]` are provided in a
     subclass of FSM, it will become a state that can be activated through the
-    :method:`self.request` method. `[my_class_name]` is a snake_case
+    :meth:`self.request` method. `[my_class_name]` is a snake_case
     representation of the name of the subclass. It assumes PascalCase for class
     names (i.e. `MyClass` -> `my_class`). Use
     :func:`~foolysh.tools.common.to_snake_case` with your class name as
@@ -49,7 +49,7 @@ class FSM:
             been previously been activated.
         * The `enter_` method from the requested state gets called.
 
-    .. info::
+    .. note::
         Only provide `enter_` / `exit_` methods for subclasses that should be
         callable states.
     """

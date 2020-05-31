@@ -1,5 +1,5 @@
 """
-Provides the Entry class for building UI components.
+Provides the Entry class for text entry fields.
 """
 
 from typing import Callable, Dict, Optional, Tuple

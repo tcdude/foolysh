@@ -57,7 +57,7 @@ class EventHandler:
             args: optional positional arguments to pass to ``callback``.
             kwargs: optional keyword arguments to pass to ``callback``.
 
-        .. warn::
+        .. warning::
             The `priority` keyword argument, if specified, will be filtered out
             of the keyword arguments that get passed on to your callback!
             Do not use a keyword argument named `priority` in the signature of

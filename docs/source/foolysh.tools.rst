@@ -73,10 +73,10 @@ foolysh.tools.spriteloader module
    :undoc-members:
    :show-inheritance:
 
-foolysh.tools.vector2 module
-----------------------------
+foolysh.tools.vec2 module
+-------------------------
 
-.. automodule:: foolysh.tools.vector2
+.. automodule:: foolysh.tools.vec2
    :members:
    :undoc-members:
    :show-inheritance:

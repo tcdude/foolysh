@@ -20,18 +20,34 @@ foolysh.ui.button module
    :undoc-members:
    :show-inheritance:
 
-foolysh.ui.frame module
------------------------
+foolysh.ui.buttonlist module
+----------------------------
 
-.. automodule:: foolysh.ui.frame
+.. automodule:: foolysh.ui.buttonlist
    :members:
    :undoc-members:
    :show-inheritance:
 
-foolysh.ui.input module
+foolysh.ui.dialogue module
+----------------------------
+
+.. automodule:: foolysh.ui.dialogue
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+foolysh.ui.entry module
 -----------------------
 
-.. automodule:: foolysh.ui.input
+.. automodule:: foolysh.ui.entry
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+foolysh.ui.frame module
+-----------------------
+
+.. automodule:: foolysh.ui.frame
    :members:
    :undoc-members:
    :show-inheritance:

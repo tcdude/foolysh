@@ -53,6 +53,7 @@ class Label(frame.Frame):
         self._margin = margin
 
     def _place_txt_node(self, txt_node: "foolysh.scene.node.TextNode") -> None:
+        # pylint: disable=no-member, unsubscriptable-object
         if txt_node.size != (0, 0):
             x = (-self.size[0] / 2) * (self.origin.value % 3)
             y = (-self.size[1] / 2) * (self.origin.value // 3)

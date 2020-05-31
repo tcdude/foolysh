@@ -53,7 +53,7 @@ class EventType(Enum):
 
 
 @dataclass
-class HandlerState:
+class _HandlerState:
     """The various state variables in UIHandler."""
     text_input_active: bool = False
     current_focus: Optional[int] = None
@@ -82,7 +82,7 @@ class UIHandler:
         self._event_handler = event_handler
         self._nodes: Dict[int, node.Node] = {}
         self._callbacks: CallbackDict = {}
-        self._state: HandlerState = HandlerState()
+        self._state: _HandlerState = _HandlerState()
         self._clock: clock.Clock = clock.Clock()
         self._window: sdl2.ext.Window = None
 
@@ -104,12 +104,12 @@ class UIHandler:
         Only one callback per :class:`EventType` and
         :class:`~foolysh.ui.uinode.UINode` can be registered,
 
-        .. info::
+        .. note::
             For text input events, the keyword argument `text` is injected into
             the kwargs dict, before calling the callback, containing the text
             received in the event.
 
-        .. warn::
+        .. warning::
             Subsequent calls with the same combination, overwrite the current
             callback.
 

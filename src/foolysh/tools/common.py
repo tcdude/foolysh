@@ -61,6 +61,7 @@ class Origin(Enum):
 # Custom Types & Enumerations
 
 COLOR = Union[Tuple[int, int, int], Tuple[int, int, int, int]]
+SCALE = Union[float, Tuple[float, float]]
 
 
 # Helper functions

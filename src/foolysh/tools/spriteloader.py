@@ -20,6 +20,7 @@ from sdl2.ext import SDLError
 
 from . import sdf
 from . import vec2
+from .common import SCALE
 
 __author__ = 'Tiziano Bettio'
 __license__ = 'MIT'
@@ -133,18 +134,18 @@ def parse_sdf_str(sdf_str):
     Parses SDF strings to get SDF type and keyword arguments for the function
     call.
 
-
     Args:
         sdf_str: ``str`` -> SDF strings are formatted as follows:
             "SDF:[sdf_type]:[I/F]:[parameter]=[value]:..." where value will be
             converted to either I=int or F=float, where appropriate. Colors are
             the exception, where always int is presumed in form of a tuple.
-            .. note::
-                SDF string Example:
 
-                ``SDF:circle:I:radius=100:frame_color=(80,120,10):alpha=180``
-                This would produce a circle with a radius of 100 pixel filled
-                with the specified frame_color and alpha values.
+    .. note::
+        SDF string Example:
+
+        ``SDF:circle:I:radius=100:frame_color=(80,120,10):alpha=180``
+        This would produce a circle with a radius of 100 pixel filled
+        with the specified frame_color and alpha values.
 
     Returns:
         ``Tuple[Dict, str]`` -> kwargs as dictionary and the SDF type as string.
@@ -252,8 +253,8 @@ class SpriteLoader:
                 continue
             self._assets[k] = Asset(k, self)
 
-    def load_image(self, asset_path, scale=1.0, res=None, retry=False):
-        # type: (str, Optional[SCALE], Optional[Tuple[int, int]]) -> TextureSprite
+    def load_image(self, asset_path: str, scale: SCALE = 1.0,
+                   res: Tuple[int, int] = None, retry: bool = False):
         """
         Loads asset_path at specified scale or generates (if necessary) a SDF
         if `asset_path` starts with "SDF:" (SDF strings are case sensitive!).

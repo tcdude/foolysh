@@ -39,7 +39,7 @@ SOFTWARE."""
 
 
 @dataclass
-class FrameSDF:
+class _FrameSDF:
     """
     Parameters to build the SDF (except size, which is stored in the Node).
     """
@@ -84,7 +84,7 @@ class Frame(uinode.UINode):
         if size == (0.0, 0.0):
             raise ValueError('Expected size different to 0, 0.')
         super().__init__(name, size, pos, **kwargs)
-        self._frame_sdf: List[FrameSDF] = []
+        self._frame_sdf: List[_FrameSDF] = []
         self._im_node = self.attach_image_node(name + '_Image')
         self._im_node.depth = 0
         self.add_state(frame_color, border_thickness, border_color,
@@ -112,7 +112,7 @@ class Frame(uinode.UINode):
             ``int`` -> the index of the newly added state.
         """
         # pylint: disable=too-many-arguments
-        self._frame_sdf.append(FrameSDF(frame_color, border_color,
+        self._frame_sdf.append(_FrameSDF(frame_color, border_color,
                                         corner_radius, border_thickness,
                                         multi_sampling, alpha))
         return self._im_node.add_image(self._sdfstr(len(self._frame_sdf) - 1))
