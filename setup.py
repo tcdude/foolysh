@@ -61,7 +61,7 @@ if 'ARCH' in os.environ and os.environ['ARCH'].startswith('arm'):
 EXT = '.pyx' if USE_CYTHON else '.cpp'
 EXTENSION = [
     Extension(
-        i[4:-4].replace('/', '.'),
+        i[4:-4].replace('/', '.').replace('\\', '.'),
         [i],
         include_dirs=['ext'],
         extra_compile_args=EXTRA_COMPILE_ARGS,
