@@ -4,19 +4,13 @@
 {
     "distutils": {
         "depends": [],
-        "extra_compile_args": [
-            "-std=c++11"
-        ],
-        "extra_link_args": [
-            "-std=c++11"
-        ],
         "include_dirs": [
             "ext"
         ],
         "language": "c++",
         "name": "foolysh.animation",
         "sources": [
-            "src/foolysh/animation.pyx"
+            "src/foolysh\\animation.pyx"
         ]
     },
     "module_name": "foolysh.animation"
@@ -857,11 +851,11 @@ static const char *__pyx_filename;
 
 
 static const char *__pyx_f[] = {
-  "src/foolysh/animation.pyx",
+  "src\\foolysh\\animation.pyx",
   "stringsource",
-  "src/foolysh/tools/aabb.pxd",
-  "src/foolysh/tools/vec2.pxd",
-  "src/foolysh/scene/node.pxd",
+  "src\\foolysh\\tools\\aabb.pxd",
+  "src\\foolysh\\tools\\vec2.pxd",
+  "src\\foolysh\\scene\\node.pxd",
 };
 
 /*--- Type declarations ---*/
@@ -2059,7 +2053,7 @@ static const char __pyx_k_Could_not_pause_Animation[] = "Could not pause Animati
 static const char __pyx_k_Could_not_resume_Interval[] = "Could not resume Interval";
 static const char __pyx_k_Could_not_resume_Sequence[] = "Could not resume Sequence";
 static const char __pyx_k_set_rotation_center_speed[] = "set_rotation_center_speed";
-static const char __pyx_k_src_foolysh_animation_pyx[] = "src/foolysh/animation.pyx";
+static const char __pyx_k_src_foolysh_animation_pyx[] = "src\\foolysh\\animation.pyx";
 static const char __pyx_k_Could_not_resume_Animation[] = "Could not resume Animation";
 static const char __pyx_k_Enumerations_of_blend_types[] = "Enumerations of blend types.";
 static const char __pyx_k_pyx_unpickle_AnimationManager[] = "__pyx_unpickle_AnimationManager";

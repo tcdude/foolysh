@@ -4,19 +4,13 @@
 {
     "distutils": {
         "depends": [],
-        "extra_compile_args": [
-            "-std=c++11"
-        ],
-        "extra_link_args": [
-            "-std=c++11"
-        ],
         "include_dirs": [
             "ext"
         ],
         "language": "c++",
         "name": "foolysh.tools.quadtree",
         "sources": [
-            "src/foolysh/tools/quadtree.pyx"
+            "src/foolysh\\tools\\quadtree.pyx"
         ]
     },
     "module_name": "foolysh.tools.quadtree"
@@ -855,9 +849,9 @@ static const char *__pyx_filename;
 
 
 static const char *__pyx_f[] = {
-  "src/foolysh/tools/quadtree.pyx",
+  "src\\foolysh\\tools\\quadtree.pyx",
   "stringsource",
-  "src/foolysh/tools/aabb.pxd",
+  "src\\foolysh\\tools\\aabb.pxd",
 };
 
 /*--- Type declarations ---*/

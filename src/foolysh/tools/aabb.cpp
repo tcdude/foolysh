@@ -4,19 +4,13 @@
 {
     "distutils": {
         "depends": [],
-        "extra_compile_args": [
-            "-std=c++11"
-        ],
-        "extra_link_args": [
-            "-std=c++11"
-        ],
         "include_dirs": [
             "ext"
         ],
         "language": "c++",
         "name": "foolysh.tools.aabb",
         "sources": [
-            "src/foolysh/tools/aabb.pyx"
+            "src/foolysh\\tools\\aabb.pyx"
         ]
     },
     "module_name": "foolysh.tools.aabb"
@@ -848,7 +842,7 @@ static const char *__pyx_filename;
 
 static const char *__pyx_f[] = {
   "stringsource",
-  "src/foolysh/tools/aabb.pyx",
+  "src\\foolysh\\tools\\aabb.pyx",
 };
 
 /*--- Type declarations ---*/

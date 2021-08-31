@@ -4,19 +4,13 @@
 {
     "distutils": {
         "depends": [],
-        "extra_compile_args": [
-            "-std=c++11"
-        ],
-        "extra_link_args": [
-            "-std=c++11"
-        ],
         "include_dirs": [
             "ext"
         ],
         "language": "c++",
         "name": "foolysh.scene.node",
         "sources": [
-            "src/foolysh/scene/node.pyx"
+            "src/foolysh\\scene\\node.pyx"
         ]
     },
     "module_name": "foolysh.scene.node"
@@ -856,9 +850,9 @@ static const char *__pyx_filename;
 
 static const char *__pyx_f[] = {
   "stringsource",
-  "src/foolysh/scene/node.pyx",
-  "src/foolysh/tools/aabb.pxd",
-  "src/foolysh/tools/vec2.pxd",
+  "src\\foolysh\\scene\\node.pyx",
+  "src\\foolysh\\tools\\aabb.pxd",
+  "src\\foolysh\\tools\\vec2.pxd",
 };
 
 /*--- Type declarations ---*/
@@ -1923,7 +1917,7 @@ static const char __pyx_k_foolysh_scene_node[] = "foolysh.scene.node";
 static const char __pyx_k_SceneGraphDataHandler[] = "SceneGraphDataHandler";
 static const char __pyx_k_Expected_positive_float[] = "Expected positive float.";
 static const char __pyx_k_Expected_tuple_of_length_2[] = "Expected tuple of length 2.";
-static const char __pyx_k_src_foolysh_scene_node_pyx[] = "src/foolysh/scene/node.pyx";
+static const char __pyx_k_src_foolysh_scene_node_pyx[] = "src\\foolysh\\scene\\node.pyx";
 static const char __pyx_k_Expected_value_in_range_0_255[] = "Expected value in range (0..255).";
 static const char __pyx_k_Copyright_c_2020_Tiziano_Bettio[] = "Copyright (c) 2020 Tiziano Bettio\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.";
 static const char __pyx_k_Cython_wrapper_of_the_C_Node_im[] = "\nCython wrapper of the C++ Node implementation.\n";

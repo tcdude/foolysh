@@ -4,19 +4,13 @@
 {
     "distutils": {
         "depends": [],
-        "extra_compile_args": [
-            "-std=c++11"
-        ],
-        "extra_link_args": [
-            "-std=c++11"
-        ],
         "include_dirs": [
             "ext"
         ],
         "language": "c++",
         "name": "foolysh.tools.vec2",
         "sources": [
-            "src/foolysh/tools/vec2.pyx"
+            "src/foolysh\\tools\\vec2.pyx"
         ]
     },
     "module_name": "foolysh.tools.vec2"
@@ -848,7 +842,7 @@ static const char *__pyx_filename;
 
 
 static const char *__pyx_f[] = {
-  "src/foolysh/tools/vec2.pyx",
+  "src\\foolysh\\tools\\vec2.pyx",
   "stringsource",
 };
 

@@ -4,19 +4,13 @@
 {
     "distutils": {
         "depends": [],
-        "extra_compile_args": [
-            "-std=c++11"
-        ],
-        "extra_link_args": [
-            "-std=c++11"
-        ],
         "include_dirs": [
             "ext"
         ],
         "language": "c++",
         "name": "foolysh.taskmanager",
         "sources": [
-            "src/foolysh/taskmanager.pyx"
+            "src/foolysh\\taskmanager.pyx"
         ]
     },
     "module_name": "foolysh.taskmanager"
@@ -851,7 +845,7 @@ static const char *__pyx_filename;
 
 
 static const char *__pyx_f[] = {
-  "src/foolysh/taskmanager.pyx",
+  "src\\foolysh\\taskmanager.pyx",
   "stringsource",
 };
 
