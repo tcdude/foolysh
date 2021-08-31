@@ -234,7 +234,7 @@ class SpriteLoader:
 
     def _refresh_assets(self):
         paths = pathlib.Path(self.asset_dir).glob('**/*.*')
-        paths = [str(f) for f in paths]
+        paths = [str(f.as_posix()) for f in paths]
         paths = [
             s[s.find(self.asset_dir) + len(self.asset_dir):] for s in paths
         ]
