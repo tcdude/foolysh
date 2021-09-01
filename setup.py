@@ -53,6 +53,7 @@ if platform.system() == 'Linux':
     EXTRA_COMPILE_ARGS.append('-std=c++11')
     EXTRA_LINK_ARGS.append('-std=c++11')
 elif platform.system() == 'Darwin':
+    EXTRA_COMPILE_ARGS.append('-std=c++11')
     EXTRA_LINK_ARGS.append('-stdlib=libc++')
     EXTRA_LINK_ARGS.append('-mmacosx-version-min=10.9')
 
