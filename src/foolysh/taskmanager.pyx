@@ -1,4 +1,5 @@
 # distutils: language = c++
+# cython: language_level=3
 """
 Provides a simplistic Task Manager to execute either every frame or in a
 specified interval.
