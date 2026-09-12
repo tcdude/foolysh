@@ -326,14 +326,22 @@ class SpriteLoader:
         for asset in self._assets.values():
             asset.empty_cache()
 
+    def _multiline_size(self, font, text, spacing=4, stroke_width=0, **kwargs):
+        dummy = Image.new("L", (1, 1))
+        draw = ImageDraw.Draw(dummy)
+        l, t, r, b = draw.multiline_textbbox(
+            (0, 0), text, font=font, spacing=spacing, stroke_width=stroke_width, **kwargs
+        )
+        return r - l, b - t
+
     def _compute_text_size_pos(self, text, font, size, spacing, multiline):
         fnt = self._load_font(font, size)
         if multiline:
-            im_sz = fnt.getsize_multiline(text, spacing=spacing)
+            im_sz = self._multiline_size(fnt, text, spacing=spacing)
             pos = 0, 0
         else:
             left, top, right, bottom = fnt.getmask(text).getbbox()
-            pos = fnt.getbox(text)
+            pos = fnt.getbbox(text)
             pos = -(left + pos[0]), -(top + pos[1])
             im_sz = right - left, bottom - top
         return im_sz, pos
