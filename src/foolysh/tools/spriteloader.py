@@ -333,7 +333,7 @@ class SpriteLoader:
             pos = 0, 0
         else:
             left, top, right, bottom = fnt.getmask(text).getbbox()
-            pos = fnt.getoffset(text)
+            pos = fnt.getbox(text)
             pos = -(left + pos[0]), -(top + pos[1])
             im_sz = right - left, bottom - top
         return im_sz, pos
