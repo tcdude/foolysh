@@ -7,6 +7,9 @@ from typing import Optional
 
 from PIL import Image
 
+# Pillow 9.1+ deprecates Image.BICUBIC in favour of Image.Resampling.BICUBIC.
+BICUBIC = getattr(getattr(Image, 'Resampling', Image), 'BICUBIC')
+
 __author__ = 'Tiziano Bettio'
 __license__ = 'MIT'
 __version__ = '0.1'
@@ -41,5 +44,5 @@ def cache_image(fpath, scale, cache_dir, suffix=None):
     if suffix is not None:
         out_path += suffix
     if not os.path.isfile(out_path):
-        img.resize((out_x, out_y), Image.BICUBIC).save(out_path)
+        img.resize((out_x, out_y), BICUBIC).save(out_path)
     return out_path

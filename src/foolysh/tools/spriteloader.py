@@ -21,6 +21,7 @@ from sdl2.ext import SDLError
 from . import sdf
 from . import vec2
 from .common import SCALE
+from .image import BICUBIC
 
 __author__ = 'Tiziano Bettio'
 __license__ = 'MIT'
@@ -214,7 +215,7 @@ class SpriteLoader:
             factory,                    # type: SpriteFactory
             asset_dir,                  # type: str
             cache_dir=None,             # type: Optional[str]
-            resize_type=Image.BICUBIC   # type: Optional[int]
+            resize_type=BICUBIC         # type: Optional[int]
     ):
         # type: (...) -> None
         if not isinstance(factory, SpriteFactory):

@@ -1,0 +1,7 @@
+include VERSION
+include LICENSE
+include README.md
+include pyproject.toml
+recursive-include ext *.hpp *.cpp *.md *.png
+recursive-include src *.pyx *.pxd *.png *.cpp
+recursive-include p4a-recipe *

@@ -208,7 +208,7 @@ cdef class Node:
         """
         self._reparent_to(parent)
 
-    cdef void _reparent_to(self, Node parent) except +:
+    cdef void _reparent_to(self, Node parent) except *:
         deref(self.thisptr).reparent_to(deref(parent.thisptr))
 
     def traverse(self):
@@ -238,7 +238,7 @@ cdef class Node:
         """
         return self._query(aabb, depth_sorted)
 
-    cdef list _query(self, AABB aabb, bint depth_sorted) except +:
+    cdef list _query(self, AABB aabb, bint depth_sorted):
         cdef SmallList[size_t] r = deref(self.thisptr).query(
             deref(aabb.thisptr),
             depth_sorted

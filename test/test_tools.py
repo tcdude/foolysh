@@ -48,13 +48,13 @@ def test_vector_math():
     assert 1 - v_b == vec2.Vec2()
     assert v_b.length == math.sqrt(2)
     assert v_b.magnitude == 2
-    assert pytest.approx(v_b.normalized().length) == 1
+    assert v_b.normalized().length == pytest.approx(1)
     v_rot = v_b.rotated(90)
-    assert pytest.approx(v_rot.x, 1)
-    assert pytest.approx(v_rot.y, -1)
+    assert v_rot.x == pytest.approx(1)
+    assert v_rot.y == pytest.approx(-1)
     v_rot = v_b.rotated(-90)
-    assert pytest.approx(v_rot.x, -1)
-    assert pytest.approx(v_rot.y, 1)
+    assert v_rot.x == pytest.approx(-1)
+    assert v_rot.y == pytest.approx(1)
     assert v_a.normalize() is False
     assert v_b.dot(v_b) == 2
 
@@ -100,8 +100,8 @@ def test_clock():
     time.sleep(0.1)
     clk.tick()
     stop = time.perf_counter()
-    assert pytest.approx(clk.get_dt(), stop - start)
+    assert clk.get_dt() == pytest.approx(stop - start, rel=0.25, abs=0.02)
     time.sleep(0.1)
     clk.tick()
     stop = time.perf_counter()
-    assert pytest.approx(clk.get_time(), stop - start)
+    assert clk.get_time() == pytest.approx(stop - start, rel=0.25, abs=0.02)

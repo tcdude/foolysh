@@ -18,6 +18,8 @@ from libcpp cimport bool
 import traceback
 import warnings
 
+cdef callback _cb_ptr
+
 __author__ = 'Tiziano Bettio'
 __license__ = 'MIT'
 __version__ = '0.1'
@@ -144,8 +146,7 @@ cdef class TaskManager:
 
     def __cinit__(self, *args, **kwargs):
         self.thisptr.reset(new _TaskManager())
-        cdef callback _cb = <callback> self._run_callback
-        deref(self.thisptr).set_callback(_cb)
+        deref(self.thisptr).set_callback(_cb_ptr)
         self._tasks = {}
         self._remove = []
 
@@ -310,3 +311,17 @@ cdef class TaskManager:
 
     def __str__(self):
         return self.__repr__()
+
+
+cdef void _c_run_callback(void* pyobj, const string name, const double dt,
+                          const bool with_dt) noexcept:
+    """C-level trampoline from C++ into the TaskManager instance."""
+    cdef TaskManager tm
+    try:
+        tm = <TaskManager> pyobj
+        tm._run_callback(name, dt, with_dt)
+    except Exception:
+        pass
+
+
+_cb_ptr = _c_run_callback

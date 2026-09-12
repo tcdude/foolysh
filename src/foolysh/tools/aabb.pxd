@@ -13,4 +13,4 @@ cdef class AABB:
     cdef bint _overlap(self, AABB other)
     cdef _AABB _split(self, Quadrant q)
     cdef _AABB _split_point(self, double x, double y, Quadrant q)
-    cdef public _AABB aabb(self)
+    cdef _AABB aabb(self)

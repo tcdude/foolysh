@@ -35,7 +35,7 @@ cdef class Vec2:
     cdef unique_ptr[_Vec2] thisptr
 
     cdef double _dot(self, Vec2 other)
-    cdef Vec2 _normalized(self) except +
+    cdef Vec2 _normalized(self)
     cpdef void rotate(self, double a, bint radians=*)
     cpdef Vec2 rotated(self, double a, bint radians=*)
     cpdef Vec2 _add(self, Vec2 other)
@@ -52,4 +52,4 @@ cdef class Vec2:
     cpdef bint _eq_scalar(self, double other)
     cpdef bint _ne(self, Vec2 other)
     cpdef bint _ne_scalar(self, double other)
-    cdef public _Vec2 vec2(self)
+    cdef _Vec2 vec2(self)

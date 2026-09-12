@@ -10,6 +10,8 @@ from typing import Union
 from PIL import Image
 import numpy as np
 
+from .image import BICUBIC
+
 __author__ = 'Tiziano Bettio'
 __license__ = 'MIT'
 __version__ = '0.1'
@@ -105,7 +107,7 @@ def framed_box_im(width: int, height: int, corner_radius: Optional[int] = 0,
         frame = box(*sdf_res, corner_radius)
         img = sdf2image(frame, frame_color, alpha)
         if multi_sampling > 1:
-            return img.resize(target_res, Image.BICUBIC)
+            return img.resize(target_res, BICUBIC)
         return img
 
     border_thickness = (border_thickness or (max(sdf_res) // 100))
@@ -126,7 +128,7 @@ def framed_box_im(width: int, height: int, corner_radius: Optional[int] = 0,
     img.paste(frame_im, (half_thickness // 2, half_thickness // 2), frame_im)
     img.alpha_composite(border_im)
     if multi_sampling > 1:
-        return img.resize(target_res, Image.BICUBIC)
+        return img.resize(target_res, BICUBIC)
     return img
 
 
@@ -235,7 +237,7 @@ def framed_circle_im(radius: int, border_thickness: Optional[int] = None,
         frame = circle(radius * multi_sampling)
         img = sdf2image(frame, frame_color, alpha)
         if multi_sampling > 1:
-            return img.resize(target_res, Image.BICUBIC)
+            return img.resize(target_res, BICUBIC)
         return img
 
     border_thickness = (border_thickness or (radius // 50)) * multi_sampling
@@ -251,7 +253,7 @@ def framed_circle_im(radius: int, border_thickness: Optional[int] = None,
     img.paste(frame_im, (half_t, half_t), frame_im)
     img.alpha_composite(border_im)
     if multi_sampling > 1:
-        return img.resize(target_res, Image.BICUBIC)
+        return img.resize(target_res, BICUBIC)
     return img
 
 

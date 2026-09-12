@@ -63,12 +63,14 @@ def test_node_nesting():
         child.pos = 0.1, 0.1
         child.size = 1.0, 1.0
     assert nd.traverse() is True
-    assert pytest.approx(child.relative_pos.x, 100.0)
-    assert pytest.approx(child.relative_pos.y, 100.0)
+    assert child.relative_pos.x == pytest.approx(100.0, abs=1e-4)
+    assert child.relative_pos.y == pytest.approx(100.0, abs=1e-4)
     nd.angle = 90
     assert nd.traverse() is True
-    assert pytest.approx(child.relative_pos.x, 100.0)
-    assert pytest.approx(child.relative_pos.y, -100.0)
+    # Default rotation center is the node size midpoint, so a 90° rotation of
+    # the (100, 100) stacked offset becomes (-400, 600).
+    assert child.relative_pos.x == pytest.approx(-400.0, abs=1e-4)
+    assert child.relative_pos.y == pytest.approx(600.0, abs=1e-4)
 
 
 def test_node_query():

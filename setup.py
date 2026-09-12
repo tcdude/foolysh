@@ -5,8 +5,9 @@ import sys
 import glob
 import platform
 from setuptools import setup
+from setuptools import Extension
 from setuptools import find_namespace_packages
-from distutils.extension import Extension  # pylint: disable=wrong-import-order
+
 try:
     from Cython.Build import cythonize
     USE_CYTHON = True
@@ -40,8 +41,11 @@ SOFTWARE.
 
 if '--no-cython' in sys.argv:
     USE_CYTHON = False
+    sys.argv.remove('--no-cython')
 
-with open(os.path.join(os.path.dirname(__file__), 'VERSION'), 'r') as f:
+ROOT = os.path.dirname(os.path.abspath(__file__))
+
+with open(os.path.join(ROOT, 'VERSION'), 'r', encoding='utf-8') as f:
     VERSION = f.read().strip()
 
 
@@ -63,27 +67,42 @@ if 'ARCH' in os.environ and os.environ['ARCH'].startswith('arm'):
     LIBRARIES.append('c++_shared')
 
 EXT = '.pyx' if USE_CYTHON else '.cpp'
+PATTERN = os.path.join('src', 'foolysh', '**', '*' + EXT)
+
+
+def _module_name(path):
+    """Turn a source path under src/ into a dotted module name."""
+    rel = os.path.relpath(path, 'src').replace('\\', '/')
+    if rel.endswith(EXT):
+        rel = rel[:-len(EXT)]
+    return rel.replace('/', '.')
+
+
 EXTENSION = [
     Extension(
-        i[4:-4].replace('/', '.').replace('\\', '.'),
-        [i],
-        include_dirs=['ext'],
+        _module_name(i),
+        [i.replace('\\', '/')],
+        include_dirs=[os.path.join(ROOT, 'ext')],
         extra_compile_args=EXTRA_COMPILE_ARGS,
         extra_link_args=EXTRA_LINK_ARGS,
         language='c++',
-        libraries=LIBRARIES
+        libraries=LIBRARIES,
     )
-    for i in glob.glob('src/foolysh/**/*' + EXT, recursive=True)
+    for i in glob.glob(PATTERN, recursive=True)
 ]
 
 
 def ext_modules():
     """Optionally cythonize."""
     if USE_CYTHON:
-        return cythonize(EXTENSION,
-                         compiler_directives={'language_level': 3,
-                                              'embedsignature': True},
-                         annotate=False)
+        return cythonize(
+            EXTENSION,
+            compiler_directives={
+                'language_level': 3,
+                'embedsignature': True,
+            },
+            annotate=False,
+        )
     return EXTENSION
 
 
@@ -93,10 +112,17 @@ setup(
     description='A 2D Rendering Engine, nobody asked for or needed.',
     author='Tiziano Bettio',
     author_email='tizilogic@gmail.com',
+    python_requires='>=3.9',
     packages=find_namespace_packages(where='src'),
     package_dir={'': 'src'},
-    package_data={'': ['LICENSE.md',],
-                  'foolysh': ['assets/*.png']},
-    install_requires=['plyer', 'Pillow', 'PySDL2>=0.9.6', 'numpy>=1.18'],
+    package_data={'foolysh': ['assets/*.png']},
+    include_package_data=True,
+    zip_safe=False,
+    install_requires=[
+        'plyer>=2.1.0',
+        'Pillow>=9.1.0',
+        'PySDL2>=0.9.16',
+        'numpy>=2.2.0',
+    ],
     ext_modules=ext_modules(),
 )
