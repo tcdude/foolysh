@@ -3,7 +3,7 @@ Provides the App class to handle everything related to execution of an App.
 """
 
 import ctypes
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import os
 import shutil
 import time
@@ -109,7 +109,7 @@ class AppStats:
     # pylint: disable=too-many-instance-attributes
     clock: clock.Clock
     window_title: str
-    mouse_pos: vec2.Point2 = vec2.Point2()
+    mouse_pos: vec2.Point2 = field(default_factory=vec2.Point2)
     mouse_down: Optional[vec2.Point2] = None
     mouse_up: Optional[vec2.Point2] = None
     enter_down: bool = False
