@@ -282,7 +282,7 @@ class HWRenderer(sdl2.ext.TextureSpriteRenderSystem):
 
     @view_pos.setter
     def view_pos(self, value):
-        # type: (vec2.Vec2)
+        # type: (vec2.Vec2) -> None
         if not isinstance(value, vec2.Vec2):
             raise TypeError
         if self._view_pos != value:
